@@ -1,4 +1,4 @@
-[gd_scene load_steps=12 format=3 uid="uid://df49m12q08003"]
+[gd_scene format=3 uid="uid://df5am12q08003"]
 
 [ext_resource type="Script" path="res://scripts/mesa_ensamblaje.gd" id="1_script"]
 

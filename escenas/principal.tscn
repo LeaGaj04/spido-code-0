@@ -1,4 +1,4 @@
-[gd_scene load_steps=9 format=3 uid="uid://cxq62g0k1m005"]
+[gd_scene load_steps=12 format=3 uid="uid://cxq62g0k1m005"]
 
 [ext_resource type="Script" path="res://scripts/controlador_principal.gd" id="1_script"]
 [ext_resource type="PackedScene" uid="uid://df24k8b6lm001" path="res://escenas/bloque_item.tscn" id="2_bloque"]
@@ -17,12 +17,25 @@ corner_radius_top_right = 8
 corner_radius_bottom_right = 8
 corner_radius_bottom_left = 8
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_BarraMision"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_BarraNivel"]
 bg_color = Color(0.07, 0.10, 0.12, 0.95)
 border_width_bottom = 2
 border_color = Color(0.13, 0.77, 0.45, 1)
 corner_radius_top_left = 6
 corner_radius_top_right = 6
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_CajaADA"]
+bg_color = Color(0.08, 0.13, 0.12, 0.90)
+border_width_left = 3
+border_color = Color(0.20, 0.85, 0.50, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+expand_margin_left = 6.0
+expand_margin_top = 4.0
+expand_margin_right = 6.0
+expand_margin_bottom = 4.0
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_BtnEjecutar"]
 bg_color = Color(0.13, 0.77, 0.45, 1)
@@ -47,6 +60,20 @@ corner_radius_top_left = 8
 corner_radius_top_right = 8
 corner_radius_bottom_right = 8
 corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_Modal"]
+bg_color = Color(0.08, 0.12, 0.14, 0.98)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.35, 0.95, 0.60, 1)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+shadow_color = Color(0, 0, 0, 0.6)
+shadow_size = 16
 
 [node name="Principal" type="Control"]
 layout_mode = 3
@@ -93,14 +120,14 @@ theme_override_constants/separation = 10
 layout_mode = 2
 theme_override_colors/font_color = Color(0.35, 0.95, 0.60, 1)
 theme_override_font_sizes/font_size = 15
-text = "🛠️ COMANDOS DE MONTAJE"
+text = "🛠️ BLOQUES DISPONIBLES"
 horizontal_alignment = 1
 
 [node name="Subtitulo" type="Label" parent="HSplit/PanelIzquierdo/VBox"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.70, 0.78, 0.82, 1)
 theme_override_font_sizes/font_size = 12
-text = "Arrastra hacia el lienzo"
+text = "Desbloqueados para este nivel"
 horizontal_alignment = 1
 
 [node name="Separador" type="HSeparator" parent="HSplit/PanelIzquierdo/VBox"]
@@ -120,30 +147,63 @@ layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 8
 
-[node name="BarraMision" type="PanelContainer" parent="HSplit/PanelCentral"]
-custom_minimum_size = Vector2(0, 42)
+[node name="BarraNivel" type="PanelContainer" parent="HSplit/PanelCentral"]
+custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_BarraMision")
+theme_override_styles/panel = SubResource("StyleBoxFlat_BarraNivel")
 
-[node name="HBox" type="HBoxContainer" parent="HSplit/PanelCentral/BarraMision"]
+[node name="HBox" type="HBoxContainer" parent="HSplit/PanelCentral/BarraNivel"]
 layout_mode = 2
-theme_override_constants/separation = 16
+theme_override_constants/separation = 12
 
-[node name="LabelMision" type="Label" parent="HSplit/PanelCentral/BarraMision/HBox"]
+[node name="BtnNivelPrev" type="Button" parent="HSplit/PanelCentral/BarraNivel/HBox"]
+custom_minimum_size = Vector2(36, 0)
+layout_mode = 2
+text = "◀"
+
+[node name="LabelNivelTitulo" type="Label" parent="HSplit/PanelCentral/BarraNivel/HBox"]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_colors/font_color = Color(0.92, 0.96, 0.98, 1)
 theme_override_font_sizes/font_size = 14
-text = "  🚀 MISIÓN 01: Ensamblar a Spid en el banco de pruebas"
+text = "🎯 Nivel 1: Primeros Pasos"
 vertical_alignment = 1
 
-[node name="LabelProgreso" type="Label" parent="HSplit/PanelCentral/BarraMision/HBox"]
+[node name="BtnNivelNext" type="Button" parent="HSplit/PanelCentral/BarraNivel/HBox"]
+custom_minimum_size = Vector2(36, 0)
+layout_mode = 2
+text = "▶"
+
+[node name="CajaADA" type="VBoxContainer" parent="HSplit/PanelCentral"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="PanelADA" type="PanelContainer" parent="HSplit/PanelCentral/CajaADA"]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_CajaADA")
+
+[node name="HBox" type="HBoxContainer" parent="HSplit/PanelCentral/CajaADA/PanelADA"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="IconoADA" type="Label" parent="HSplit/PanelCentral/CajaADA/PanelADA/HBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "🤖"
+
+[node name="LabelADATexto" type="Label" parent="HSplit/PanelCentral/CajaADA/PanelADA/HBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.85, 0.94, 0.90, 1)
+theme_override_font_sizes/font_size = 13
+text = "Instrucción didáctica de A.D.A."
+autowrap_mode = 3
+
+[node name="LabelConcepto" type="Label" parent="HSplit/PanelCentral/CajaADA"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.35, 0.95, 0.60, 1)
-theme_override_font_sizes/font_size = 14
-text = "Ensamblaje: [0/3] piezas  "
-horizontal_alignment = 2
-vertical_alignment = 1
+theme_override_font_sizes/font_size = 12
+text = "💡 Concepto: Secuencia lineal"
 
 [node name="SubViewportContainer" type="SubViewportContainer" parent="HSplit/PanelCentral"]
 layout_mode = 2
@@ -233,6 +293,64 @@ size_flags_vertical = 6
 theme_override_colors/font_color = Color(0.40, 0.52, 0.50, 1)
 theme_override_font_sizes/font_size = 13
 text = "Arrastra y suelta aquí
-tus bloques de construcción"
+tus bloques de código"
 horizontal_alignment = 1
 vertical_alignment = 1
+
+[node name="ModalVictoria" type="PanelContainer" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -200.0
+offset_top = -140.0
+offset_right = 200.0
+offset_bottom = 140.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_Modal")
+
+[node name="VBox" type="VBoxContainer" parent="ModalVictoria"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="LabelTitulo" type="Label" parent="ModalVictoria/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.35, 0.95, 0.60, 1)
+theme_override_font_sizes/font_size = 20
+text = "🎉 ¡MISIÓN CUMPLIDA!"
+horizontal_alignment = 1
+
+[node name="LabelEstrellas" type="Label" parent="ModalVictoria/VBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 32
+text = "⭐ ⭐ ⭐"
+horizontal_alignment = 1
+
+[node name="LabelDetalle" type="Label" parent="ModalVictoria/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.85, 0.92, 0.95, 1)
+theme_override_font_sizes/font_size = 13
+text = "Detalle del aprendizaje..."
+horizontal_alignment = 1
+
+[node name="Separador" type="HSeparator" parent="ModalVictoria/VBox"]
+layout_mode = 2
+
+[node name="HBox" type="HBoxContainer" parent="ModalVictoria/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="BtnModalReintentar" type="Button" parent="ModalVictoria/VBox/HBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "↺ Reintentar"
+
+[node name="BtnModalSiguiente" type="Button" parent="ModalVictoria/VBox/HBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/normal = SubResource("StyleBoxFlat_BtnEjecutar")
+text = "Siguiente Misión ▶"

@@ -33,6 +33,18 @@ func _ready() -> void:
 	grid_x = grid_x_inicial
 	grid_z = grid_z_inicial
 
+func configurar_inicio(pos_grid: Vector2i, ori: int) -> void:
+	grid_x_inicial = pos_grid.x
+	grid_z_inicial = pos_grid.y
+	grid_x = grid_x_inicial
+	grid_z = grid_z_inicial
+	orientacion_actual = ori
+	posicion_inicial = Vector3(grid_x * tamano_celda, position.y, grid_z * tamano_celda)
+	rotacion_inicial = Vector3(0, -deg_to_rad(ori * 90.0), 0)
+	position = posicion_inicial
+	rotation = rotacion_inicial
+
+
 func reiniciar() -> void:
 	if is_instance_valid(pieza_en_mano):
 		pieza_en_mano.reparent(get_parent())

@@ -1,9 +1,10 @@
-[gd_scene load_steps=10 format=3 uid="uid://c83prmwd89004"]
+[gd_scene load_steps=11 format=3 uid="uid://c83prmwd89004"]
 
 [ext_resource type="Script" path="res://scripts/mundo_3d.gd" id="1_script"]
 [ext_resource type="PackedScene" uid="uid://b23f890as1001" path="res://escenas/astronauta_ingeniero.tscn" id="2_astronauta"]
 [ext_resource type="PackedScene" uid="uid://df49m12q08003" path="res://escenas/mesa_ensamblaje.tscn" id="3_mesa"]
 [ext_resource type="PackedScene" uid="uid://c7m902kj12002" path="res://escenas/pieza_taller.tscn" id="4_pieza"]
+[ext_resource type="PackedScene" uid="uid://dm0k19la35004" path="res://escenas/baliza_meta.tscn" id="5_baliza"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSky_1"]
 sky_top_color = Color(0.12, 0.16, 0.20, 1)
@@ -34,6 +35,7 @@ size = Vector2(24, 24)
 
 [node name="Mundo3D" type="Node3D"]
 script = ExtResource("1_script")
+escena_pieza = ExtResource("4_pieza")
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = SubResource("Environment_1")
@@ -55,22 +57,10 @@ mesh = SubResource("MeshSuelo")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -4)
 celda_mesa = Vector2i(0, -2)
 
+[node name="BalizaMeta" parent="." instance=ExtResource("5_baliza")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.05, -2)
+
 [node name="Astronauta" parent="." instance=ExtResource("2_astronauta")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 2)
 
 [node name="ContenedorPiezas" type="Node3D" parent="."]
-
-[node name="PiezaChasis" parent="ContenedorPiezas" instance=ExtResource("4_pieza")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 0.4, 0)
-tipo_pieza = "CHASIS"
-celda_inicial = Vector2i(-2, 0)
-
-[node name="PiezaRuedas" parent="ContenedorPiezas" instance=ExtResource("4_pieza")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0.4, 0)
-tipo_pieza = "RUEDAS"
-celda_inicial = Vector2i(2, 0)
-
-[node name="PiezaSensor" parent="ContenedorPiezas" instance=ExtResource("4_pieza")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 0.4, -4)
-tipo_pieza = "SENSOR"
-celda_inicial = Vector2i(-2, -2)
