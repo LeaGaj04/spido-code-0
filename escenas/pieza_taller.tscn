@@ -1,0 +1,47 @@
+[gd_scene load_steps=7 format=3 uid="uid://c7m902kj12002"]
+
+[ext_resource type="Script" path="res://scripts/pieza_taller.gd" id="1_script"]
+
+[sub_resource type="StandardMaterial3D" id="MatPedestal"]
+albedo_color = Color(0.18, 0.22, 0.28, 1)
+roughness = 0.8
+
+[sub_resource type="CylinderMesh" id="MeshPedestal"]
+material = SubResource("MatPedestal")
+top_radius = 0.45
+bottom_radius = 0.50
+height = 0.25
+
+[sub_resource type="StandardMaterial3D" id="MatPiezaVerde"]
+albedo_color = Color(0.12, 0.72, 0.42, 1)
+roughness = 0.3
+emission_enabled = true
+emission = Color(0.12, 0.72, 0.42, 1)
+emission_energy_multiplier = 0.8
+
+[sub_resource type="BoxMesh" id="MeshCuboPieza"]
+material = SubResource("MatPiezaVerde")
+size = Vector3(0.5, 0.5, 0.5)
+
+[sub_resource type="StandardMaterial3D" id="MatDetalleGris"]
+albedo_color = Color(0.7, 0.75, 0.8, 1)
+metallic = 0.4
+
+[sub_resource type="CylinderMesh" id="MeshDetalle"]
+material = SubResource("MatDetalleGris")
+top_radius = 0.18
+bottom_radius = 0.18
+height = 0.55
+
+[node name="PiezaTaller" type="Node3D"]
+script = ExtResource("1_script")
+
+[node name="Pedestal" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.25, 0)
+mesh = SubResource("MeshPedestal")
+
+[node name="MallaPieza" type="MeshInstance3D" parent="."]
+mesh = SubResource("MeshCuboPieza")
+
+[node name="Detalle" type="MeshInstance3D" parent="MallaPieza"]
+mesh = SubResource("MeshDetalle")

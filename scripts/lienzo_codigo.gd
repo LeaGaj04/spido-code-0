@@ -9,7 +9,7 @@ signal algoritmo_modificado
 @onready var label_vacio: Label = $Scroll/ContenedorBloques/LabelVacio
 
 func _ready() -> void:
-	custom_minimum_size = Vector2(240, 200)
+	custom_minimum_size = Vector2(250, 200)
 	_actualizar_estado_vacio()
 
 func _can_drop_data(_at_position: Vector2, data: Variant) -> bool:
@@ -22,7 +22,6 @@ func _drop_data(at_position: Vector2, data: Variant) -> void:
 	var idx_destino = _calcular_indice_insercion(at_position.y)
 
 	if data.get("es_de_paleta", false):
-		# Proviene de la paleta: clonar e insertar
 		var nuevo_bloque: BloqueItem
 		if escena_bloque:
 			nuevo_bloque = escena_bloque.instantiate() as BloqueItem
@@ -32,8 +31,8 @@ func _drop_data(at_position: Vector2, data: Variant) -> void:
 		nuevo_bloque.configurar(
 			data.get("id_comando", "AVANZAR"),
 			data.get("titulo", "Comando"),
-			data.get("icono", "▶️"),
-			data.get("color", Color.DODGER_BLUE),
+			data.get("icono", "▶"),
+			data.get("color_borde", Color(0.13, 0.77, 0.45)),
 			false
 		)
 		nuevo_bloque.solicitado_eliminar.connect(_on_bloque_solicitado_eliminar)
@@ -41,7 +40,6 @@ func _drop_data(at_position: Vector2, data: Variant) -> void:
 		contenedor_bloques.add_child(nuevo_bloque)
 		contenedor_bloques.move_child(nuevo_bloque, idx_destino)
 	else:
-		# Ya está en el lienzo: reordenar
 		var nodo_origen = data.get("nodo_origen")
 		if is_instance_valid(nodo_origen) and nodo_origen.get_parent() == contenedor_bloques:
 			contenedor_bloques.move_child(nodo_origen, idx_destino)
@@ -75,7 +73,6 @@ func limpiar_todo() -> void:
 
 func _on_bloque_solicitado_eliminar(bloque: BloqueItem) -> void:
 	bloque.queue_free()
-	# Esperar al siguiente frame para actualizar estado vacío
 	await get_tree().process_frame
 	_actualizar_estado_vacio()
 	algoritmo_modificado.emit()

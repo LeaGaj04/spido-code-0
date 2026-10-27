@@ -1,24 +1,48 @@
-[gd_scene load_steps=7 format=3 uid="uid://cxq62g0k1m005"]
+[gd_scene load_steps=9 format=3 uid="uid://cxq62g0k1m005"]
 
 [ext_resource type="Script" path="res://scripts/controlador_principal.gd" id="1_script"]
 [ext_resource type="PackedScene" uid="uid://df24k8b6lm001" path="res://escenas/bloque_item.tscn" id="2_bloque"]
 [ext_resource type="PackedScene" uid="uid://c83prmwd89004" path="res://escenas/mundo_3d.tscn" id="3_mundo"]
 [ext_resource type="Script" path="res://scripts/lienzo_codigo.gd" id="4_lienzo"]
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_Panel"]
-bg_color = Color(0.08, 0.1, 0.14, 0.95)
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_PanelGris"]
+bg_color = Color(0.09, 0.12, 0.15, 0.95)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.18, 0.28, 0.24, 1)
 corner_radius_top_left = 8
 corner_radius_top_right = 8
 corner_radius_bottom_right = 8
 corner_radius_bottom_left = 8
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_BarraMision"]
+bg_color = Color(0.07, 0.10, 0.12, 0.95)
+border_width_bottom = 2
+border_color = Color(0.13, 0.77, 0.45, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_BtnEjecutar"]
+bg_color = Color(0.13, 0.77, 0.45, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 2
+border_color = Color(0.35, 0.95, 0.60, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_Lienzo"]
-bg_color = Color(0.05, 0.07, 0.1, 0.8)
+bg_color = Color(0.06, 0.08, 0.10, 0.95)
 border_width_left = 2
 border_width_top = 2
 border_width_right = 2
 border_width_bottom = 2
-border_color = Color(0.2, 0.28, 0.4, 1)
+border_color = Color(0.15, 0.50, 0.32, 1)
 corner_radius_top_left = 8
 corner_radius_top_right = 8
 corner_radius_bottom_right = 8
@@ -41,7 +65,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-color = Color(0.06, 0.07, 0.09, 1)
+color = Color(0.05, 0.07, 0.09, 1)
 
 [node name="HSplit" type="HBoxContainer" parent="."]
 layout_mode = 1
@@ -57,9 +81,9 @@ grow_vertical = 2
 theme_override_constants/separation = 12
 
 [node name="PanelIzquierdo" type="PanelContainer" parent="HSplit"]
-custom_minimum_size = Vector2(240, 0)
+custom_minimum_size = Vector2(250, 0)
 layout_mode = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_Panel")
+theme_override_styles/panel = SubResource("StyleBoxFlat_PanelGris")
 
 [node name="VBox" type="VBoxContainer" parent="HSplit/PanelIzquierdo"]
 layout_mode = 2
@@ -67,13 +91,14 @@ theme_override_constants/separation = 10
 
 [node name="Titulo" type="Label" parent="HSplit/PanelIzquierdo/VBox"]
 layout_mode = 2
+theme_override_colors/font_color = Color(0.35, 0.95, 0.60, 1)
 theme_override_font_sizes/font_size = 15
-text = "🛠️ PALETA DE BLOQUES"
+text = "🛠️ COMANDOS DE MONTAJE"
 horizontal_alignment = 1
 
 [node name="Subtitulo" type="Label" parent="HSplit/PanelIzquierdo/VBox"]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.65, 0.7, 0.8, 1)
+theme_override_colors/font_color = Color(0.70, 0.78, 0.82, 1)
 theme_override_font_sizes/font_size = 12
 text = "Arrastra hacia el lienzo"
 horizontal_alignment = 1
@@ -95,6 +120,31 @@ layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 8
 
+[node name="BarraMision" type="PanelContainer" parent="HSplit/PanelCentral"]
+custom_minimum_size = Vector2(0, 42)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_BarraMision")
+
+[node name="HBox" type="HBoxContainer" parent="HSplit/PanelCentral/BarraMision"]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="LabelMision" type="Label" parent="HSplit/PanelCentral/BarraMision/HBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.92, 0.96, 0.98, 1)
+theme_override_font_sizes/font_size = 14
+text = "  🚀 MISIÓN 01: Ensamblar a Spid en el banco de pruebas"
+vertical_alignment = 1
+
+[node name="LabelProgreso" type="Label" parent="HSplit/PanelCentral/BarraMision/HBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.35, 0.95, 0.60, 1)
+theme_override_font_sizes/font_size = 14
+text = "Ensamblaje: [0/3] piezas  "
+horizontal_alignment = 2
+vertical_alignment = 1
+
 [node name="SubViewportContainer" type="SubViewportContainer" parent="HSplit/PanelCentral"]
 layout_mode = 2
 size_flags_vertical = 3
@@ -110,20 +160,20 @@ render_target_update_mode = 4
 [node name="BarraEstado" type="PanelContainer" parent="HSplit/PanelCentral"]
 custom_minimum_size = Vector2(0, 36)
 layout_mode = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_Panel")
+theme_override_styles/panel = SubResource("StyleBoxFlat_PanelGris")
 
 [node name="LabelEstado" type="Label" parent="HSplit/PanelCentral/BarraEstado"]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.9, 0.95, 1, 1)
+theme_override_colors/font_color = Color(0.85, 0.92, 0.95, 1)
 theme_override_font_sizes/font_size = 13
-text = "Listo para programar."
+text = "Astronauta listo en el hangar de montaje."
 horizontal_alignment = 1
 vertical_alignment = 1
 
 [node name="PanelDerecho" type="PanelContainer" parent="HSplit"]
-custom_minimum_size = Vector2(280, 0)
+custom_minimum_size = Vector2(290, 0)
 layout_mode = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_Panel")
+theme_override_styles/panel = SubResource("StyleBoxFlat_PanelGris")
 
 [node name="VBox" type="VBoxContainer" parent="HSplit/PanelDerecho"]
 layout_mode = 2
@@ -131,8 +181,9 @@ theme_override_constants/separation = 10
 
 [node name="Titulo" type="Label" parent="HSplit/PanelDerecho/VBox"]
 layout_mode = 2
+theme_override_colors/font_color = Color(0.35, 0.95, 0.60, 1)
 theme_override_font_sizes/font_size = 15
-text = "📋 LIENZO DE CÓDIGO"
+text = "📋 PROTOCOLO DE CONSTRUCCIÓN"
 horizontal_alignment = 1
 
 [node name="BarraBotones" type="HBoxContainer" parent="HSplit/PanelDerecho/VBox"]
@@ -142,6 +193,7 @@ theme_override_constants/separation = 6
 [node name="BtnEjecutar" type="Button" parent="HSplit/PanelDerecho/VBox/BarraBotones"]
 layout_mode = 2
 size_flags_horizontal = 3
+theme_override_styles/normal = SubResource("StyleBoxFlat_BtnEjecutar")
 text = "▶ Ejecutar"
 
 [node name="BtnPaso" type="Button" parent="HSplit/PanelDerecho/VBox/BarraBotones"]
@@ -178,9 +230,9 @@ theme_override_constants/separation = 6
 [node name="LabelVacio" type="Label" parent="HSplit/PanelDerecho/VBox/LienzoCodigo/Scroll/ContenedorBloques"]
 layout_mode = 2
 size_flags_vertical = 6
-theme_override_colors/font_color = Color(0.45, 0.55, 0.65, 1)
+theme_override_colors/font_color = Color(0.40, 0.52, 0.50, 1)
 theme_override_font_sizes/font_size = 13
 text = "Arrastra y suelta aquí
-tus bloques de código"
+tus bloques de construcción"
 horizontal_alignment = 1
 vertical_alignment = 1
