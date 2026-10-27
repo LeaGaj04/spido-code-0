@@ -6,28 +6,30 @@
 [ext_resource type="Script" path="res://scripts/lienzo_codigo.gd" id="4_lienzo"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_PanelGris"]
-bg_color = Color(0.09, 0.12, 0.15, 0.95)
+bg_color = Color(0, 0.0666667, 0, 0.760784)
 border_width_left = 1
 border_width_top = 1
 border_width_right = 1
 border_width_bottom = 1
-border_color = Color(0.18, 0.28, 0.24, 1)
+border_color = Color(0.372549, 0.592157, 0.419608, 0.95)
 corner_radius_top_left = 8
 corner_radius_top_right = 8
 corner_radius_bottom_right = 8
 corner_radius_bottom_left = 8
+shadow_color = Color(0.00392157, 0.0901961, 0.0117647, 0.65098)
+shadow_size = 4
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_BarraNivel"]
-bg_color = Color(0.07, 0.10, 0.12, 0.95)
+bg_color = Color(0.005, 0.055, 0.02, 0.96)
 border_width_bottom = 2
-border_color = Color(0.13, 0.77, 0.45, 1)
+border_color = Color(0.372549, 0.592157, 0.419608, 0.95)
 corner_radius_top_left = 6
 corner_radius_top_right = 6
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_CajaADA"]
-bg_color = Color(0.08, 0.13, 0.12, 0.90)
+bg_color = Color(0, 0.04, 0.012, 0.85)
 border_width_left = 3
-border_color = Color(0.20, 0.85, 0.50, 1)
+border_color = Color(0.48, 0.76, 0.54, 1)
 corner_radius_top_left = 4
 corner_radius_top_right = 4
 corner_radius_bottom_right = 4
@@ -38,41 +40,43 @@ expand_margin_right = 6.0
 expand_margin_bottom = 4.0
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_BtnEjecutar"]
-bg_color = Color(0.13, 0.77, 0.45, 1)
+bg_color = Color(0.015, 0.12, 0.025, 0.92)
 border_width_left = 1
 border_width_top = 1
 border_width_right = 1
 border_width_bottom = 2
-border_color = Color(0.35, 0.95, 0.60, 1)
+border_color = Color(0.48, 0.76, 0.54, 1)
 corner_radius_top_left = 6
 corner_radius_top_right = 6
 corner_radius_bottom_right = 6
 corner_radius_bottom_left = 6
+shadow_color = Color(0.00392157, 0.0901961, 0.0117647, 0.65098)
+shadow_size = 3
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_Lienzo"]
-bg_color = Color(0.06, 0.08, 0.10, 0.95)
+bg_color = Color(0.082, 0.102, 0.098, 0.98)
 border_width_left = 2
 border_width_top = 2
 border_width_right = 2
 border_width_bottom = 2
-border_color = Color(0.15, 0.50, 0.32, 1)
+border_color = Color(0.372549, 0.592157, 0.419608, 0.85)
 corner_radius_top_left = 8
 corner_radius_top_right = 8
 corner_radius_bottom_right = 8
 corner_radius_bottom_left = 8
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_Modal"]
-bg_color = Color(0.08, 0.12, 0.14, 0.98)
+bg_color = Color(0.005, 0.055, 0.02, 0.98)
 border_width_left = 2
 border_width_top = 2
 border_width_right = 2
 border_width_bottom = 2
-border_color = Color(0.35, 0.95, 0.60, 1)
+border_color = Color(0.48, 0.76, 0.54, 1)
 corner_radius_top_left = 12
 corner_radius_top_right = 12
 corner_radius_bottom_right = 12
 corner_radius_bottom_left = 12
-shadow_color = Color(0, 0, 0, 0.6)
+shadow_color = Color(0.00392157, 0.0901961, 0.0117647, 0.85)
 shadow_size = 16
 
 [node name="Principal" type="Control"]
@@ -92,7 +96,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-color = Color(0.05, 0.07, 0.09, 1)
+color = Color(0.01, 0.03, 0.015, 1)
 
 [node name="HSplit" type="HBoxContainer" parent="."]
 layout_mode = 1
@@ -118,14 +122,14 @@ theme_override_constants/separation = 10
 
 [node name="Titulo" type="Label" parent="HSplit/PanelIzquierdo/VBox"]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.35, 0.95, 0.60, 1)
+theme_override_colors/font_color = Color(0.760784, 0.937255, 0.776471, 1)
 theme_override_font_sizes/font_size = 15
 text = "BLOQUES DISPONIBLES"
 horizontal_alignment = 1
 
 [node name="Subtitulo" type="Label" parent="HSplit/PanelIzquierdo/VBox"]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.70, 0.78, 0.82, 1)
+theme_override_colors/font_color = Color(0.58, 0.58, 0.61, 1)
 theme_override_font_sizes/font_size = 12
 text = "Desbloqueados para este nivel"
 horizontal_alignment = 1
@@ -161,13 +165,14 @@ theme_override_constants/separation = 12
 unique_name_in_owner = true
 custom_minimum_size = Vector2(36, 0)
 layout_mode = 2
+theme_override_colors/font_color = Color(0.760784, 0.937255, 0.776471, 1)
 text = "<"
 
 [node name="LabelNivelTitulo" type="Label" parent="HSplit/PanelCentral/BarraNivel/HBox"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_colors/font_color = Color(0.92, 0.96, 0.98, 1)
+theme_override_colors/font_color = Color(0.760784, 0.937255, 0.776471, 1)
 theme_override_font_sizes/font_size = 14
 text = "[NIVEL 1] Primeros Pasos"
 vertical_alignment = 1
@@ -176,6 +181,7 @@ vertical_alignment = 1
 unique_name_in_owner = true
 custom_minimum_size = Vector2(36, 0)
 layout_mode = 2
+theme_override_colors/font_color = Color(0.760784, 0.937255, 0.776471, 1)
 text = ">"
 
 [node name="CajaADA" type="VBoxContainer" parent="HSplit/PanelCentral"]
@@ -192,7 +198,7 @@ theme_override_constants/separation = 8
 
 [node name="IconoADA" type="Label" parent="HSplit/PanelCentral/CajaADA/PanelADA/HBox"]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.35, 0.95, 0.60, 1)
+theme_override_colors/font_color = Color(0.48, 0.76, 0.54, 1)
 theme_override_font_sizes/font_size = 13
 text = "[A.D.A.]"
 
@@ -200,7 +206,7 @@ text = "[A.D.A.]"
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_colors/font_color = Color(0.85, 0.94, 0.90, 1)
+theme_override_colors/font_color = Color(0.760784, 0.937255, 0.776471, 1)
 theme_override_font_sizes/font_size = 13
 text = "Instruccion didactica de A.D.A."
 autowrap_mode = 3
@@ -208,7 +214,7 @@ autowrap_mode = 3
 [node name="LabelConcepto" type="Label" parent="HSplit/PanelCentral/CajaADA"]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_colors/font_color = Color(0.35, 0.95, 0.60, 1)
+theme_override_colors/font_color = Color(0.48, 0.76, 0.54, 1)
 theme_override_font_sizes/font_size = 12
 text = "Concepto: Secuencia lineal"
 
@@ -233,7 +239,7 @@ theme_override_styles/panel = SubResource("StyleBoxFlat_PanelGris")
 [node name="LabelEstado" type="Label" parent="HSplit/PanelCentral/BarraEstado"]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_colors/font_color = Color(0.85, 0.92, 0.95, 1)
+theme_override_colors/font_color = Color(0.760784, 0.937255, 0.776471, 1)
 theme_override_font_sizes/font_size = 13
 text = "Astronauta listo en el hangar de montaje."
 horizontal_alignment = 1
@@ -250,7 +256,7 @@ theme_override_constants/separation = 10
 
 [node name="Titulo" type="Label" parent="HSplit/PanelDerecho/VBox"]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.35, 0.95, 0.60, 1)
+theme_override_colors/font_color = Color(0.760784, 0.937255, 0.776471, 1)
 theme_override_font_sizes/font_size = 15
 text = "PROTOCOLO DE CONSTRUCCION"
 horizontal_alignment = 1
@@ -263,22 +269,26 @@ theme_override_constants/separation = 6
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.9, 1, 0.9, 1)
 theme_override_styles/normal = SubResource("StyleBoxFlat_BtnEjecutar")
 text = "Ejecutar"
 
 [node name="BtnPaso" type="Button" parent="HSplit/PanelDerecho/VBox/BarraBotones"]
 unique_name_in_owner = true
 layout_mode = 2
+theme_override_colors/font_color = Color(0.760784, 0.937255, 0.776471, 1)
 text = "Paso"
 
 [node name="BtnReiniciar" type="Button" parent="HSplit/PanelDerecho/VBox/BarraBotones"]
 unique_name_in_owner = true
 layout_mode = 2
+theme_override_colors/font_color = Color(0.760784, 0.937255, 0.776471, 1)
 text = "Reset"
 
 [node name="BtnLimpiar" type="Button" parent="HSplit/PanelDerecho/VBox/BarraBotones"]
 unique_name_in_owner = true
 layout_mode = 2
+theme_override_colors/font_color = Color(0.760784, 0.937255, 0.776471, 1)
 text = "Limpiar"
 
 [node name="Separador" type="HSeparator" parent="HSplit/PanelDerecho/VBox"]
@@ -304,7 +314,7 @@ theme_override_constants/separation = 6
 [node name="LabelVacio" type="Label" parent="HSplit/PanelDerecho/VBox/LienzoCodigo/Scroll/ContenedorBloques"]
 layout_mode = 2
 size_flags_vertical = 6
-theme_override_colors/font_color = Color(0.40, 0.52, 0.50, 1)
+theme_override_colors/font_color = Color(0.58, 0.58, 0.61, 1)
 theme_override_font_sizes/font_size = 13
 text = "Arrastra y suelta aqui
 tus bloques de codigo"
@@ -334,7 +344,7 @@ theme_override_constants/separation = 12
 
 [node name="LabelTitulo" type="Label" parent="ModalVictoria/VBox"]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.35, 0.95, 0.60, 1)
+theme_override_colors/font_color = Color(0.48, 0.76, 0.54, 1)
 theme_override_font_sizes/font_size = 20
 text = "[!] MISION CUMPLIDA"
 horizontal_alignment = 1
@@ -342,6 +352,7 @@ horizontal_alignment = 1
 [node name="LabelEstrellas" type="Label" parent="ModalVictoria/VBox"]
 unique_name_in_owner = true
 layout_mode = 2
+theme_override_colors/font_color = Color(0.760784, 0.937255, 0.776471, 1)
 theme_override_font_sizes/font_size = 22
 text = "[*] [*] [*]"
 horizontal_alignment = 1
@@ -349,7 +360,7 @@ horizontal_alignment = 1
 [node name="LabelDetalle" type="Label" parent="ModalVictoria/VBox"]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_colors/font_color = Color(0.85, 0.92, 0.95, 1)
+theme_override_colors/font_color = Color(0.760784, 0.937255, 0.776471, 1)
 theme_override_font_sizes/font_size = 13
 text = "Detalle del aprendizaje..."
 horizontal_alignment = 1
@@ -365,11 +376,13 @@ theme_override_constants/separation = 12
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.760784, 0.937255, 0.776471, 1)
 text = "Reintentar"
 
 [node name="BtnModalSiguiente" type="Button" parent="ModalVictoria/VBox/HBox"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.9, 1, 0.9, 1)
 theme_override_styles/normal = SubResource("StyleBoxFlat_BtnEjecutar")
 text = "Siguiente Mision"

@@ -15,7 +15,7 @@ theme_override_constants/separation = 8
 
 [node name="Prefijo" type="Label" parent="HBox"]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.35, 0.95, 0.60, 1)
+theme_override_colors/font_color = Color(0.48, 0.76, 0.54, 1)
 text = "[AVZ]"
 horizontal_alignment = 1
 vertical_alignment = 1
@@ -23,11 +23,14 @@ vertical_alignment = 1
 [node name="Titulo" type="Label" parent="HBox"]
 layout_mode = 2
 size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.760784, 0.937255, 0.776471, 1)
 text = "Avanzar 1 Paso"
 vertical_alignment = 1
 
 [node name="BtnEliminar" type="Button" parent="HBox"]
 custom_minimum_size = Vector2(28, 28)
 layout_mode = 2
+theme_override_colors/font_color = Color(0.58, 0.58, 0.61, 1)
+theme_override_colors/font_hover_color = Color(0.9, 1, 0.9, 1)
 text = "X"
 flat = true

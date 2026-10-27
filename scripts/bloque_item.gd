@@ -6,7 +6,7 @@ signal solicitado_eliminar(bloque: BloqueItem)
 @export var id_comando: String = "AVANZAR"
 @export var titulo: String = "Avanzar 1 Paso"
 @export var prefijo: String = "[AVZ]"
-@export var color_borde: Color = Color(0.13, 0.77, 0.45)
+@export var color_borde: Color = Color(0.372549, 0.592157, 0.419608, 0.95)
 @export var es_de_paleta: bool = false
 
 @onready var label_prefijo: Label = $HBox/Prefijo
@@ -38,14 +38,16 @@ func configurar(p_id: String, p_titulo: String, p_prefijo: String, p_color_borde
 func actualizar_vista() -> void:
 	if is_instance_valid(label_prefijo):
 		label_prefijo.text = prefijo
+		label_prefijo.modulate = color_borde
 	if is_instance_valid(label_titulo):
 		label_titulo.text = titulo
 	if is_instance_valid(btn_eliminar):
 		btn_eliminar.visible = not es_de_paleta
 
 func _configurar_estilos() -> void:
+	# Base de color gris grafito de SpidoCode (Color(0.082, 0.102, 0.098, 0.98))
 	style_box_normal = StyleBoxFlat.new()
-	style_box_normal.bg_color = Color(0.11, 0.14, 0.18, 0.95)
+	style_box_normal.bg_color = Color(0.082, 0.102, 0.098, 0.98)
 	style_box_normal.set_corner_radius_all(6)
 	style_box_normal.set_content_margin_all(8)
 	style_box_normal.border_width_left = 4
@@ -53,10 +55,13 @@ func _configurar_estilos() -> void:
 	style_box_normal.border_width_right = 1
 	style_box_normal.border_width_bottom = 1
 	style_box_normal.border_color = color_borde
+	style_box_normal.shadow_color = Color(0.00392, 0.0902, 0.01176, 0.65)
+	style_box_normal.shadow_size = 2
 
+	# Estado activo con el verde hover de SpidoCode
 	style_box_activo = style_box_normal.duplicate()
-	style_box_activo.bg_color = Color(0.14, 0.22, 0.20, 1.0)
-	style_box_activo.border_color = Color(0.35, 1.0, 0.6)
+	style_box_activo.bg_color = Color(0.015, 0.12, 0.025, 0.95)
+	style_box_activo.border_color = Color(0.48, 0.76, 0.54, 1.0)
 	style_box_activo.border_width_left = 6
 	style_box_activo.border_width_top = 2
 	style_box_activo.border_width_right = 2
@@ -84,9 +89,10 @@ func _get_drag_data(_at_position: Vector2) -> Variant:
 	var hbox = HBoxContainer.new()
 	var l_pref = Label.new()
 	l_pref.text = prefijo
+	l_pref.modulate = color_borde
 	var l_tit = Label.new()
 	l_tit.text = titulo
-	l_tit.modulate = Color(0.95, 0.98, 1.0)
+	l_tit.modulate = Color(0.760784, 0.937255, 0.776471, 1.0)
 	hbox.add_child(l_pref)
 	hbox.add_child(l_tit)
 	preview.add_child(hbox)

@@ -1,22 +1,22 @@
-[gd_scene format=3 uid="uid://c7na02kj12002"]
+[gd_scene load_steps=7 format=3 uid="uid://c7na02kj12002"]
 
 [ext_resource type="Script" path="res://scripts/pieza_taller.gd" id="1_script"]
 
 [sub_resource type="StandardMaterial3D" id="MatPedestal"]
-albedo_color = Color(0.18, 0.22, 0.28, 1)
+albedo_color = Color(0.11, 0.11, 0.12, 1)
 roughness = 0.8
 
 [sub_resource type="CylinderMesh" id="MeshPedestal"]
 material = SubResource("MatPedestal")
 top_radius = 0.45
-bottom_radius = 0.50
+bottom_radius = 0.5
 height = 0.25
 
 [sub_resource type="StandardMaterial3D" id="MatPiezaVerde"]
-albedo_color = Color(0.12, 0.72, 0.42, 1)
+albedo_color = Color(0.15, 0.45, 0.3, 1)
 roughness = 0.3
 emission_enabled = true
-emission = Color(0.12, 0.72, 0.42, 1)
+emission = Color(0.372549, 0.592157, 0.419608, 1)
 emission_energy_multiplier = 0.8
 
 [sub_resource type="BoxMesh" id="MeshCuboPieza"]
@@ -24,7 +24,7 @@ material = SubResource("MatPiezaVerde")
 size = Vector3(0.5, 0.5, 0.5)
 
 [sub_resource type="StandardMaterial3D" id="MatDetalleGris"]
-albedo_color = Color(0.7, 0.75, 0.8, 1)
+albedo_color = Color(0.58, 0.58, 0.61, 1)
 metallic = 0.4
 
 [sub_resource type="CylinderMesh" id="MeshDetalle"]

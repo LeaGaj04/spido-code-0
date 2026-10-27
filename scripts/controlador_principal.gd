@@ -36,14 +36,14 @@ var en_ejecucion: bool = false
 var indice_paso_actual: int = 0
 var errores_durante_ejecucion: int = 0
 
-# Diccionario maestro de comandos didacticos (sin emojis)
+# Paleta exacta SpidoCode (Verdes y Grises oficiales)
 const COMANDOS_DISPONIBLES = {
-	"AVANZAR": {"tit": "Avanzar 1 Paso", "prefijo": "[AVZ]", "color": Color(0.13, 0.77, 0.45)},
-	"RETROCEDER": {"tit": "Retroceder 1 Paso", "prefijo": "[RET]", "color": Color(0.55, 0.62, 0.70)},
-	"GIRAR_DER": {"tit": "Girar Derecha 90", "prefijo": "[DER]", "color": Color(0.20, 0.82, 0.60)},
-	"GIRAR_IZQ": {"tit": "Girar Izquierda 90", "prefijo": "[IZQ]", "color": Color(0.20, 0.82, 0.60)},
-	"TOMAR_PIEZA": {"tit": "Tomar Pieza", "prefijo": "[TOM]", "color": Color(0.18, 0.85, 0.35)},
-	"ENSAMBLAR": {"tit": "Ensamblar en Spid", "prefijo": "[ENS]", "color": Color(0.30, 0.95, 0.50)}
+	"AVANZAR": {"tit": "Avanzar 1 Paso", "prefijo": "[AVZ]", "color": Color(0.372549, 0.592157, 0.419608, 1.0)},
+	"RETROCEDER": {"tit": "Retroceder 1 Paso", "prefijo": "[RET]", "color": Color(0.58, 0.58, 0.61, 1.0)},
+	"GIRAR_DER": {"tit": "Girar Derecha 90", "prefijo": "[DER]", "color": Color(0.48, 0.76, 0.54, 1.0)},
+	"GIRAR_IZQ": {"tit": "Girar Izquierda 90", "prefijo": "[IZQ]", "color": Color(0.48, 0.76, 0.54, 1.0)},
+	"TOMAR_PIEZA": {"tit": "Tomar Pieza", "prefijo": "[TOM]", "color": Color(0.30, 0.95, 0.60, 1.0)},
+	"ENSAMBLAR": {"tit": "Ensamblar en Spid", "prefijo": "[ENS]", "color": Color(0.38, 1.0, 0.60, 1.0)}
 }
 
 func _ready() -> void:
@@ -59,7 +59,7 @@ func cargar_nivel(indice: int) -> void:
 	indice_nivel_actual = indice
 	var nivel = niveles[indice_nivel_actual]
 
-	# Actualizar cabecera didactica
+	# Actualizar cabecera didactica con tipografia y colores de SpidoCode
 	label_nivel_titulo.text = "[NIVEL %d] %s - %s" % [nivel.id, nivel.titulo, nivel.subtitulo]
 	label_ada_texto.text = nivel.instruccion
 	label_concepto.text = "Concepto: %s" % nivel.concepto_clave
