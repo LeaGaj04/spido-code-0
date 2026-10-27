@@ -3,8 +3,8 @@
 [ext_resource type="Script" path="res://scripts/bloque_item.gd" id="1_script"]
 
 [node name="BloqueItem" type="PanelContainer"]
-custom_minimum_size = Vector2(190, 44)
-offset_right = 190.0
+custom_minimum_size = Vector2(200, 44)
+offset_right = 200.0
 offset_bottom = 44.0
 mouse_filter = 0
 script = ExtResource("1_script")
@@ -13,9 +13,10 @@ script = ExtResource("1_script")
 layout_mode = 2
 theme_override_constants/separation = 8
 
-[node name="Icono" type="Label" parent="HBox"]
+[node name="Prefijo" type="Label" parent="HBox"]
 layout_mode = 2
-text = "⬆️"
+theme_override_colors/font_color = Color(0.35, 0.95, 0.60, 1)
+text = "[AVZ]"
 horizontal_alignment = 1
 vertical_alignment = 1
 
@@ -28,5 +29,5 @@ vertical_alignment = 1
 [node name="BtnEliminar" type="Button" parent="HBox"]
 custom_minimum_size = Vector2(28, 28)
 layout_mode = 2
-text = "✕"
+text = "X"
 flat = true

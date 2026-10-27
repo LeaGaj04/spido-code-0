@@ -44,7 +44,6 @@ func configurar_inicio(pos_grid: Vector2i, ori: int) -> void:
 	position = posicion_inicial
 	rotation = rotacion_inicial
 
-
 func reiniciar() -> void:
 	if is_instance_valid(pieza_en_mano):
 		pieza_en_mano.reparent(get_parent())
@@ -60,7 +59,7 @@ func reiniciar() -> void:
 	grid_x = grid_x_inicial
 	grid_z = grid_z_inicial
 	orientacion_actual = 0
-	_set_color_visor(Color(0.13, 0.77, 0.45)) # Verde esmeralda normal
+	_set_color_visor(Color(0.13, 0.77, 0.45))
 
 func ejecutar_accion(accion: String) -> bool:
 	match accion:
@@ -87,17 +86,15 @@ func avanzar() -> bool:
 	var nueva_x = grid_x + delta.x
 	var nueva_z = grid_z + delta.y
 
-	# Límites del taller (-4 a 4)
 	if abs(nueva_x) > 4 or abs(nueva_z) > 4:
 		await _animar_choque()
-		accion_fallida.emit("¡El astronauta alcanzó la pared del taller!")
+		accion_fallida.emit("El astronauta alcanzo el limite de la zona.")
 		return false
 
-	# Verificar si hay una mesa de trabajo u obstáculo enfrente
 	var mundo = get_parent()
 	if mundo and mundo.has_method("es_celda_solida") and mundo.es_celda_solida(Vector2i(nueva_x, nueva_z)):
 		await _animar_choque()
-		accion_fallida.emit("¡Hay una estación de trabajo enfrente! No puedes caminar sobre ella.")
+		accion_fallida.emit("Hay una estacion de trabajo enfrente. No puedes caminar sobre ella.")
 		return false
 
 	grid_x = nueva_x
@@ -108,12 +105,10 @@ func avanzar() -> bool:
 	tween.tween_property(self, "position:x", destino.x, tiempo_movimiento).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 	tween.tween_property(self, "position:z", destino.z, tiempo_movimiento).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 
-	# Bamboleo al caminar (paso de astronauta)
 	var tween_bob = create_tween()
 	tween_bob.tween_property(self, "position:y", position.y + 0.18, tiempo_movimiento * 0.5).set_trans(Tween.TRANS_SINE)
 	tween_bob.tween_property(self, "position:y", position.y, tiempo_movimiento * 0.5).set_trans(Tween.TRANS_SINE)
 
-	# Balanceo lateral de hombros
 	var tween_roll = create_tween()
 	tween_roll.tween_property(self, "rotation:z", deg_to_rad(4.0), tiempo_movimiento * 0.5)
 	tween_roll.tween_property(self, "rotation:z", 0.0, tiempo_movimiento * 0.5)
@@ -129,13 +124,13 @@ func retroceder() -> bool:
 
 	if abs(nueva_x) > 4 or abs(nueva_z) > 4:
 		await _animar_choque()
-		accion_fallida.emit("¡Límite del taller alcanzado!")
+		accion_fallida.emit("Limite del taller alcanzado.")
 		return false
 
 	var mundo = get_parent()
 	if mundo and mundo.has_method("es_celda_solida") and mundo.es_celda_solida(Vector2i(nueva_x, nueva_z)):
 		await _animar_choque()
-		accion_fallida.emit("¡Obstáculo a espaldas del astronauta!")
+		accion_fallida.emit("Obstaculo a espaldas del astronauta.")
 		return false
 
 	grid_x = nueva_x
@@ -163,7 +158,7 @@ func girar(hacia_izquierda: bool) -> bool:
 
 func tomar_pieza_cercana() -> bool:
 	if is_instance_valid(pieza_en_mano):
-		accion_fallida.emit("¡El astronauta ya tiene una pieza en sus manos!")
+		accion_fallida.emit("El astronauta ya lleva una pieza en sus manos.")
 		await _animar_duda()
 		return false
 
@@ -183,18 +178,18 @@ func tomar_pieza_cercana() -> bool:
 		pieza.reparent(slot_manos)
 		pieza.position = Vector3.ZERO
 		pieza.rotation = Vector3.ZERO
-		_set_color_visor(Color(0.2, 1.0, 0.5)) # Verde brillante
+		_set_color_visor(Color(0.2, 1.0, 0.5))
 		pieza_recogida.emit(pieza.name)
 		animacion_terminada.emit()
 		return true
 	else:
-		accion_fallida.emit("No hay ninguna pieza frente al astronauta para recoger.")
+		accion_fallida.emit("No hay ninguna pieza frente al astronauta.")
 		await _animar_duda()
 		return false
 
 func ensamblar_en_mesa() -> bool:
 	if not is_instance_valid(pieza_en_mano):
-		accion_fallida.emit("¡No tienes ninguna pieza en las manos para ensamblar!")
+		accion_fallida.emit("No tienes ninguna pieza en las manos para ensamblar.")
 		await _animar_duda()
 		return false
 
@@ -213,7 +208,6 @@ func ensamblar_en_mesa() -> bool:
 			pieza_en_mano.queue_free()
 			pieza_en_mano = null
 			_set_color_visor(Color(0.3, 1.0, 0.6))
-			# Pequeña animación de ajuste con herramienta
 			var tween = create_tween()
 			tween.tween_property(self, "position:y", position.y + 0.1, 0.1)
 			tween.tween_property(self, "position:y", position.y, 0.1)
@@ -222,11 +216,11 @@ func ensamblar_en_mesa() -> bool:
 			animacion_terminada.emit()
 			return true
 		else:
-			accion_fallida.emit("La mesa no requiere esta pieza en esta etapa de montaje.")
+			accion_fallida.emit("La mesa requiere otra pieza en esta etapa.")
 			await _animar_duda()
 			return false
 	else:
-		accion_fallida.emit("No estás frente a la mesa de ensamblaje de Spid.")
+		accion_fallida.emit("No estas frente a la mesa de ensamblaje de Spid.")
 		await _animar_duda()
 		return false
 
@@ -241,7 +235,7 @@ func ejecutar_diagnostico() -> bool:
 	if mesa:
 		return await mesa.probar_sistemas()
 	else:
-		accion_fallida.emit("Apunta el escáner hacia la mesa de Spid para diagnosticar.")
+		accion_fallida.emit("Apunta hacia la mesa de Spid para diagnosticar.")
 		await _animar_duda()
 		return false
 
@@ -254,7 +248,7 @@ func _obtener_vector_orientacion(ori: int) -> Vector2i:
 		_: return Vector2i.ZERO
 
 func _animar_choque() -> void:
-	_set_color_visor(Color(0.8, 0.3, 0.2)) # Alerta tenue
+	_set_color_visor(Color(0.8, 0.3, 0.2))
 	var tween = create_tween()
 	var pos_curr = position
 	var avance_leve = _obtener_vector_orientacion(orientacion_actual)

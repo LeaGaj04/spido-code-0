@@ -31,7 +31,7 @@ func _drop_data(at_position: Vector2, data: Variant) -> void:
 		nuevo_bloque.configurar(
 			data.get("id_comando", "AVANZAR"),
 			data.get("titulo", "Comando"),
-			data.get("icono", "▶"),
+			data.get("prefijo", "[CMD]"),
 			data.get("color_borde", Color(0.13, 0.77, 0.45)),
 			false
 		)

@@ -3,31 +3,31 @@ extends Control
 
 @export var escena_bloque: PackedScene
 
-# Contenedores UI
-@onready var paleta_contenedor: VBoxContainer = $HSplit/PanelIzquierdo/VBox/PaletaScroll/ListaBloques
-@onready var lienzo: LienzoCodigo = $HSplit/PanelDerecho/VBox/LienzoCodigo
-@onready var mundo_3d: Mundo3D = $HSplit/PanelCentral/SubViewportContainer/SubViewport/Mundo3D
+# Contenedores UI con Scene Unique Nodes (%)
+@onready var paleta_contenedor: VBoxContainer = %ListaBloques
+@onready var lienzo: LienzoCodigo = %LienzoCodigo
+@onready var mundo_3d: Mundo3D = %Mundo3D
 
-# Elementos Didácticos
-@onready var label_nivel_titulo: Label = $HSplit/PanelCentral/BarraNivel/HBox/LabelNivelTitulo
-@onready var btn_nivel_prev: Button = $HSplit/PanelCentral/BarraNivel/HBox/BtnNivelPrev
-@onready var btn_nivel_next: Button = $HSplit/PanelCentral/BarraNivel/HBox/BtnNivelNext
-@onready var label_ada_texto: Label = $HSplit/PanelCentral/CajaADA/HBox/LabelADATexto
-@onready var label_concepto: Label = $HSplit/PanelCentral/CajaADA/LabelConcepto
-@onready var label_estado: Label = $HSplit/PanelCentral/BarraEstado/LabelEstado
+# Elementos Didacticos
+@onready var label_nivel_titulo: Label = %LabelNivelTitulo
+@onready var btn_nivel_prev: Button = %BtnNivelPrev
+@onready var btn_nivel_next: Button = %BtnNivelNext
+@onready var label_ada_texto: Label = %LabelADATexto
+@onready var label_concepto: Label = %LabelConcepto
+@onready var label_estado: Label = %LabelEstado
 
-# Botones de Ejecución
-@onready var btn_ejecutar: Button = $HSplit/PanelDerecho/VBox/BarraBotones/BtnEjecutar
-@onready var btn_paso: Button = $HSplit/PanelDerecho/VBox/BarraBotones/BtnPaso
-@onready var btn_reiniciar: Button = $HSplit/PanelDerecho/VBox/BarraBotones/BtnReiniciar
-@onready var btn_limpiar: Button = $HSplit/PanelDerecho/VBox/BarraBotones/BtnLimpiar
+# Botones de Ejecucion
+@onready var btn_ejecutar: Button = %BtnEjecutar
+@onready var btn_paso: Button = %BtnPaso
+@onready var btn_reiniciar: Button = %BtnReiniciar
+@onready var btn_limpiar: Button = %BtnLimpiar
 
 # Popup / Modal de Victoria
-@onready var panel_victoria: PanelContainer = $ModalVictoria
-@onready var label_estrellas: Label = $ModalVictoria/VBox/LabelEstrellas
-@onready var label_victoria_detalle: Label = $ModalVictoria/VBox/LabelDetalle
-@onready var btn_modal_siguiente: Button = $ModalVictoria/VBox/HBox/BtnModalSiguiente
-@onready var btn_modal_reintentar: Button = $ModalVictoria/VBox/HBox/BtnModalReintentar
+@onready var panel_victoria: PanelContainer = %ModalVictoria
+@onready var label_estrellas: Label = %LabelEstrellas
+@onready var label_victoria_detalle: Label = %LabelDetalle
+@onready var btn_modal_siguiente: Button = %BtnModalSiguiente
+@onready var btn_modal_reintentar: Button = %BtnModalReintentar
 
 var niveles: Array[Dictionary] = []
 var indice_nivel_actual: int = 0
@@ -36,14 +36,14 @@ var en_ejecucion: bool = false
 var indice_paso_actual: int = 0
 var errores_durante_ejecucion: int = 0
 
-# Diccionario maestro de comandos didácticos
+# Diccionario maestro de comandos didacticos (sin emojis)
 const COMANDOS_DISPONIBLES = {
-	"AVANZAR": {"tit": "Avanzar 1 Paso", "ico": "🚶", "color": Color(0.13, 0.77, 0.45)},
-	"RETROCEDER": {"tit": "Retroceder 1 Paso", "ico": "🔙", "color": Color(0.55, 0.62, 0.70)},
-	"GIRAR_DER": {"tit": "Girar Derecha 90°", "ico": "↷", "color": Color(0.20, 0.82, 0.60)},
-	"GIRAR_IZQ": {"tit": "Girar Izquierda 90°", "ico": "↶", "color": Color(0.20, 0.82, 0.60)},
-	"TOMAR_PIEZA": {"tit": "Tomar Pieza", "ico": "✋", "color": Color(0.18, 0.85, 0.35)},
-	"ENSAMBLAR": {"tit": "Ensamblar en Spid", "ico": "🔧", "color": Color(0.30, 0.95, 0.50)}
+	"AVANZAR": {"tit": "Avanzar 1 Paso", "prefijo": "[AVZ]", "color": Color(0.13, 0.77, 0.45)},
+	"RETROCEDER": {"tit": "Retroceder 1 Paso", "prefijo": "[RET]", "color": Color(0.55, 0.62, 0.70)},
+	"GIRAR_DER": {"tit": "Girar Derecha 90", "prefijo": "[DER]", "color": Color(0.20, 0.82, 0.60)},
+	"GIRAR_IZQ": {"tit": "Girar Izquierda 90", "prefijo": "[IZQ]", "color": Color(0.20, 0.82, 0.60)},
+	"TOMAR_PIEZA": {"tit": "Tomar Pieza", "prefijo": "[TOM]", "color": Color(0.18, 0.85, 0.35)},
+	"ENSAMBLAR": {"tit": "Ensamblar en Spid", "prefijo": "[ENS]", "color": Color(0.30, 0.95, 0.50)}
 }
 
 func _ready() -> void:
@@ -59,10 +59,10 @@ func cargar_nivel(indice: int) -> void:
 	indice_nivel_actual = indice
 	var nivel = niveles[indice_nivel_actual]
 
-	# Actualizar cabecera didáctica
-	label_nivel_titulo.text = "🎯 %s - %s" % [nivel.titulo, nivel.subtitulo]
+	# Actualizar cabecera didactica
+	label_nivel_titulo.text = "[NIVEL %d] %s - %s" % [nivel.id, nivel.titulo, nivel.subtitulo]
 	label_ada_texto.text = nivel.instruccion
-	label_concepto.text = "💡 Concepto: %s" % nivel.concepto_clave
+	label_concepto.text = "Concepto: %s" % nivel.concepto_clave
 
 	btn_nivel_prev.disabled = (indice_nivel_actual == 0)
 	btn_nivel_next.disabled = (indice_nivel_actual == niveles.size() - 1)
@@ -93,7 +93,7 @@ func _actualizar_paleta(bloques_permitidos: Array) -> void:
 			else:
 				bloque = BloqueItem.new()
 
-			bloque.configurar(id_cmd, data.tit, data.ico, data.color, true)
+			bloque.configurar(id_cmd, data.tit, data.prefijo, data.color, true)
 			paleta_contenedor.add_child(bloque)
 
 func _conectar_senales() -> void:
@@ -118,7 +118,7 @@ func _on_ejecutar_pressed() -> void:
 	if en_ejecucion: return
 	var secuencia = lienzo.obtener_secuencia_comandos()
 	if secuencia.is_empty():
-		_actualizar_estado("El lienzo está vacío. Arrastra al menos un bloque.")
+		_actualizar_estado("El lienzo esta vacio. Arrastra al menos un bloque.")
 		return
 
 	en_ejecucion = true
@@ -146,7 +146,7 @@ func _on_ejecutar_pressed() -> void:
 	en_ejecucion = false
 	_bloquear_interfaz(false)
 
-	# Evaluar si se cumplió la meta
+	# Evaluar si se cumplio la meta
 	await get_tree().create_timer(0.2).timeout
 	_evaluar_resultado_nivel(secuencia.size(), abortado)
 
@@ -155,28 +155,28 @@ func _evaluar_resultado_nivel(cant_bloques: int, abortado: bool) -> void:
 	var cumplido = mundo_3d.verificar_objetivo_completado()
 
 	if cumplido:
-		var estrellas = 1 # Por completar
+		var estrellas = 1
 		if errores_durante_ejecucion == 0 and not abortado:
-			estrellas += 1 # Sin errores
+			estrellas += 1
 		if cant_bloques <= nivel.bloques_optimos:
-			estrellas += 1 # Código óptimo
+			estrellas += 1
 
 		_mostrar_victoria(estrellas, cant_bloques, nivel.bloques_optimos)
 	else:
-		_actualizar_estado("❌ La meta no fue alcanzada. Revisa tu secuencia de bloques.")
+		_actualizar_estado("[FALLO] La meta no fue alcanzada. Revisa tu secuencia de bloques.")
 
 func _mostrar_victoria(estrellas: int, cant_bloques: int, optimo: int) -> void:
 	var texto_estrellas = ""
 	for i in range(3):
-		texto_estrellas += "⭐ " if i < estrellas else "☆ "
+		texto_estrellas += "[*] " if i < estrellas else "[ ] "
 
 	label_estrellas.text = texto_estrellas
 	label_victoria_detalle.text = (
-		"¡Excelente razonamiento algorítmico!\n" +
-		"• Meta alcanzada con éxito\n" +
-		"• Errores en ejecución: %d\n" +
-		"• Bloques usados: %d (Óptimo pedagógico: %d)"
-	) % [errores_durante_ejecucion, cant_bloques, optimo]
+		"Calificacion: %d/3 Estrellas\n" +
+		"- Objetivo alcanzado con exito\n" +
+		"- Errores cometidos: %d\n" +
+		"- Bloques usados: %d (Optimo pedagogico: %d)"
+	) % [estrellas, errores_durante_ejecucion, cant_bloques, optimo]
 
 	btn_modal_siguiente.visible = (indice_nivel_actual < niveles.size() - 1)
 	panel_victoria.visible = true
@@ -239,10 +239,10 @@ func _actualizar_estado(mensaje: String) -> void:
 
 func _on_accion_fallida(motivo: String) -> void:
 	errores_durante_ejecucion += 1
-	_actualizar_estado("⚠️ %s" % motivo)
+	_actualizar_estado("[ALERTA] %s" % motivo)
 
 func _on_pieza_recogida(nombre: String) -> void:
-	_actualizar_estado("📦 Astronauta tomó: %s" % nombre)
+	_actualizar_estado("[ITEM] Astronauta tomo: %s" % nombre)
 
 func _on_pieza_ensamblada(tipo: String) -> void:
-	_actualizar_estado("✅ ¡Pieza %s montada en Spid!" % tipo)
+	_actualizar_estado("[OK] Pieza %s montada en Spid" % tipo)

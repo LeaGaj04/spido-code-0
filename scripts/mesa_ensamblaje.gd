@@ -40,17 +40,17 @@ func ensamblar_componente(tipo: String) -> bool:
 			spid_chasis.visible = true
 			spid_chasis.scale = Vector3.ZERO
 			tween.tween_property(spid_chasis, "scale", Vector3.ONE, 0.35).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
-			spid_actualizado.emit(1, orden_esperado.size(), "¡Chasis de Spid fijado en el banco de montaje!")
+			spid_actualizado.emit(1, orden_esperado.size(), "Chasis de Spid fijado en el banco de montaje.")
 		"RUEDAS":
 			spid_ruedas.visible = true
 			spid_ruedas.scale = Vector3.ZERO
 			tween.tween_property(spid_ruedas, "scale", Vector3.ONE, 0.35).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
-			spid_actualizado.emit(2, orden_esperado.size(), "¡Sistemas de tracción y 4 ruedas montadas!")
+			spid_actualizado.emit(2, orden_esperado.size(), "Sistemas de traccion y 4 ruedas montadas.")
 		"SENSOR":
 			spid_sensor.visible = true
 			spid_sensor.scale = Vector3.ZERO
 			tween.tween_property(spid_sensor, "scale", Vector3.ONE, 0.35).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
-			spid_actualizado.emit(3, orden_esperado.size(), "¡Sensor óptico y procesador A.D.A. conectado!")
+			spid_actualizado.emit(3, orden_esperado.size(), "Sensor optico y procesador A.D.A. conectado.")
 
 	await tween.finished
 
@@ -61,14 +61,12 @@ func ensamblar_componente(tipo: String) -> bool:
 	return true
 
 func _activar_spid() -> void:
-	# Animación donde Spid cobra vida con luces verdes pulsantes
 	if luz_plataforma:
 		var tw_luz = create_tween().set_loops(3)
 		tw_luz.tween_property(luz_plataforma, "light_energy", 3.5, 0.2)
 		tw_luz.tween_property(luz_plataforma, "light_energy", 1.2, 0.2)
 		luz_plataforma.light_color = Color(0.2, 1.0, 0.5)
 
-	# Bamboleo feliz de Spid
 	var tw_spid = create_tween()
 	tw_spid.tween_property($SoporteSpid, "position:y", 0.85, 0.2).set_trans(Tween.TRANS_SINE)
 	tw_spid.tween_property($SoporteSpid, "position:y", 0.70, 0.2).set_trans(Tween.TRANS_BOUNCE)
