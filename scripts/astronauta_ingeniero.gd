@@ -203,7 +203,7 @@ func ensamblar_en_mesa() -> bool:
 
 	if mesa:
 		var tipo_pieza = pieza_en_mano.get("tipo_pieza") if "tipo_pieza" in pieza_en_mano else "COMPONENTE"
-		var exito = mesa.ensamblar_componente(tipo_pieza)
+		var exito = await mesa.ensamblar_componente(tipo_pieza)
 		if exito:
 			pieza_en_mano.queue_free()
 			pieza_en_mano = null
