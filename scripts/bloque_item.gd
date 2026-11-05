@@ -15,6 +15,7 @@ signal solicitado_eliminar(bloque: BloqueItem)
 
 var style_box_normal: StyleBoxFlat
 var style_box_activo: StyleBoxFlat
+var style_box_error: StyleBoxFlat
 
 func _ready() -> void:
 	custom_minimum_size = Vector2(200, 54)
@@ -68,6 +69,14 @@ func _configurar_estilos() -> void:
 	style_box_activo.border_width_right = 2
 	style_box_activo.border_width_bottom = 2
 
+	style_box_error = style_box_normal.duplicate()
+	style_box_error.bg_color = Color(0.27, 0.18, 0.2, 1.0)
+	style_box_error.border_color = Color(0.88, 0.42, 0.42, 1.0)
+	style_box_error.border_width_left = 6
+	style_box_error.border_width_top = 3
+	style_box_error.border_width_right = 3
+	style_box_error.border_width_bottom = 4
+
 	add_theme_stylebox_override("panel", style_box_normal)
 
 func resaltar_ejecucion(activo: bool) -> void:
@@ -79,6 +88,9 @@ func resaltar_ejecucion(activo: bool) -> void:
 		add_theme_stylebox_override("panel", style_box_normal)
 		var tween = create_tween()
 		tween.tween_property(self, "scale", Vector2.ONE, 0.1)
+
+func resaltar_error(activo: bool) -> void:
+	add_theme_stylebox_override("panel", style_box_error if activo else style_box_normal)
 
 func _get_drag_data(_at_position: Vector2) -> Variant:
 	var preview = PanelContainer.new()

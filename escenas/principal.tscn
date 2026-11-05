@@ -296,14 +296,26 @@ custom_minimum_size = Vector2(0, 36)
 layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_PanelGris")
 
-[node name="LabelEstado" type="Label" parent="HSplit/PanelCentral/BarraEstado"]
+[node name="HBox" type="HBoxContainer" parent="HSplit/PanelCentral/BarraEstado"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="LabelEstado" type="Label" parent="HSplit/PanelCentral/BarraEstado/HBox"]
 unique_name_in_owner = true
 layout_mode = 2
+size_flags_horizontal = 3
 theme_override_colors/font_color = Color(0.956863, 0.964706, 0.94902, 1)
 theme_override_font_sizes/font_size = 15
 text = "Astronauta listo en el hangar de montaje."
 horizontal_alignment = 1
 vertical_alignment = 1
+
+[node name="BtnPista" type="Button" parent="HSplit/PanelCentral/BarraEstado/HBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(100, 0)
+layout_mode = 2
+theme_type_variation = &"SecondaryButton"
+text = "Pista"
 
 [node name="PanelDerecho" type="PanelContainer" parent="HSplit"]
 custom_minimum_size = Vector2(340, 0)

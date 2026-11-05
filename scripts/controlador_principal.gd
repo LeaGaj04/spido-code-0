@@ -15,6 +15,7 @@ extends Control
 @onready var label_ada_texto: Label = %LabelADATexto
 @onready var label_concepto: Label = %LabelConcepto
 @onready var label_estado: Label = %LabelEstado
+@onready var btn_pista: Button = %BtnPista
 @onready var panel_guia: PanelContainer = %PanelGuia
 @onready var label_guia_texto: Label = %LabelGuiaTexto
 @onready var btn_guia_continuar: Button = %BtnGuiaContinuar
@@ -40,6 +41,8 @@ var indice_paso_actual: int = 0
 var errores_durante_ejecucion: int = 0
 var guia_activa: bool = false
 var paso_guia: int = 0
+var ultimo_error: String = ""
+var bloque_con_error: BloqueItem = null
 
 const PASOS_GUIA = [
 	{"titulo": "OBSERVA", "texto": "El astronauta está en el hangar y la baliza marca la meta. Cada bloque representa una acción."},
@@ -88,6 +91,7 @@ func cargar_nivel(indice: int) -> void:
 
 	# Limpiar lienzo y estado
 	lienzo.limpiar_todo()
+	_limpiar_error()
 	panel_victoria.visible = false
 	errores_durante_ejecucion = 0
 	indice_paso_actual = 0
@@ -124,6 +128,8 @@ func _conectar_senales() -> void:
 	btn_modal_siguiente.pressed.connect(_on_modal_siguiente_pressed)
 	btn_modal_reintentar.pressed.connect(_on_modal_reintentar_pressed)
 	btn_guia_continuar.pressed.connect(_on_guia_continuar_pressed)
+	btn_pista.pressed.connect(_on_pista_pressed)
+	btn_pista.disabled = true
 
 	if mundo_3d:
 		if mundo_3d.astronauta:
@@ -139,6 +145,7 @@ func _on_ejecutar_pressed() -> void:
 		return
 
 	en_ejecucion = true
+	_limpiar_error()
 	_bloquear_interfaz(true)
 	errores_durante_ejecucion = 0
 	_actualizar_estado("Ejecutando algoritmo...")
@@ -155,10 +162,11 @@ func _on_ejecutar_pressed() -> void:
 
 		if not exito:
 			errores_durante_ejecucion += 1
-			if bloque.id_comando in ["AVANZAR", "ENSAMBLAR"]:
-				_actualizar_estado("El astronauta no pudo completar el paso %d." % (i + 1))
-				abortado = true
-				break
+			bloque.resaltar_error(true)
+			bloque_con_error = bloque
+			_actualizar_estado("[ERROR] Paso %d: %s" % [i + 1, ultimo_error if not ultimo_error.is_empty() else "La accion no pudo completarse."])
+			abortado = true
+			break
 
 	en_ejecucion = false
 	_bloquear_interfaz(false)
@@ -223,12 +231,18 @@ func _on_paso_pressed() -> void:
 	_actualizar_estado("Paso manual %d/%d: %s" % [indice_paso_actual + 1, secuencia.size(), bloque.titulo])
 
 	en_ejecucion = true
+	_limpiar_error()
 	_bloquear_interfaz(true)
 	bloque.resaltar_ejecucion(true)
 
-	await mundo_3d.astronauta.ejecutar_accion(bloque.id_comando)
+	var exito = await mundo_3d.astronauta.ejecutar_accion(bloque.id_comando)
 	await get_tree().create_timer(0.08).timeout
 	bloque.resaltar_ejecucion(false)
+	if not exito:
+		errores_durante_ejecucion += 1
+		bloque.resaltar_error(true)
+		bloque_con_error = bloque
+		_actualizar_estado("[ERROR] Paso manual: %s" % (ultimo_error if not ultimo_error.is_empty() else "La accion no pudo completarse."))
 
 	indice_paso_actual += 1
 	en_ejecucion = false
@@ -237,6 +251,7 @@ func _on_paso_pressed() -> void:
 func _on_reiniciar_pressed() -> void:
 	indice_paso_actual = 0
 	errores_durante_ejecucion = 0
+	_limpiar_error()
 	await mundo_3d.reiniciar_mundo()
 	_actualizar_estado("Nivel reiniciado. Prueba otra vez tu algoritmo.")
 
@@ -244,6 +259,7 @@ func _on_limpiar_pressed() -> void:
 	if en_ejecucion: return
 	lienzo.limpiar_todo()
 	indice_paso_actual = 0
+	_limpiar_error()
 	_actualizar_estado("Lienzo vaciado.")
 
 func _bloquear_interfaz(bloquear: bool) -> void:
@@ -253,6 +269,7 @@ func _bloquear_interfaz(bloquear: bool) -> void:
 	btn_nivel_prev.disabled = bloquear or (indice_nivel_actual == 0)
 	btn_nivel_next.disabled = bloquear or (indice_nivel_actual == niveles.size() - 1)
 	btn_guia_continuar.disabled = bloquear
+	btn_pista.disabled = bloquear or ultimo_error.is_empty()
 
 func _on_guia_continuar_pressed() -> void:
 	if not guia_activa:
@@ -271,12 +288,37 @@ func _actualizar_guia() -> void:
 	label_guia_texto.text = "%s\n%s" % [paso.titulo, paso.texto]
 	btn_guia_continuar.text = "Comenzar" if paso_guia == PASOS_GUIA.size() - 1 else "Continuar"
 
+func _limpiar_error() -> void:
+	ultimo_error = ""
+	if is_instance_valid(bloque_con_error):
+		bloque_con_error.resaltar_error(false)
+	bloque_con_error = null
+	if is_instance_valid(btn_pista):
+		btn_pista.disabled = true
+
+func _on_pista_pressed() -> void:
+	if ultimo_error.is_empty():
+		return
+	var pista = "Revisa la instruccion marcada y prueba otra vez."
+	if "ninguna pieza frente" in ultimo_error:
+		pista = "Pista: acerca al astronauta a la pieza y orientalo hacia ella antes de usar Tomar Pieza."
+	elif "No tienes ninguna pieza" in ultimo_error:
+		pista = "Pista: primero recoge una pieza; despues podras llevarla a la mesa."
+	elif "No estas frente a la mesa" in ultimo_error:
+		pista = "Pista: lleva la pieza hasta una casilla vecina a la mesa y orienta al astronauta hacia ella."
+	elif "requiere otra pieza" in ultimo_error:
+		pista = "Pista: revisa el orden de montaje; esta pieza todavia no corresponde a la siguiente etapa."
+	elif "limite" in ultimo_error or "Limite" in ultimo_error:
+		pista = "Pista: el astronauta no puede salir del area de trabajo; cambia la ruta."
+	_actualizar_estado(pista)
+
 func _actualizar_estado(mensaje: String) -> void:
 	if label_estado:
 		label_estado.text = mensaje
 
 func _on_accion_fallida(motivo: String) -> void:
-	errores_durante_ejecucion += 1
+	ultimo_error = motivo
+	btn_pista.disabled = false
 	_actualizar_estado("[ALERTA] %s" % motivo)
 
 func _on_pieza_recogida(nombre: String) -> void:
