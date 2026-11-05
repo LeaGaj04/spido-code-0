@@ -1,4 +1,4 @@
-[gd_scene load_steps=11 format=3 uid="uid://cxq62g0k1m005"]
+[gd_scene load_steps=12 format=3 uid="uid://cxq62g0k1m005"]
 
 [ext_resource type="Script" path="res://scripts/controlador_principal.gd" id="1_script"]
 [ext_resource type="PackedScene" uid="uid://df24k8b6lm001" path="res://escenas/bloque_item.tscn" id="2_bloque"]
@@ -70,6 +70,22 @@ border_width_top = 3
 border_width_right = 3
 border_width_bottom = 3
 border_color = Color(0.34902, 0.388235, 0.447059, 1)
+corner_radius_top_left = 14
+corner_radius_top_right = 14
+corner_radius_bottom_right = 14
+corner_radius_bottom_left = 14
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_Guia"]
+content_margin_left = 14.0
+content_margin_top = 10.0
+content_margin_right = 14.0
+content_margin_bottom = 10.0
+bg_color = Color(0.12549, 0.156863, 0.2, 0.98)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.545098, 0.796078, 0.568627, 1)
 corner_radius_top_left = 14
 corner_radius_top_right = 14
 corner_radius_bottom_right = 14
@@ -232,6 +248,35 @@ layout_mode = 2
 theme_override_colors/font_color = Color(0.545098, 0.796078, 0.568627, 1)
 theme_override_font_sizes/font_size = 14
 text = "Concepto: Secuencia lineal"
+
+[node name="PanelGuia" type="PanelContainer" parent="HSplit/PanelCentral"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_Guia")
+
+[node name="VBox" type="VBoxContainer" parent="HSplit/PanelCentral/PanelGuia"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="LabelGuiaTitulo" type="Label" parent="HSplit/PanelCentral/PanelGuia/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.545098, 0.796078, 0.568627, 1)
+theme_override_font_sizes/font_size = 16
+text = "RUTA DE APRENDIZAJE"
+
+[node name="LabelGuiaTexto" type="Label" parent="HSplit/PanelCentral/PanelGuia/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.956863, 0.964706, 0.94902, 1)
+theme_override_font_sizes/font_size = 15
+autowrap_mode = 2
+
+[node name="BtnGuiaContinuar" type="Button" parent="HSplit/PanelCentral/PanelGuia/VBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 42)
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Continuar"
 
 [node name="SubViewportContainer" type="SubViewportContainer" parent="HSplit/PanelCentral"]
 layout_mode = 2

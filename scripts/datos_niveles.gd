@@ -9,6 +9,8 @@ static func obtener_niveles() -> Array[Dictionary]:
 			"subtitulo": "Secuencia Lineal Basica",
 			"instruccion": "Un algoritmo ejecuta ordenes paso a paso en orden estricto. Arrastra 3 bloques 'Avanzar' al lienzo y presiona Ejecutar para llegar a la baliza de energia.",
 			"concepto_clave": "Secuencia: Las computadoras siguen instrucciones una tras otra, de arriba a abajo.",
+			"objetivo_aprendizaje": "Construir, ejecutar y corregir una secuencia de instrucciones.",
+			"guiada": true,
 			"bloques_permitidos": ["AVANZAR"],
 			"bloques_optimos": 3,
 			"pos_astronauta": Vector2i(0, 2),
