@@ -1,0 +1,64 @@
+[gd_scene format=3 uid="uid://c83prmweaa004"]
+
+[ext_resource type="Script" uid="uid://djhqsygcvcjfh" path="res://scripts/mundo_3d.gd" id="1_script"]
+[ext_resource type="PackedScene" uid="uid://b23gaa0as1001" path="res://escenas/astronauta_ingeniero.tscn" id="2_astronauta"]
+[ext_resource type="PackedScene" uid="uid://df5am12q08003" path="res://escenas/mesa_ensamblaje.tscn" id="3_mesa"]
+[ext_resource type="PackedScene" uid="uid://c7na02kj12002" path="res://escenas/pieza_taller.tscn" id="4_pieza"]
+[ext_resource type="PackedScene" uid="uid://dm0k2ala35004" path="res://escenas/baliza_meta.tscn" id="5_baliza"]
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSky_1"]
+sky_top_color = Color(0.08, 0.12, 0.1, 1)
+sky_horizon_color = Color(0.14, 0.22, 0.18, 1)
+ground_bottom_color = Color(0.04, 0.06, 0.05, 1)
+ground_horizon_color = Color(0.1, 0.16, 0.13, 1)
+
+[sub_resource type="Sky" id="Sky_1"]
+sky_material = SubResource("ProceduralSky_1")
+
+[sub_resource type="Environment" id="Environment_1"]
+background_mode = 2
+sky = SubResource("Sky_1")
+ambient_light_source = 3
+ambient_light_color = Color(0.65, 0.75, 0.7, 1)
+tonemap_mode = 2
+glow_enabled = true
+glow_bloom = 0.15
+
+[sub_resource type="StandardMaterial3D" id="MatSueloHangar"]
+albedo_color = Color(0.06, 0.08, 0.07, 1)
+metallic = 0.1
+roughness = 0.8
+
+[sub_resource type="PlaneMesh" id="MeshSuelo"]
+material = SubResource("MatSueloHangar")
+size = Vector2(24, 24)
+
+[node name="Mundo3D" type="Node3D" unique_id=867094500]
+script = ExtResource("1_script")
+escena_pieza = ExtResource("4_pieza")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=1903861102]
+environment = SubResource("Environment_1")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=343956795]
+transform = Transform3D(0.866025, -0.353553, 0.353553, 0, 0.707107, 0.707107, -0.5, -0.612372, 0.612372, 0, 12, 0)
+light_color = Color(0.92, 0.96, 0.94, 1)
+shadow_enabled = true
+
+[node name="Camera3D" type="Camera3D" parent="." unique_id=1784270914]
+transform = Transform3D(1, 0, 0, 0, 0.7880111, 0.6156611, 0, -0.6156611, 0.7880111, 0, 7.768818, 11.910039)
+fov = 46.0
+
+[node name="SueloHangar" type="MeshInstance3D" parent="." unique_id=1389275597]
+mesh = SubResource("MeshSuelo")
+
+[node name="MesaEnsamblaje" parent="." unique_id=744348960 instance=ExtResource("3_mesa")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -4)
+
+[node name="BalizaMeta" parent="." unique_id=999163968 instance=ExtResource("5_baliza")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.05, -2)
+
+[node name="Astronauta" parent="." unique_id=609596835 instance=ExtResource("2_astronauta")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 2)
+
+[node name="ContenedorPiezas" type="Node3D" parent="." unique_id=498335174]

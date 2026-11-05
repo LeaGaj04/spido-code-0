@@ -1,0 +1,388 @@
+[gd_scene load_steps=12 format=3 uid="uid://cxq62g0k1m005"]
+
+[ext_resource type="Script" path="res://scripts/controlador_principal.gd" id="1_script"]
+[ext_resource type="PackedScene" uid="uid://df24k8b6lm001" path="res://escenas/bloque_item.tscn" id="2_bloque"]
+[ext_resource type="PackedScene" uid="uid://c83prmwd89004" path="res://escenas/mundo_3d.tscn" id="3_mundo"]
+[ext_resource type="Script" path="res://scripts/lienzo_codigo.gd" id="4_lienzo"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_PanelGris"]
+bg_color = Color(0, 0.0666667, 0, 0.760784)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.372549, 0.592157, 0.419608, 0.95)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+shadow_color = Color(0.00392157, 0.0901961, 0.0117647, 0.65098)
+shadow_size = 4
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_BarraNivel"]
+bg_color = Color(0.005, 0.055, 0.02, 0.96)
+border_width_bottom = 2
+border_color = Color(0.372549, 0.592157, 0.419608, 0.95)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_CajaADA"]
+bg_color = Color(0, 0.04, 0.012, 0.85)
+border_width_left = 3
+border_color = Color(0.48, 0.76, 0.54, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+expand_margin_left = 6.0
+expand_margin_top = 4.0
+expand_margin_right = 6.0
+expand_margin_bottom = 4.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_BtnEjecutar"]
+bg_color = Color(0.015, 0.12, 0.025, 0.92)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 2
+border_color = Color(0.48, 0.76, 0.54, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+shadow_color = Color(0.00392157, 0.0901961, 0.0117647, 0.65098)
+shadow_size = 3
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_Lienzo"]
+bg_color = Color(0.082, 0.102, 0.098, 0.98)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.372549, 0.592157, 0.419608, 0.85)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_Modal"]
+bg_color = Color(0.005, 0.055, 0.02, 0.98)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.48, 0.76, 0.54, 1)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+shadow_color = Color(0.00392157, 0.0901961, 0.0117647, 0.85)
+shadow_size = 16
+
+[node name="Principal" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_script")
+escena_bloque = ExtResource("2_bloque")
+
+[node name="Fondo" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.01, 0.03, 0.015, 1)
+
+[node name="HSplit" type="HBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 12.0
+offset_top = 12.0
+offset_right = -12.0
+offset_bottom = -12.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 12
+
+[node name="PanelIzquierdo" type="PanelContainer" parent="HSplit"]
+custom_minimum_size = Vector2(250, 0)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_PanelGris")
+
+[node name="VBox" type="VBoxContainer" parent="HSplit/PanelIzquierdo"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="Titulo" type="Label" parent="HSplit/PanelIzquierdo/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.760784, 0.937255, 0.776471, 1)
+theme_override_font_sizes/font_size = 15
+text = "BLOQUES DISPONIBLES"
+horizontal_alignment = 1
+
+[node name="Subtitulo" type="Label" parent="HSplit/PanelIzquierdo/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.58, 0.58, 0.61, 1)
+theme_override_font_sizes/font_size = 12
+text = "Desbloqueados para este nivel"
+horizontal_alignment = 1
+
+[node name="Separador" type="HSeparator" parent="HSplit/PanelIzquierdo/VBox"]
+layout_mode = 2
+
+[node name="PaletaScroll" type="ScrollContainer" parent="HSplit/PanelIzquierdo/VBox"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="ListaBloques" type="VBoxContainer" parent="HSplit/PanelIzquierdo/VBox/PaletaScroll"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 8
+
+[node name="PanelCentral" type="VBoxContainer" parent="HSplit"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 8
+
+[node name="BarraNivel" type="PanelContainer" parent="HSplit/PanelCentral"]
+custom_minimum_size = Vector2(0, 40)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_BarraNivel")
+
+[node name="HBox" type="HBoxContainer" parent="HSplit/PanelCentral/BarraNivel"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="BtnNivelPrev" type="Button" parent="HSplit/PanelCentral/BarraNivel/HBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(36, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.760784, 0.937255, 0.776471, 1)
+text = "<"
+
+[node name="LabelNivelTitulo" type="Label" parent="HSplit/PanelCentral/BarraNivel/HBox"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.760784, 0.937255, 0.776471, 1)
+theme_override_font_sizes/font_size = 14
+text = "[NIVEL 1] Primeros Pasos"
+vertical_alignment = 1
+
+[node name="BtnNivelNext" type="Button" parent="HSplit/PanelCentral/BarraNivel/HBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(36, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.760784, 0.937255, 0.776471, 1)
+text = ">"
+
+[node name="CajaADA" type="VBoxContainer" parent="HSplit/PanelCentral"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="PanelADA" type="PanelContainer" parent="HSplit/PanelCentral/CajaADA"]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_CajaADA")
+
+[node name="HBox" type="HBoxContainer" parent="HSplit/PanelCentral/CajaADA/PanelADA"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="IconoADA" type="Label" parent="HSplit/PanelCentral/CajaADA/PanelADA/HBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.48, 0.76, 0.54, 1)
+theme_override_font_sizes/font_size = 13
+text = "[A.D.A.]"
+
+[node name="LabelADATexto" type="Label" parent="HSplit/PanelCentral/CajaADA/PanelADA/HBox"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.760784, 0.937255, 0.776471, 1)
+theme_override_font_sizes/font_size = 13
+text = "Instruccion didactica de A.D.A."
+autowrap_mode = 3
+
+[node name="LabelConcepto" type="Label" parent="HSplit/PanelCentral/CajaADA"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.48, 0.76, 0.54, 1)
+theme_override_font_sizes/font_size = 12
+text = "Concepto: Secuencia lineal"
+
+[node name="SubViewportContainer" type="SubViewportContainer" parent="HSplit/PanelCentral"]
+layout_mode = 2
+size_flags_vertical = 3
+stretch = true
+
+[node name="SubViewport" type="SubViewport" parent="HSplit/PanelCentral/SubViewportContainer"]
+handle_input_locally = false
+size = Vector2i(2, 2)
+render_target_update_mode = 4
+
+[node name="Mundo3D" parent="HSplit/PanelCentral/SubViewportContainer/SubViewport" instance=ExtResource("3_mundo")]
+unique_name_in_owner = true
+
+[node name="BarraEstado" type="PanelContainer" parent="HSplit/PanelCentral"]
+custom_minimum_size = Vector2(0, 36)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_PanelGris")
+
+[node name="LabelEstado" type="Label" parent="HSplit/PanelCentral/BarraEstado"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.760784, 0.937255, 0.776471, 1)
+theme_override_font_sizes/font_size = 13
+text = "Astronauta listo en el hangar de montaje."
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="PanelDerecho" type="PanelContainer" parent="HSplit"]
+custom_minimum_size = Vector2(290, 0)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_PanelGris")
+
+[node name="VBox" type="VBoxContainer" parent="HSplit/PanelDerecho"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="Titulo" type="Label" parent="HSplit/PanelDerecho/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.760784, 0.937255, 0.776471, 1)
+theme_override_font_sizes/font_size = 15
+text = "PROTOCOLO DE CONSTRUCCION"
+horizontal_alignment = 1
+
+[node name="BarraBotones" type="HBoxContainer" parent="HSplit/PanelDerecho/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="BtnEjecutar" type="Button" parent="HSplit/PanelDerecho/VBox/BarraBotones"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.9, 1, 0.9, 1)
+theme_override_styles/normal = SubResource("StyleBoxFlat_BtnEjecutar")
+text = "Ejecutar"
+
+[node name="BtnPaso" type="Button" parent="HSplit/PanelDerecho/VBox/BarraBotones"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.760784, 0.937255, 0.776471, 1)
+text = "Paso"
+
+[node name="BtnReiniciar" type="Button" parent="HSplit/PanelDerecho/VBox/BarraBotones"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.760784, 0.937255, 0.776471, 1)
+text = "Reset"
+
+[node name="BtnLimpiar" type="Button" parent="HSplit/PanelDerecho/VBox/BarraBotones"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.760784, 0.937255, 0.776471, 1)
+text = "Limpiar"
+
+[node name="Separador" type="HSeparator" parent="HSplit/PanelDerecho/VBox"]
+layout_mode = 2
+
+[node name="LienzoCodigo" type="PanelContainer" parent="HSplit/PanelDerecho/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_Lienzo")
+script = ExtResource("4_lienzo")
+escena_bloque = ExtResource("2_bloque")
+
+[node name="Scroll" type="ScrollContainer" parent="HSplit/PanelDerecho/VBox/LienzoCodigo"]
+layout_mode = 2
+
+[node name="ContenedorBloques" type="VBoxContainer" parent="HSplit/PanelDerecho/VBox/LienzoCodigo/Scroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 6
+
+[node name="LabelVacio" type="Label" parent="HSplit/PanelDerecho/VBox/LienzoCodigo/Scroll/ContenedorBloques"]
+layout_mode = 2
+size_flags_vertical = 6
+theme_override_colors/font_color = Color(0.58, 0.58, 0.61, 1)
+theme_override_font_sizes/font_size = 13
+text = "Arrastra y suelta aqui
+tus bloques de codigo"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="ModalVictoria" type="PanelContainer" parent="."]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -200.0
+offset_top = -140.0
+offset_right = 200.0
+offset_bottom = 140.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_Modal")
+
+[node name="VBox" type="VBoxContainer" parent="ModalVictoria"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="LabelTitulo" type="Label" parent="ModalVictoria/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.48, 0.76, 0.54, 1)
+theme_override_font_sizes/font_size = 20
+text = "[!] MISION CUMPLIDA"
+horizontal_alignment = 1
+
+[node name="LabelEstrellas" type="Label" parent="ModalVictoria/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.760784, 0.937255, 0.776471, 1)
+theme_override_font_sizes/font_size = 22
+text = "[*] [*] [*]"
+horizontal_alignment = 1
+
+[node name="LabelDetalle" type="Label" parent="ModalVictoria/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.760784, 0.937255, 0.776471, 1)
+theme_override_font_sizes/font_size = 13
+text = "Detalle del aprendizaje..."
+horizontal_alignment = 1
+
+[node name="Separador" type="HSeparator" parent="ModalVictoria/VBox"]
+layout_mode = 2
+
+[node name="HBox" type="HBoxContainer" parent="ModalVictoria/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="BtnModalReintentar" type="Button" parent="ModalVictoria/VBox/HBox"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.760784, 0.937255, 0.776471, 1)
+text = "Reintentar"
+
+[node name="BtnModalSiguiente" type="Button" parent="ModalVictoria/VBox/HBox"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.9, 1, 0.9, 1)
+theme_override_styles/normal = SubResource("StyleBoxFlat_BtnEjecutar")
+text = "Siguiente Mision"
