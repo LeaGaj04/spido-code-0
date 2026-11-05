@@ -42,7 +42,7 @@ static func obtener_niveles() -> Array[Dictionary]:
 			"instruccion": "Avanza hacia el pedestal, toma el Chasis con 'Tomar Pieza', luego muevete frente al banco de montaje y colocalo con 'Ensamblar en Spid'.",
 			"concepto_clave": "Precondicion y Estado: No puedes ensamblar una pieza sin haberla recogido antes.",
 			"bloques_permitidos": ["AVANZAR", "GIRAR_DER", "GIRAR_IZQ", "TOMAR_PIEZA", "ENSAMBLAR"],
-			"bloques_optimos": 8,
+			"bloques_optimos": 9,
 			"pos_astronauta": Vector2i(0, 1),
 			"ori_astronauta": 0,
 			"tipo_meta": "ENSAMBLAJE",
