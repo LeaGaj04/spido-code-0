@@ -15,6 +15,9 @@ extends Control
 @onready var label_ada_texto: Label = %LabelADATexto
 @onready var label_concepto: Label = %LabelConcepto
 @onready var label_estado: Label = %LabelEstado
+@onready var panel_guia: PanelContainer = %PanelGuia
+@onready var label_guia_texto: Label = %LabelGuiaTexto
+@onready var btn_guia_continuar: Button = %BtnGuiaContinuar
 
 # Botones de Ejecucion
 @onready var btn_ejecutar: Button = %BtnEjecutar
@@ -35,6 +38,15 @@ var indice_nivel_actual: int = 0
 var en_ejecucion: bool = false
 var indice_paso_actual: int = 0
 var errores_durante_ejecucion: int = 0
+var guia_activa: bool = false
+var paso_guia: int = 0
+
+const PASOS_GUIA = [
+	{"titulo": "OBSERVA", "texto": "El astronauta está en el hangar y la baliza marca la meta. Cada bloque representa una acción."},
+	{"titulo": "PREDICE", "texto": "Antes de ejecutar, imagina dónde terminará el astronauta después de avanzar tres veces."},
+	{"titulo": "CONSTRUYE", "texto": "Arrastra 3 bloques AVANZAR desde la izquierda hacia el lienzo de instrucciones."},
+	{"titulo": "CORRIGE", "texto": "Si no llega a la baliza, revisa cuántos pasos necesita y vuelve a ordenar tu secuencia."}
+]
 
 # Paleta exacta del rediseño oficial de SpidoCode.
 const COMANDOS_DISPONIBLES = {
@@ -63,6 +75,10 @@ func cargar_nivel(indice: int) -> void:
 	label_nivel_titulo.text = "[NIVEL %d] %s - %s" % [nivel.id, nivel.titulo, nivel.subtitulo]
 	label_ada_texto.text = nivel.instruccion
 	label_concepto.text = "Concepto: %s" % nivel.concepto_clave
+	guia_activa = nivel.get("guiada", false)
+	paso_guia = 0
+	panel_guia.visible = guia_activa
+	_actualizar_guia()
 
 	btn_nivel_prev.disabled = (indice_nivel_actual == 0)
 	btn_nivel_next.disabled = (indice_nivel_actual == niveles.size() - 1)
@@ -107,6 +123,7 @@ func _conectar_senales() -> void:
 
 	btn_modal_siguiente.pressed.connect(_on_modal_siguiente_pressed)
 	btn_modal_reintentar.pressed.connect(_on_modal_reintentar_pressed)
+	btn_guia_continuar.pressed.connect(_on_guia_continuar_pressed)
 
 	if mundo_3d:
 		if mundo_3d.astronauta:
@@ -171,12 +188,15 @@ func _mostrar_victoria(estrellas: int, cant_bloques: int, optimo: int) -> void:
 		texto_estrellas += "[*] " if i < estrellas else "[ ] "
 
 	label_estrellas.text = texto_estrellas
+	var detalle_aprendizaje = ""
+	if niveles[indice_nivel_actual].get("guiada", false):
+		detalle_aprendizaje = "\n\nAprendizaje: construiste y corregiste una secuencia."
 	label_victoria_detalle.text = (
 		"Calificacion: %d/3 Estrellas\n" +
 		"- Objetivo alcanzado con exito\n" +
 		"- Errores cometidos: %d\n" +
-		"- Bloques usados: %d (Optimo pedagogico: %d)"
-	) % [estrellas, errores_durante_ejecucion, cant_bloques, optimo]
+		"- Bloques usados: %d (Optimo pedagogico: %d)%s"
+	) % [estrellas, errores_durante_ejecucion, cant_bloques, optimo, detalle_aprendizaje]
 
 	btn_modal_siguiente.visible = (indice_nivel_actual < niveles.size() - 1)
 	panel_victoria.visible = true
@@ -232,6 +252,24 @@ func _bloquear_interfaz(bloquear: bool) -> void:
 	btn_limpiar.disabled = bloquear
 	btn_nivel_prev.disabled = bloquear or (indice_nivel_actual == 0)
 	btn_nivel_next.disabled = bloquear or (indice_nivel_actual == niveles.size() - 1)
+	btn_guia_continuar.disabled = bloquear
+
+func _on_guia_continuar_pressed() -> void:
+	if not guia_activa:
+		return
+	if paso_guia < PASOS_GUIA.size() - 1:
+		paso_guia += 1
+		_actualizar_guia()
+	else:
+		panel_guia.visible = false
+		_actualizar_estado("Guia completada. Ahora construye y ejecuta tu propia secuencia.")
+
+func _actualizar_guia() -> void:
+	if not guia_activa or not is_instance_valid(label_guia_texto):
+		return
+	var paso = PASOS_GUIA[paso_guia]
+	label_guia_texto.text = "%s\n%s" % [paso.titulo, paso.texto]
+	btn_guia_continuar.text = "Comenzar" if paso_guia == PASOS_GUIA.size() - 1 else "Continuar"
 
 func _actualizar_estado(mensaje: String) -> void:
 	if label_estado:
