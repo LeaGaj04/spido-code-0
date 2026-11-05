@@ -4,6 +4,7 @@ extends Node3D
 @export var escena_pieza: PackedScene
 
 @onready var astronauta: AstronautaIngeniero = $Astronauta
+@onready var astronauta_2: AstronautaIngeniero = $Astronauta2
 @onready var mesa_spid: MesaEnsamblaje = $MesaEnsamblaje
 @onready var baliza_meta: BalizaMeta = $BalizaMeta
 @onready var contenedor_piezas: Node3D = $ContenedorPiezas
@@ -19,6 +20,11 @@ func cargar_nivel(config: Dictionary) -> void:
 	var ori_astro = config.get("ori_astronauta", 0)
 	if astronauta:
 		astronauta.configurar_inicio(pos_astro, ori_astro)
+	if astronauta_2:
+		var mostrar_astronauta_2 = config.get("cantidad_astronautas", 1) >= 2
+		astronauta_2.visible = mostrar_astronauta_2
+		if mostrar_astronauta_2:
+			astronauta_2.configurar_inicio(config.get("pos_astronauta_2", Vector2i(1, 0)), config.get("ori_astronauta_2", 0))
 
 	# 2. Configurar mesa de ensamblaje
 	var mostrar_mesa = config.get("mostrar_mesa", false)
@@ -102,11 +108,15 @@ func verificar_objetivo_completado() -> bool:
 			return false
 		"ENSAMBLAJE":
 			return mesa_spid and mesa_spid.etapas_completadas.size() > 0
+		"ENSAMBLAJE_EQUIPO":
+			return mesa_spid and mesa_spid.etapas_completadas.size() >= 2
 	return false
 
 func reiniciar_mundo() -> void:
 	if astronauta:
 		await astronauta.reiniciar()
+	if astronauta_2 and astronauta_2.visible:
+		await astronauta_2.reiniciar()
 	if mesa_spid and mesa_spid.visible:
 		mesa_spid.reiniciar()
 	_recrear_piezas(config_nivel_actual.get("piezas", []))

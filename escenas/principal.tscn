@@ -4,6 +4,7 @@
 [ext_resource type="PackedScene" uid="uid://df24k8b6lm001" path="res://escenas/bloque_item.tscn" id="2_bloque"]
 [ext_resource type="PackedScene" uid="uid://c83prmwd89004" path="res://escenas/mundo_3d.tscn" id="3_mundo"]
 [ext_resource type="Script" path="res://scripts/lienzo_codigo.gd" id="4_lienzo"]
+[ext_resource type="PackedScene" path="res://escenas/lienzo_codigo.tscn" id="5_lienzo"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_PanelGris"]
 content_margin_left = 16.0
@@ -368,32 +369,18 @@ text = "Limpiar"
 [node name="Separador" type="HSeparator" parent="HSplit/PanelDerecho/VBox"]
 layout_mode = 2
 
-[node name="LienzoCodigo" type="PanelContainer" parent="HSplit/PanelDerecho/VBox"]
+[node name="EquipoCodigo" type="TabContainer" parent="HSplit/PanelDerecho/VBox"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 3
-theme_override_styles/panel = SubResource("StyleBoxFlat_Lienzo")
-script = ExtResource("4_lienzo")
-escena_bloque = ExtResource("2_bloque")
 
-[node name="Scroll" type="ScrollContainer" parent="HSplit/PanelDerecho/VBox/LienzoCodigo"]
+[node name="LienzoAstronauta1" parent="HSplit/PanelDerecho/VBox/EquipoCodigo" instance=ExtResource("5_lienzo")]
+unique_name_in_owner = true
 layout_mode = 2
 
-[node name="ContenedorBloques" type="VBoxContainer" parent="HSplit/PanelDerecho/VBox/LienzoCodigo/Scroll"]
+[node name="LienzoAstronauta2" parent="HSplit/PanelDerecho/VBox/EquipoCodigo" instance=ExtResource("5_lienzo")]
+unique_name_in_owner = true
 layout_mode = 2
-size_flags_horizontal = 3
-size_flags_vertical = 3
-theme_override_constants/separation = 6
-
-[node name="LabelVacio" type="Label" parent="HSplit/PanelDerecho/VBox/LienzoCodigo/Scroll/ContenedorBloques"]
-layout_mode = 2
-size_flags_vertical = 6
-theme_override_colors/font_color = Color(0.75, 0.78, 0.78, 1)
-theme_override_font_sizes/font_size = 15
-text = "Arrastra y suelta aqui
-tus bloques de codigo"
-horizontal_alignment = 1
-vertical_alignment = 1
 
 [node name="ModalVictoria" type="PanelContainer" parent="."]
 unique_name_in_owner = true

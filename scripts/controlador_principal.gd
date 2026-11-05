@@ -5,7 +5,9 @@ extends Control
 
 # Contenedores UI con Scene Unique Nodes (%)
 @onready var paleta_contenedor: VBoxContainer = %ListaBloques
-@onready var lienzo: LienzoCodigo = %LienzoCodigo
+@onready var lienzo: LienzoCodigo = %LienzoAstronauta1
+@onready var lienzo_a2: LienzoCodigo = %LienzoAstronauta2
+@onready var tabs_codigo: TabContainer = %EquipoCodigo
 @onready var mundo_3d: Mundo3D = %Mundo3D
 
 # Elementos Didacticos
@@ -64,6 +66,9 @@ const COMANDOS_DISPONIBLES = {
 func _ready() -> void:
 	niveles = DatosNiveles.obtener_niveles()
 	_conectar_senales()
+	tabs_codigo.set_tab_title(0, "Astronauta 1")
+	tabs_codigo.set_tab_title(1, "Astronauta 2")
+	tabs_codigo.set_tab_hidden(1, true)
 	panel_victoria.visible = false
 	cargar_nivel(0)
 
@@ -88,9 +93,11 @@ func cargar_nivel(indice: int) -> void:
 
 	# Actualizar paleta con SOLO los bloques autorizados en este nivel
 	_actualizar_paleta(nivel.bloques_permitidos)
+	tabs_codigo.set_tab_hidden(1, nivel.get("cantidad_astronautas", 1) < 2)
 
 	# Limpiar lienzo y estado
 	lienzo.limpiar_todo()
+	lienzo_a2.limpiar_todo()
 	_limpiar_error()
 	panel_victoria.visible = false
 	errores_durante_ejecucion = 0
@@ -136,44 +143,53 @@ func _conectar_senales() -> void:
 			mundo_3d.astronauta.accion_fallida.connect(_on_accion_fallida)
 			mundo_3d.astronauta.pieza_recogida.connect(_on_pieza_recogida)
 			mundo_3d.astronauta.pieza_ensamblada.connect(_on_pieza_ensamblada)
+		if mundo_3d.astronauta_2:
+			mundo_3d.astronauta_2.accion_fallida.connect(_on_accion_fallida)
+			mundo_3d.astronauta_2.pieza_recogida.connect(_on_pieza_recogida)
+			mundo_3d.astronauta_2.pieza_ensamblada.connect(_on_pieza_ensamblada)
 
 func _on_ejecutar_pressed() -> void:
 	if en_ejecucion: return
-	var secuencia = lienzo.obtener_secuencia_comandos()
-	if secuencia.is_empty():
-		_actualizar_estado("El lienzo esta vacio. Arrastra al menos un bloque.")
+	var secuencia_a1 = lienzo.obtener_secuencia_comandos()
+	var secuencia_a2 = lienzo_a2.obtener_secuencia_comandos()
+	if secuencia_a1.is_empty() and secuencia_a2.is_empty():
+		_actualizar_estado("Los lienzos estan vacios. Arrastra bloques para programar al equipo.")
 		return
 
 	en_ejecucion = true
 	_limpiar_error()
 	_bloquear_interfaz(true)
 	errores_durante_ejecucion = 0
-	_actualizar_estado("Ejecutando algoritmo...")
+	_actualizar_estado("Ejecutando las secuencias del equipo...")
 
 	var abortado = false
-	for i in range(secuencia.size()):
-		var bloque = secuencia[i]
-		_actualizar_estado("Paso %d/%d: %s" % [i + 1, secuencia.size(), bloque.titulo])
-		bloque.resaltar_ejecucion(true)
-
-		var exito = await mundo_3d.astronauta.ejecutar_accion(bloque.id_comando)
-		await get_tree().create_timer(0.12).timeout
-		bloque.resaltar_ejecucion(false)
-
-		if not exito:
-			errores_durante_ejecucion += 1
-			bloque.resaltar_error(true)
-			bloque_con_error = bloque
-			_actualizar_estado("[ERROR] Paso %d: %s" % [i + 1, ultimo_error if not ultimo_error.is_empty() else "La accion no pudo completarse."])
-			abortado = true
-			break
+	if not secuencia_a1.is_empty():
+		abortado = not await _ejecutar_secuencia(mundo_3d.astronauta, secuencia_a1, "Astronauta 1")
+	if not abortado and not secuencia_a2.is_empty():
+		abortado = not await _ejecutar_secuencia(mundo_3d.astronauta_2, secuencia_a2, "Astronauta 2")
 
 	en_ejecucion = false
 	_bloquear_interfaz(false)
 
 	# Evaluar si se cumplio la meta
 	await get_tree().create_timer(0.2).timeout
-	_evaluar_resultado_nivel(secuencia.size(), abortado)
+	_evaluar_resultado_nivel(secuencia_a1.size() + secuencia_a2.size(), abortado)
+
+func _ejecutar_secuencia(astronauta: AstronautaIngeniero, secuencia: Array[BloqueItem], etiqueta: String) -> bool:
+	for i in range(secuencia.size()):
+		var bloque = secuencia[i]
+		_actualizar_estado("%s - paso %d/%d: %s" % [etiqueta, i + 1, secuencia.size(), bloque.titulo])
+		bloque.resaltar_ejecucion(true)
+		var exito = await astronauta.ejecutar_accion(bloque.id_comando)
+		await get_tree().create_timer(0.12).timeout
+		bloque.resaltar_ejecucion(false)
+		if not exito:
+			errores_durante_ejecucion += 1
+			bloque.resaltar_error(true)
+			bloque_con_error = bloque
+			_actualizar_estado("[ERROR] %s - paso %d: %s" % [etiqueta, i + 1, ultimo_error if not ultimo_error.is_empty() else "La accion no pudo completarse."])
+			return false
+	return true
 
 func _evaluar_resultado_nivel(cant_bloques: int, abortado: bool) -> void:
 	var nivel = niveles[indice_nivel_actual]
@@ -219,9 +235,11 @@ func _on_modal_reintentar_pressed() -> void:
 
 func _on_paso_pressed() -> void:
 	if en_ejecucion: return
-	var secuencia = lienzo.obtener_secuencia_comandos()
+	var lienzo_actual = lienzo if tabs_codigo.current_tab == 0 else lienzo_a2
+	var astronauta_actual = mundo_3d.astronauta if tabs_codigo.current_tab == 0 else mundo_3d.astronauta_2
+	var secuencia = lienzo_actual.obtener_secuencia_comandos()
 	if secuencia.is_empty():
-		_actualizar_estado("Agrega bloques al lienzo para probar paso a paso.")
+		_actualizar_estado("Agrega bloques al lienzo del astronauta seleccionado.")
 		return
 
 	if indice_paso_actual >= secuencia.size():
@@ -235,7 +253,7 @@ func _on_paso_pressed() -> void:
 	_bloquear_interfaz(true)
 	bloque.resaltar_ejecucion(true)
 
-	var exito = await mundo_3d.astronauta.ejecutar_accion(bloque.id_comando)
+	var exito = await astronauta_actual.ejecutar_accion(bloque.id_comando)
 	await get_tree().create_timer(0.08).timeout
 	bloque.resaltar_ejecucion(false)
 	if not exito:
@@ -258,6 +276,7 @@ func _on_reiniciar_pressed() -> void:
 func _on_limpiar_pressed() -> void:
 	if en_ejecucion: return
 	lienzo.limpiar_todo()
+	lienzo_a2.limpiar_todo()
 	indice_paso_actual = 0
 	_limpiar_error()
 	_actualizar_estado("Lienzo vaciado.")

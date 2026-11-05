@@ -1,0 +1,50 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://scripts/lienzo_codigo.gd" id="1_lienzo"]
+[ext_resource type="PackedScene" uid="uid://df24k8b6lm001" path="res://escenas/bloque_item.tscn" id="2_bloque"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_Lienzo"]
+content_margin_left = 12.0
+content_margin_top = 12.0
+content_margin_right = 12.0
+content_margin_bottom = 12.0
+bg_color = Color(0.12549, 0.156863, 0.2, 0.98)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.34902, 0.388235, 0.447059, 1)
+corner_radius_top_left = 14
+corner_radius_top_right = 14
+corner_radius_bottom_right = 14
+corner_radius_bottom_left = 14
+
+[node name="LienzoCodigo" type="PanelContainer"]
+custom_minimum_size = Vector2(250, 200)
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_Lienzo")
+script = ExtResource("1_lienzo")
+escena_bloque = ExtResource("2_bloque")
+
+[node name="Scroll" type="ScrollContainer" parent="."]
+layout_mode = 2
+
+[node name="ContenedorBloques" type="VBoxContainer" parent="Scroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 6
+
+[node name="LabelVacio" type="Label" parent="Scroll/ContenedorBloques"]
+layout_mode = 2
+size_flags_vertical = 6
+theme_override_colors/font_color = Color(0.75, 0.78, 0.78, 1)
+theme_override_font_sizes/font_size = 15
+text = "Arrastra y suelta aqui\ntus bloques de codigo"
+horizontal_alignment = 1
+vertical_alignment = 1

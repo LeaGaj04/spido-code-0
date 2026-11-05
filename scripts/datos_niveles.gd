@@ -54,5 +54,28 @@ static func obtener_niveles() -> Array[Dictionary]:
 					"celda": Vector2i(-2, 0)
 				}
 			]
+		},
+		{
+			"id": 4,
+			"titulo": "Nivel 4: Trabajo en Equipo",
+			"subtitulo": "Divide y coordina tareas",
+			"instruccion": "Programa una secuencia para cada astronauta. El primero montara el Chasis y el segundo montara las Ruedas.",
+			"concepto_clave": "Descomposicion: divide una tarea grande en trabajos pequenos y coordina su orden.",
+			"objetivo_aprendizaje": "Asignar tareas a dos astronautas y respetar el orden del ensamblaje.",
+			"guiada": false,
+			"bloques_permitidos": ["AVANZAR", "GIRAR_DER", "GIRAR_IZQ", "TOMAR_PIEZA", "ENSAMBLAR"],
+			"bloques_optimos": 15,
+			"pos_astronauta": Vector2i(0, 1),
+			"ori_astronauta": 0,
+			"cantidad_astronautas": 2,
+			"pos_astronauta_2": Vector2i(1, 0),
+			"ori_astronauta_2": 0,
+			"tipo_meta": "ENSAMBLAJE_EQUIPO",
+			"mostrar_mesa": true,
+			"pos_mesa": Vector2i(0, -2),
+			"piezas": [
+				{"tipo": "CHASIS", "celda": Vector2i(-2, 0)},
+				{"tipo": "RUEDAS", "celda": Vector2i(1, -1)}
+			]
 		}
 	]
