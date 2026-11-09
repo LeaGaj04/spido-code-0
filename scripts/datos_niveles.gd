@@ -77,5 +77,32 @@ static func obtener_niveles() -> Array[Dictionary]:
 				{"tipo": "CHASIS", "celda": Vector2i(-2, 0)},
 				{"tipo": "RUEDAS", "celda": Vector2i(1, -1)}
 			]
+		},
+		{
+			"id": 5,
+			"titulo": "Nivel 5: Cadena de Montaje",
+			"subtitulo": "Tres roles, un objetivo",
+			"instruccion": "Asigna una pieza a cada astronauta: Chasis, Ruedas y Sensor. El montaje debe respetar ese orden.",
+			"concepto_clave": "Roles y dependencias: cada tarea aporta una parte y algunas deben ocurrir antes que otras.",
+			"objetivo_aprendizaje": "Coordinar tres secuencias con responsabilidades distintas.",
+			"guiada": false,
+			"bloques_permitidos": ["AVANZAR", "GIRAR_DER", "GIRAR_IZQ", "TOMAR_PIEZA", "ENSAMBLAR"],
+			"bloques_optimos": 21,
+			"pos_astronauta": Vector2i(0, 1),
+			"ori_astronauta": 0,
+			"cantidad_astronautas": 3,
+			"pos_astronauta_2": Vector2i(1, 0),
+			"ori_astronauta_2": 0,
+			"pos_astronauta_3": Vector2i(-1, 0),
+			"ori_astronauta_3": 0,
+			"tipo_meta": "ENSAMBLAJE_EQUIPO",
+			"componentes_objetivo": 3,
+			"mostrar_mesa": true,
+			"pos_mesa": Vector2i(0, -2),
+			"piezas": [
+				{"tipo": "CHASIS", "celda": Vector2i(-2, 0)},
+				{"tipo": "RUEDAS", "celda": Vector2i(1, -1)},
+				{"tipo": "SENSOR", "celda": Vector2i(-1, -1)}
+			]
 		}
 	]

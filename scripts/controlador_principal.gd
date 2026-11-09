@@ -7,6 +7,7 @@ extends Control
 @onready var paleta_contenedor: VBoxContainer = %ListaBloques
 @onready var lienzo: LienzoCodigo = %LienzoAstronauta1
 @onready var lienzo_a2: LienzoCodigo = %LienzoAstronauta2
+@onready var lienzo_a3: LienzoCodigo = %LienzoAstronauta3
 @onready var tabs_codigo: TabContainer = %EquipoCodigo
 @onready var mundo_3d: Mundo3D = %Mundo3D
 
@@ -68,7 +69,9 @@ func _ready() -> void:
 	_conectar_senales()
 	tabs_codigo.set_tab_title(0, "Astronauta 1")
 	tabs_codigo.set_tab_title(1, "Astronauta 2")
+	tabs_codigo.set_tab_title(2, "Astronauta 3")
 	tabs_codigo.set_tab_hidden(1, true)
+	tabs_codigo.set_tab_hidden(2, true)
 	panel_victoria.visible = false
 	cargar_nivel(0)
 
@@ -94,10 +97,12 @@ func cargar_nivel(indice: int) -> void:
 	# Actualizar paleta con SOLO los bloques autorizados en este nivel
 	_actualizar_paleta(nivel.bloques_permitidos)
 	tabs_codigo.set_tab_hidden(1, nivel.get("cantidad_astronautas", 1) < 2)
+	tabs_codigo.set_tab_hidden(2, nivel.get("cantidad_astronautas", 1) < 3)
 
 	# Limpiar lienzo y estado
 	lienzo.limpiar_todo()
 	lienzo_a2.limpiar_todo()
+	lienzo_a3.limpiar_todo()
 	_limpiar_error()
 	panel_victoria.visible = false
 	errores_durante_ejecucion = 0
@@ -147,12 +152,17 @@ func _conectar_senales() -> void:
 			mundo_3d.astronauta_2.accion_fallida.connect(_on_accion_fallida)
 			mundo_3d.astronauta_2.pieza_recogida.connect(_on_pieza_recogida)
 			mundo_3d.astronauta_2.pieza_ensamblada.connect(_on_pieza_ensamblada)
+		if mundo_3d.astronauta_3:
+			mundo_3d.astronauta_3.accion_fallida.connect(_on_accion_fallida)
+			mundo_3d.astronauta_3.pieza_recogida.connect(_on_pieza_recogida)
+			mundo_3d.astronauta_3.pieza_ensamblada.connect(_on_pieza_ensamblada)
 
 func _on_ejecutar_pressed() -> void:
 	if en_ejecucion: return
 	var secuencia_a1 = lienzo.obtener_secuencia_comandos()
 	var secuencia_a2 = lienzo_a2.obtener_secuencia_comandos()
-	if secuencia_a1.is_empty() and secuencia_a2.is_empty():
+	var secuencia_a3 = lienzo_a3.obtener_secuencia_comandos()
+	if secuencia_a1.is_empty() and secuencia_a2.is_empty() and secuencia_a3.is_empty():
 		_actualizar_estado("Los lienzos estan vacios. Arrastra bloques para programar al equipo.")
 		return
 
@@ -167,13 +177,15 @@ func _on_ejecutar_pressed() -> void:
 		abortado = not await _ejecutar_secuencia(mundo_3d.astronauta, secuencia_a1, "Astronauta 1")
 	if not abortado and not secuencia_a2.is_empty():
 		abortado = not await _ejecutar_secuencia(mundo_3d.astronauta_2, secuencia_a2, "Astronauta 2")
+	if not abortado and not secuencia_a3.is_empty():
+		abortado = not await _ejecutar_secuencia(mundo_3d.astronauta_3, secuencia_a3, "Astronauta 3")
 
 	en_ejecucion = false
 	_bloquear_interfaz(false)
 
 	# Evaluar si se cumplio la meta
 	await get_tree().create_timer(0.2).timeout
-	_evaluar_resultado_nivel(secuencia_a1.size() + secuencia_a2.size(), abortado)
+	_evaluar_resultado_nivel(secuencia_a1.size() + secuencia_a2.size() + secuencia_a3.size(), abortado)
 
 func _ejecutar_secuencia(astronauta: AstronautaIngeniero, secuencia: Array[BloqueItem], etiqueta: String) -> bool:
 	for i in range(secuencia.size()):
@@ -235,8 +247,14 @@ func _on_modal_reintentar_pressed() -> void:
 
 func _on_paso_pressed() -> void:
 	if en_ejecucion: return
-	var lienzo_actual = lienzo if tabs_codigo.current_tab == 0 else lienzo_a2
-	var astronauta_actual = mundo_3d.astronauta if tabs_codigo.current_tab == 0 else mundo_3d.astronauta_2
+	var lienzo_actual = lienzo
+	var astronauta_actual = mundo_3d.astronauta
+	if tabs_codigo.current_tab == 1:
+		lienzo_actual = lienzo_a2
+		astronauta_actual = mundo_3d.astronauta_2
+	elif tabs_codigo.current_tab == 2:
+		lienzo_actual = lienzo_a3
+		astronauta_actual = mundo_3d.astronauta_3
 	var secuencia = lienzo_actual.obtener_secuencia_comandos()
 	if secuencia.is_empty():
 		_actualizar_estado("Agrega bloques al lienzo del astronauta seleccionado.")
@@ -277,6 +295,7 @@ func _on_limpiar_pressed() -> void:
 	if en_ejecucion: return
 	lienzo.limpiar_todo()
 	lienzo_a2.limpiar_todo()
+	lienzo_a3.limpiar_todo()
 	indice_paso_actual = 0
 	_limpiar_error()
 	_actualizar_estado("Lienzo vaciado.")
