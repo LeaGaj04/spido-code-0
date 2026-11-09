@@ -104,5 +104,32 @@ static func obtener_niveles() -> Array[Dictionary]:
 				{"tipo": "RUEDAS", "celda": Vector2i(1, -1)},
 				{"tipo": "SENSOR", "celda": Vector2i(-1, -1)}
 			]
+		},
+		{
+			"id": 6,
+			"titulo": "Nivel 6: Patron Reutilizable",
+			"subtitulo": "Repite sin reconstruir",
+			"instruccion": "Construye una secuencia de movimiento y usa Duplicar para reutilizarla antes de ajustarla a cada astronauta.",
+			"concepto_clave": "Reutilizacion: un patron de acciones puede servir como base para otra tarea.",
+			"objetivo_aprendizaje": "Reconocer y reutilizar patrones de instrucciones.",
+			"guiada": false,
+			"bloques_permitidos": ["AVANZAR", "GIRAR_DER", "GIRAR_IZQ", "TOMAR_PIEZA", "ENSAMBLAR"],
+			"bloques_optimos": 21,
+			"pos_astronauta": Vector2i(0, 1),
+			"ori_astronauta": 0,
+			"cantidad_astronautas": 3,
+			"pos_astronauta_2": Vector2i(1, 0),
+			"ori_astronauta_2": 0,
+			"pos_astronauta_3": Vector2i(-1, 0),
+			"ori_astronauta_3": 0,
+			"tipo_meta": "ENSAMBLAJE_EQUIPO",
+			"componentes_objetivo": 3,
+			"mostrar_mesa": true,
+			"pos_mesa": Vector2i(0, -2),
+			"piezas": [
+				{"tipo": "CHASIS", "celda": Vector2i(-2, 0)},
+				{"tipo": "RUEDAS", "celda": Vector2i(1, -1)},
+				{"tipo": "SENSOR", "celda": Vector2i(-1, -1)}
+			]
 		}
 	]

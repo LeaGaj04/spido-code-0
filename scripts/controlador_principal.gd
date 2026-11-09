@@ -28,6 +28,7 @@ extends Control
 @onready var btn_paso: Button = %BtnPaso
 @onready var btn_reiniciar: Button = %BtnReiniciar
 @onready var btn_limpiar: Button = %BtnLimpiar
+@onready var btn_duplicar: Button = %BtnDuplicar
 
 # Popup / Modal de Victoria
 @onready var panel_victoria: PanelContainer = %ModalVictoria
@@ -133,6 +134,7 @@ func _conectar_senales() -> void:
 	btn_paso.pressed.connect(_on_paso_pressed)
 	btn_reiniciar.pressed.connect(_on_reiniciar_pressed)
 	btn_limpiar.pressed.connect(_on_limpiar_pressed)
+	btn_duplicar.pressed.connect(_on_duplicar_pressed)
 
 	btn_nivel_prev.pressed.connect(func(): cargar_nivel(indice_nivel_actual - 1))
 	btn_nivel_next.pressed.connect(func(): cargar_nivel(indice_nivel_actual + 1))
@@ -300,10 +302,24 @@ func _on_limpiar_pressed() -> void:
 	_limpiar_error()
 	_actualizar_estado("Lienzo vaciado.")
 
+func _on_duplicar_pressed() -> void:
+	if en_ejecucion:
+		return
+	var lienzo_actual = lienzo
+	if tabs_codigo.current_tab == 1:
+		lienzo_actual = lienzo_a2
+	elif tabs_codigo.current_tab == 2:
+		lienzo_actual = lienzo_a3
+	if lienzo_actual.duplicar_secuencia():
+		_actualizar_estado("Secuencia duplicada. Ahora puedes reutilizarla o modificarla.")
+	else:
+		_actualizar_estado("No hay una secuencia para duplicar.")
+
 func _bloquear_interfaz(bloquear: bool) -> void:
 	btn_ejecutar.disabled = bloquear
 	btn_paso.disabled = bloquear
 	btn_limpiar.disabled = bloquear
+	btn_duplicar.disabled = bloquear
 	btn_nivel_prev.disabled = bloquear or (indice_nivel_actual == 0)
 	btn_nivel_next.disabled = bloquear or (indice_nivel_actual == niveles.size() - 1)
 	btn_guia_continuar.disabled = bloquear

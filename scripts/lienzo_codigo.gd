@@ -71,6 +71,22 @@ func limpiar_todo() -> void:
 	_actualizar_estado_vacio()
 	algoritmo_modificado.emit()
 
+func duplicar_secuencia() -> bool:
+	var originales = obtener_secuencia_comandos()
+	if originales.is_empty():
+		return false
+	var copias: Array[BloqueItem] = []
+	for original in originales:
+		var copia := escena_bloque.instantiate() as BloqueItem
+		copia.configurar(original.id_comando, original.titulo, original.prefijo, original.color_borde, false)
+		copia.solicitado_eliminar.connect(_on_bloque_solicitado_eliminar)
+		copias.append(copia)
+	for copia in copias:
+		contenedor_bloques.add_child(copia)
+	_actualizar_estado_vacio()
+	algoritmo_modificado.emit()
+	return true
+
 func _on_bloque_solicitado_eliminar(bloque: BloqueItem) -> void:
 	bloque.queue_free()
 	await get_tree().process_frame
