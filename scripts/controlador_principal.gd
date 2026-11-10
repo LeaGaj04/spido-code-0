@@ -10,6 +10,8 @@ extends Control
 @onready var lienzo_a3: LienzoCodigo = %LienzoAstronauta3
 @onready var lienzo_a4: LienzoCodigo = %LienzoAstronauta4
 @onready var lienzo_a5: LienzoCodigo = %LienzoAstronauta5
+@onready var lienzo_a6: LienzoCodigo = %LienzoAstronauta6
+@onready var lienzo_a7: LienzoCodigo = %LienzoAstronauta7
 @onready var tabs_codigo: TabContainer = %EquipoCodigo
 @onready var mundo_3d: Mundo3D = %Mundo3D
 
@@ -75,10 +77,14 @@ func _ready() -> void:
 	tabs_codigo.set_tab_title(2, "Astronauta 3")
 	tabs_codigo.set_tab_title(3, "Astronauta 4")
 	tabs_codigo.set_tab_title(4, "Astronauta 5")
+	tabs_codigo.set_tab_title(5, "Astronauta 6")
+	tabs_codigo.set_tab_title(6, "Astronauta 7")
 	tabs_codigo.set_tab_hidden(1, true)
 	tabs_codigo.set_tab_hidden(2, true)
 	tabs_codigo.set_tab_hidden(3, true)
 	tabs_codigo.set_tab_hidden(4, true)
+	tabs_codigo.set_tab_hidden(5, true)
+	tabs_codigo.set_tab_hidden(6, true)
 	panel_victoria.visible = false
 	cargar_nivel(0)
 
@@ -107,6 +113,8 @@ func cargar_nivel(indice: int) -> void:
 	tabs_codigo.set_tab_hidden(2, nivel.get("cantidad_astronautas", 1) < 3)
 	tabs_codigo.set_tab_hidden(3, nivel.get("cantidad_astronautas", 1) < 4)
 	tabs_codigo.set_tab_hidden(4, nivel.get("cantidad_astronautas", 1) < 5)
+	tabs_codigo.set_tab_hidden(5, nivel.get("cantidad_astronautas", 1) < 6)
+	tabs_codigo.set_tab_hidden(6, nivel.get("cantidad_astronautas", 1) < 7)
 
 	# Limpiar lienzo y estado
 	lienzo.limpiar_todo()
@@ -114,6 +122,8 @@ func cargar_nivel(indice: int) -> void:
 	lienzo_a3.limpiar_todo()
 	lienzo_a4.limpiar_todo()
 	lienzo_a5.limpiar_todo()
+	lienzo_a6.limpiar_todo()
+	lienzo_a7.limpiar_todo()
 	_limpiar_error()
 	panel_victoria.visible = false
 	errores_durante_ejecucion = 0
@@ -176,6 +186,14 @@ func _conectar_senales() -> void:
 			mundo_3d.astronauta_5.accion_fallida.connect(_on_accion_fallida)
 			mundo_3d.astronauta_5.pieza_recogida.connect(_on_pieza_recogida)
 			mundo_3d.astronauta_5.pieza_ensamblada.connect(_on_pieza_ensamblada)
+		if mundo_3d.astronauta_6:
+			mundo_3d.astronauta_6.accion_fallida.connect(_on_accion_fallida)
+			mundo_3d.astronauta_6.pieza_recogida.connect(_on_pieza_recogida)
+			mundo_3d.astronauta_6.pieza_ensamblada.connect(_on_pieza_ensamblada)
+		if mundo_3d.astronauta_7:
+			mundo_3d.astronauta_7.accion_fallida.connect(_on_accion_fallida)
+			mundo_3d.astronauta_7.pieza_recogida.connect(_on_pieza_recogida)
+			mundo_3d.astronauta_7.pieza_ensamblada.connect(_on_pieza_ensamblada)
 
 func _on_ejecutar_pressed() -> void:
 	if en_ejecucion: return
@@ -184,7 +202,9 @@ func _on_ejecutar_pressed() -> void:
 	var secuencia_a3 = lienzo_a3.obtener_secuencia_comandos()
 	var secuencia_a4 = lienzo_a4.obtener_secuencia_comandos()
 	var secuencia_a5 = lienzo_a5.obtener_secuencia_comandos()
-	if secuencia_a1.is_empty() and secuencia_a2.is_empty() and secuencia_a3.is_empty() and secuencia_a4.is_empty() and secuencia_a5.is_empty():
+	var secuencia_a6 = lienzo_a6.obtener_secuencia_comandos()
+	var secuencia_a7 = lienzo_a7.obtener_secuencia_comandos()
+	if secuencia_a1.is_empty() and secuencia_a2.is_empty() and secuencia_a3.is_empty() and secuencia_a4.is_empty() and secuencia_a5.is_empty() and secuencia_a6.is_empty() and secuencia_a7.is_empty():
 		_actualizar_estado("Los lienzos estan vacios. Arrastra bloques para programar al equipo.")
 		return
 
@@ -198,8 +218,8 @@ func _on_ejecutar_pressed() -> void:
 	var nivel = niveles[indice_nivel_actual]
 	if nivel.get("modo_paralelo", false):
 		abortado = not await _ejecutar_equipo_paralelo(
-			[mundo_3d.astronauta, mundo_3d.astronauta_2, mundo_3d.astronauta_3, mundo_3d.astronauta_4, mundo_3d.astronauta_5],
-			[secuencia_a1, secuencia_a2, secuencia_a3, secuencia_a4, secuencia_a5]
+			[mundo_3d.astronauta, mundo_3d.astronauta_2, mundo_3d.astronauta_3, mundo_3d.astronauta_4, mundo_3d.astronauta_5, mundo_3d.astronauta_6, mundo_3d.astronauta_7],
+			[secuencia_a1, secuencia_a2, secuencia_a3, secuencia_a4, secuencia_a5, secuencia_a6, secuencia_a7]
 		)
 	else:
 		if not secuencia_a1.is_empty():
@@ -212,13 +232,17 @@ func _on_ejecutar_pressed() -> void:
 			abortado = not await _ejecutar_secuencia(mundo_3d.astronauta_4, secuencia_a4, "Astronauta 4")
 		if not abortado and not secuencia_a5.is_empty():
 			abortado = not await _ejecutar_secuencia(mundo_3d.astronauta_5, secuencia_a5, "Astronauta 5")
+		if not abortado and not secuencia_a6.is_empty():
+			abortado = not await _ejecutar_secuencia(mundo_3d.astronauta_6, secuencia_a6, "Astronauta 6")
+		if not abortado and not secuencia_a7.is_empty():
+			abortado = not await _ejecutar_secuencia(mundo_3d.astronauta_7, secuencia_a7, "Astronauta 7")
 
 	en_ejecucion = false
 	_bloquear_interfaz(false)
 
 	# Evaluar si se cumplio la meta
 	await get_tree().create_timer(0.2).timeout
-	_evaluar_resultado_nivel(secuencia_a1.size() + secuencia_a2.size() + secuencia_a3.size() + secuencia_a4.size() + secuencia_a5.size(), abortado)
+	_evaluar_resultado_nivel(secuencia_a1.size() + secuencia_a2.size() + secuencia_a3.size() + secuencia_a4.size() + secuencia_a5.size() + secuencia_a6.size() + secuencia_a7.size(), abortado)
 
 func _ejecutar_equipo_paralelo(astronautas: Array, secuencias: Array) -> bool:
 	var max_pasos = 0
@@ -311,10 +335,6 @@ func _on_paso_pressed() -> void:
 		astronauta_actual = mundo_3d.astronauta_2
 	elif tabs_codigo.current_tab == 2:
 		lienzo_actual = lienzo_a3
-	elif tabs_codigo.current_tab == 3:
-		lienzo_actual = lienzo_a4
-	elif tabs_codigo.current_tab == 4:
-		lienzo_actual = lienzo_a5
 		astronauta_actual = mundo_3d.astronauta_3
 	elif tabs_codigo.current_tab == 3:
 		lienzo_actual = lienzo_a4
@@ -322,6 +342,12 @@ func _on_paso_pressed() -> void:
 	elif tabs_codigo.current_tab == 4:
 		lienzo_actual = lienzo_a5
 		astronauta_actual = mundo_3d.astronauta_5
+	elif tabs_codigo.current_tab == 5:
+		lienzo_actual = lienzo_a6
+		astronauta_actual = mundo_3d.astronauta_6
+	elif tabs_codigo.current_tab == 6:
+		lienzo_actual = lienzo_a7
+		astronauta_actual = mundo_3d.astronauta_7
 	var secuencia = lienzo_actual.obtener_secuencia_comandos()
 	if secuencia.is_empty():
 		_actualizar_estado("Agrega bloques al lienzo del astronauta seleccionado.")
@@ -365,6 +391,8 @@ func _on_limpiar_pressed() -> void:
 	lienzo_a3.limpiar_todo()
 	lienzo_a4.limpiar_todo()
 	lienzo_a5.limpiar_todo()
+	lienzo_a6.limpiar_todo()
+	lienzo_a7.limpiar_todo()
 	indice_paso_actual = 0
 	_limpiar_error()
 	_actualizar_estado("Lienzo vaciado.")
@@ -377,6 +405,14 @@ func _on_duplicar_pressed() -> void:
 		lienzo_actual = lienzo_a2
 	elif tabs_codigo.current_tab == 2:
 		lienzo_actual = lienzo_a3
+	elif tabs_codigo.current_tab == 3:
+		lienzo_actual = lienzo_a4
+	elif tabs_codigo.current_tab == 4:
+		lienzo_actual = lienzo_a5
+	elif tabs_codigo.current_tab == 5:
+		lienzo_actual = lienzo_a6
+	elif tabs_codigo.current_tab == 6:
+		lienzo_actual = lienzo_a7
 	if lienzo_actual.duplicar_secuencia():
 		_actualizar_estado("Secuencia duplicada. Ahora puedes reutilizarla o modificarla.")
 	else:

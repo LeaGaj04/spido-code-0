@@ -163,5 +163,41 @@ static func obtener_niveles() -> Array[Dictionary]:
 				{"tipo": "RUEDAS", "celda": Vector2i(1, -1)},
 				{"tipo": "SENSOR", "celda": Vector2i(-1, -1)}
 			]
+		},
+		{
+			"id": 8,
+			"titulo": "Nivel 8: Operacion Completa",
+			"subtitulo": "Siete astronautas, una estrategia",
+			"instruccion": "Distribuye las tareas entre siete astronautas. Los primeros tres ensamblan y los demas apoyan con rutas de preparacion.",
+			"concepto_clave": "Planificacion: una solucion grande necesita repartir trabajo y anticipar dependencias.",
+			"objetivo_aprendizaje": "Diseñar una estrategia para un equipo con tareas principales y de apoyo.",
+			"guiada": false,
+			"modo_paralelo": true,
+			"bloques_permitidos": ["AVANZAR", "GIRAR_DER", "GIRAR_IZQ", "TOMAR_PIEZA", "ENSAMBLAR"],
+			"bloques_optimos": 27,
+			"pos_astronauta": Vector2i(0, 1),
+			"ori_astronauta": 0,
+			"cantidad_astronautas": 7,
+			"pos_astronauta_2": Vector2i(1, 0),
+			"ori_astronauta_2": 0,
+			"pos_astronauta_3": Vector2i(-1, 0),
+			"ori_astronauta_3": 0,
+			"pos_astronauta_4": Vector2i(2, 1),
+			"ori_astronauta_4": 0,
+			"pos_astronauta_5": Vector2i(-2, 1),
+			"ori_astronauta_5": 0,
+			"pos_astronauta_6": Vector2i(2, 0),
+			"ori_astronauta_6": 0,
+			"pos_astronauta_7": Vector2i(-2, 0),
+			"ori_astronauta_7": 0,
+			"tipo_meta": "ENSAMBLAJE_EQUIPO",
+			"componentes_objetivo": 3,
+			"mostrar_mesa": true,
+			"pos_mesa": Vector2i(0, -2),
+			"piezas": [
+				{"tipo": "CHASIS", "celda": Vector2i(-2, 0)},
+				{"tipo": "RUEDAS", "celda": Vector2i(1, -1)},
+				{"tipo": "SENSOR", "celda": Vector2i(-1, -1)}
+			]
 		}
 	]
