@@ -131,5 +131,37 @@ static func obtener_niveles() -> Array[Dictionary]:
 				{"tipo": "RUEDAS", "celda": Vector2i(1, -1)},
 				{"tipo": "SENSOR", "celda": Vector2i(-1, -1)}
 			]
+		},
+		{
+			"id": 7,
+			"titulo": "Nivel 7: Cadena Paralela",
+			"subtitulo": "Coordina cinco astronautas",
+			"instruccion": "Programa cinco secuencias. Las acciones avanzaran intercaladas para que el equipo trabaje al mismo tiempo.",
+			"concepto_clave": "Paralelismo: varias tareas pueden avanzar coordinadamente sin perder sus responsabilidades.",
+			"objetivo_aprendizaje": "Planificar acciones de un equipo grande y observar su coordinacion.",
+			"guiada": false,
+			"modo_paralelo": true,
+			"bloques_permitidos": ["AVANZAR", "GIRAR_DER", "GIRAR_IZQ", "TOMAR_PIEZA", "ENSAMBLAR"],
+			"bloques_optimos": 23,
+			"pos_astronauta": Vector2i(0, 1),
+			"ori_astronauta": 0,
+			"cantidad_astronautas": 5,
+			"pos_astronauta_2": Vector2i(1, 0),
+			"ori_astronauta_2": 0,
+			"pos_astronauta_3": Vector2i(-1, 0),
+			"ori_astronauta_3": 0,
+			"pos_astronauta_4": Vector2i(2, 1),
+			"ori_astronauta_4": 0,
+			"pos_astronauta_5": Vector2i(-2, 1),
+			"ori_astronauta_5": 0,
+			"tipo_meta": "ENSAMBLAJE_EQUIPO",
+			"componentes_objetivo": 3,
+			"mostrar_mesa": true,
+			"pos_mesa": Vector2i(0, -2),
+			"piezas": [
+				{"tipo": "CHASIS", "celda": Vector2i(-2, 0)},
+				{"tipo": "RUEDAS", "celda": Vector2i(1, -1)},
+				{"tipo": "SENSOR", "celda": Vector2i(-1, -1)}
+			]
 		}
 	]

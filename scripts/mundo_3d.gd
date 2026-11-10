@@ -6,6 +6,8 @@ extends Node3D
 @onready var astronauta: AstronautaIngeniero = $Astronauta
 @onready var astronauta_2: AstronautaIngeniero = $Astronauta2
 @onready var astronauta_3: AstronautaIngeniero = $Astronauta3
+@onready var astronauta_4: AstronautaIngeniero = $Astronauta4
+@onready var astronauta_5: AstronautaIngeniero = $Astronauta5
 @onready var mesa_spid: MesaEnsamblaje = $MesaEnsamblaje
 @onready var baliza_meta: BalizaMeta = $BalizaMeta
 @onready var contenedor_piezas: Node3D = $ContenedorPiezas
@@ -31,6 +33,13 @@ func cargar_nivel(config: Dictionary) -> void:
 		astronauta_3.visible = mostrar_astronauta_3
 		if mostrar_astronauta_3:
 			astronauta_3.configurar_inicio(config.get("pos_astronauta_3", Vector2i(-1, 0)), config.get("ori_astronauta_3", 0))
+	for par in [[astronauta_4, 4], [astronauta_5, 5]]:
+		var extra: AstronautaIngeniero = par[0]
+		var numero: int = par[1]
+		if extra:
+			extra.visible = config.get("cantidad_astronautas", 1) >= numero
+			if extra.visible:
+				extra.configurar_inicio(config.get("pos_astronauta_%d" % numero, Vector2i.ZERO), config.get("ori_astronauta_%d" % numero, 0))
 
 	# 2. Configurar mesa de ensamblaje
 	var mostrar_mesa = config.get("mostrar_mesa", false)
@@ -125,6 +134,10 @@ func reiniciar_mundo() -> void:
 		await astronauta_2.reiniciar()
 	if astronauta_3 and astronauta_3.visible:
 		await astronauta_3.reiniciar()
+	if astronauta_4 and astronauta_4.visible:
+		await astronauta_4.reiniciar()
+	if astronauta_5 and astronauta_5.visible:
+		await astronauta_5.reiniciar()
 	if mesa_spid and mesa_spid.visible:
 		mesa_spid.reiniciar()
 	_recrear_piezas(config_nivel_actual.get("piezas", []))
