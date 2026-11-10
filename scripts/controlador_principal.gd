@@ -108,6 +108,8 @@ func cargar_nivel(indice: int) -> void:
 	label_nivel_titulo.text = "[NIVEL %d] %s - %s" % [nivel.id, nivel.titulo, nivel.subtitulo]
 	label_ada_texto.text = nivel.instruccion
 	label_concepto.text = "Concepto: %s" % nivel.concepto_clave
+	if nivel.get("puente_spidocode", false):
+		label_concepto.text += "\nPuente a SpidoCode: Avanzar → spid.avanzar(), Girar → spid.girar(), Ensamblar → spid.ensamblar()"
 	guia_activa = nivel.get("guiada", false)
 	paso_guia = 0
 	panel_guia.visible = guia_activa
