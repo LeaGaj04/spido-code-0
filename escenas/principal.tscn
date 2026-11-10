@@ -484,3 +484,63 @@ unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Siguiente Mision"
+
+[node name="FondoMenuPausa" type="ColorRect" parent="."]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.015, 0.025, 0.055, 0.78)
+
+[node name="MenuPausa" type="PanelContainer" parent="."]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -210.0
+offset_top = -155.0
+offset_right = 210.0
+offset_bottom = 155.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_Modal")
+
+[node name="VBox" type="VBoxContainer" parent="MenuPausa"]
+layout_mode = 2
+theme_override_constants/separation = 18
+
+[node name="Titulo" type="Label" parent="MenuPausa/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.545098, 0.796078, 0.568627, 1)
+theme_override_font_sizes/font_size = 30
+text = "JUEGO EN PAUSA"
+horizontal_alignment = 1
+
+[node name="Descripcion" type="Label" parent="MenuPausa/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.956863, 0.964706, 0.94902, 1)
+theme_override_font_sizes/font_size = 16
+text = "Presiona Esc para continuar"
+horizontal_alignment = 1
+
+[node name="Separador" type="HSeparator" parent="MenuPausa/VBox"]
+layout_mode = 2
+
+[node name="BtnContinuar" type="Button" parent="MenuPausa/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Continuar"
+
+[node name="BtnVolverMenu" type="Button" parent="MenuPausa/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_type_variation = &"SecondaryButton"
+text = "Volver al menú principal"

@@ -1,0 +1,212 @@
+[gd_scene load_steps=7 format=3]
+
+[ext_resource type="Script" path="res://scripts/menu_inicio.gd" id="1_menu"]
+[ext_resource type="Texture2D" path="res://assets/menu/fondo_spidocode_0.png" id="2_fondo"]
+
+[sub_resource type="StyleBoxFlat" id="PanelMenu"]
+content_margin_left = 16.0
+content_margin_top = 16.0
+content_margin_right = 16.0
+content_margin_bottom = 16.0
+bg_color = Color(0.270588, 0.301961, 0.352941, 0.96)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 4
+border_color = Color(0.34902, 0.388235, 0.447059, 1)
+corner_radius_top_left = 22
+corner_radius_top_right = 22
+corner_radius_bottom_right = 22
+corner_radius_bottom_left = 22
+shadow_color = Color(0.12549, 0.156863, 0.2, 0.95)
+shadow_size = 4
+shadow_offset = Vector2(8, 8)
+
+[sub_resource type="StyleBoxFlat" id="ButtonNormal"]
+content_margin_left = 14.0
+content_margin_top = 9.0
+content_margin_right = 14.0
+content_margin_bottom = 9.0
+bg_color = Color(0.545098, 0.796078, 0.568627, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 6
+border_color = Color(0.435294, 0.686275, 0.470588, 1)
+corner_radius_top_left = 16
+corner_radius_top_right = 16
+corner_radius_bottom_right = 16
+corner_radius_bottom_left = 16
+shadow_color = Color(0.12549, 0.156863, 0.2, 0.92)
+shadow_size = 2
+shadow_offset = Vector2(0, 6)
+
+[sub_resource type="StyleBoxFlat" id="ButtonPressed"]
+content_margin_left = 14.0
+content_margin_top = 9.0
+content_margin_right = 14.0
+content_margin_bottom = 9.0
+bg_color = Color(0.435294, 0.686275, 0.470588, 1)
+border_width_left = 3
+border_width_top = 5
+border_width_right = 3
+border_width_bottom = 2
+border_color = Color(0.345098, 0.564706, 0.384314, 1)
+corner_radius_top_left = 16
+corner_radius_top_right = 16
+corner_radius_bottom_right = 16
+corner_radius_bottom_left = 16
+
+[sub_resource type="StyleBoxFlat" id="ButtonHover"]
+content_margin_left = 14.0
+content_margin_top = 9.0
+content_margin_right = 14.0
+content_margin_bottom = 9.0
+bg_color = Color(0.631373, 0.85098, 0.65098, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 6
+border_color = Color(0.435294, 0.686275, 0.470588, 1)
+corner_radius_top_left = 16
+corner_radius_top_right = 16
+corner_radius_bottom_right = 16
+corner_radius_bottom_left = 16
+expand_margin_left = 2.0
+expand_margin_top = 2.0
+expand_margin_right = 2.0
+expand_margin_bottom = 2.0
+shadow_color = Color(0.12549, 0.156863, 0.2, 0.92)
+shadow_size = 2
+shadow_offset = Vector2(0, 7)
+
+[sub_resource type="StyleBoxFlat" id="PanelPerfil"]
+content_margin_left = 20.0
+content_margin_top = 20.0
+content_margin_right = 20.0
+content_margin_bottom = 20.0
+bg_color = Color(0.270588, 0.301961, 0.352941, 0.96)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 4
+border_color = Color(0.34902, 0.388235, 0.447059, 1)
+corner_radius_top_left = 18
+corner_radius_top_right = 18
+corner_radius_bottom_right = 18
+corner_radius_bottom_left = 18
+shadow_color = Color(0.12549, 0.156863, 0.2, 0.95)
+shadow_size = 4
+shadow_offset = Vector2(7, 7)
+
+[node name="MenuInicio" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_menu")
+
+[node name="Fondo" type="TextureRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("2_fondo")
+expand_mode = 1
+stretch_mode = 6
+mouse_filter = 2
+
+[node name="Titulo" type="Label" parent="."]
+layout_mode = 1
+offset_left = 20.0
+offset_top = 34.0
+offset_right = 1200.0
+offset_bottom = 250.0
+theme_override_colors/font_color = Color(0.956863, 0.964706, 0.94902, 1)
+theme_override_colors/font_shadow_color = Color(0.35, 0.08, 0.85, 0.8)
+theme_override_colors/font_outline_color = Color(0.12549, 0.156863, 0.2, 1)
+theme_override_constants/shadow_offset_x = 5
+theme_override_constants/shadow_offset_y = 7
+theme_override_constants/outline_size = 15
+theme_override_font_sizes/font_size = 150
+text = "SPIDOCODE 0"
+horizontal_alignment = 1
+
+[node name="PanelMenu" type="PanelContainer" parent="."]
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 40.0
+offset_top = -236.0
+offset_right = 250.0
+offset_bottom = -40.0
+grow_vertical = 0
+theme_override_styles/panel = SubResource("PanelMenu")
+
+[node name="ContenedorPrincipal" type="VBoxContainer" parent="PanelMenu"]
+layout_mode = 2
+theme_override_constants/separation = 20
+
+[node name="BotonJugar" type="Button" parent="PanelMenu/ContenedorPrincipal"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.956863, 0.964706, 0.94902, 1)
+theme_override_colors/font_outline_color = Color(0.12549, 0.156863, 0.2, 1)
+theme_override_constants/outline_size = 3
+theme_override_font_sizes/font_size = 20
+theme_override_styles/normal = SubResource("ButtonNormal")
+theme_override_styles/pressed = SubResource("ButtonPressed")
+theme_override_styles/hover = SubResource("ButtonHover")
+text = "Nueva Partida"
+
+[node name="BotonConfiguracion" type="Button" parent="PanelMenu/ContenedorPrincipal"]
+layout_mode = 2
+theme_type_variation = &"SecondaryButton"
+theme_override_colors/font_color = Color(0.956863, 0.964706, 0.94902, 1)
+theme_override_colors/font_outline_color = Color(0.12549, 0.156863, 0.2, 1)
+theme_override_constants/outline_size = 3
+theme_override_font_sizes/font_size = 20
+text = "Configuración"
+
+[node name="BotonSalir" type="Button" parent="PanelMenu/ContenedorPrincipal"]
+layout_mode = 2
+theme_type_variation = &"SecondaryButton"
+theme_override_colors/font_color = Color(0.956863, 0.964706, 0.94902, 1)
+theme_override_colors/font_outline_color = Color(0.12549, 0.156863, 0.2, 1)
+theme_override_constants/outline_size = 3
+theme_override_font_sizes/font_size = 20
+text = "Salir"
+
+[node name="PanelPerfil" type="PanelContainer" parent="."]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -218.0
+offset_top = 24.0
+offset_right = -24.0
+offset_bottom = 87.0
+grow_horizontal = 0
+theme_override_styles/panel = SubResource("PanelPerfil")
+
+[node name="ButtonLogin" type="Button" parent="PanelPerfil"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.956863, 0.964706, 0.94902, 1)
+theme_override_colors/font_outline_color = Color(0.12549, 0.156863, 0.2, 1)
+theme_override_constants/outline_size = 3
+theme_override_font_sizes/font_size = 20
+theme_override_styles/normal = SubResource("ButtonNormal")
+theme_override_styles/pressed = SubResource("ButtonPressed")
+theme_override_styles/hover = SubResource("ButtonHover")
+text = "Iniciar Sesión"
+
+[node name="Dialogo" type="AcceptDialog" parent="."]
+
+[connection signal="pressed" from="PanelMenu/ContenedorPrincipal/BotonJugar" to="." method="_on_boton_jugar_pressed"]
+[connection signal="pressed" from="PanelMenu/ContenedorPrincipal/BotonConfiguracion" to="." method="_on_boton_configuracion_pressed"]
+[connection signal="pressed" from="PanelMenu/ContenedorPrincipal/BotonSalir" to="." method="_on_boton_salir_pressed"]
+[connection signal="pressed" from="PanelPerfil/ButtonLogin" to="." method="_on_boton_login_pressed"]
