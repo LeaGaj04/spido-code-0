@@ -21,11 +21,11 @@ var grid_z_inicial: int = 0
 
 var pieza_en_mano: Node3D = null
 
-@onready var cuerpo: MeshInstance3D = $Cuerpo
-@onready var casco_visor: MeshInstance3D = $Casco/Visor
 @onready var slot_manos: Marker3D = $SlotManos
+var casco_visor: MeshInstance3D = null
 
 func _ready() -> void:
+	casco_visor = find_child("Visor", true, false) as MeshInstance3D
 	posicion_inicial = global_position
 	rotacion_inicial = rotation
 	grid_x_inicial = int(round(position.x / tamano_celda))
@@ -268,8 +268,15 @@ func _animar_duda() -> void:
 	animacion_terminada.emit()
 
 func _set_color_visor(c: Color) -> void:
-	if not casco_visor: return
+	if not casco_visor:
+		casco_visor = find_child("Visor", true, false) as MeshInstance3D
+	if not casco_visor:
+		return
 	var mat = casco_visor.get_surface_override_material(0)
-	if mat is StandardMaterial3D:
-		mat.albedo_color = c
-		mat.emission = c
+	if not (mat is StandardMaterial3D):
+		mat = StandardMaterial3D.new()
+		mat.roughness = 0.1
+		mat.emission_enabled = true
+		casco_visor.set_surface_override_material(0, mat)
+	mat.albedo_color = c
+	mat.emission = c
