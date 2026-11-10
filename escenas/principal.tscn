@@ -366,6 +366,13 @@ size_flags_horizontal = 3
 theme_type_variation = &"SecondaryButton"
 text = "Limpiar"
 
+[node name="BtnDuplicar" type="Button" parent="HSplit/PanelDerecho/VBox/BarraBotones"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_type_variation = &"SecondaryButton"
+text = "Duplicar"
+
 [node name="Separador" type="HSeparator" parent="HSplit/PanelDerecho/VBox"]
 layout_mode = 2
 
@@ -379,6 +386,26 @@ unique_name_in_owner = true
 layout_mode = 2
 
 [node name="LienzoAstronauta2" parent="HSplit/PanelDerecho/VBox/EquipoCodigo" instance=ExtResource("5_lienzo")]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="LienzoAstronauta3" parent="HSplit/PanelDerecho/VBox/EquipoCodigo" instance=ExtResource("5_lienzo")]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="LienzoAstronauta4" parent="HSplit/PanelDerecho/VBox/EquipoCodigo" instance=ExtResource("5_lienzo")]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="LienzoAstronauta5" parent="HSplit/PanelDerecho/VBox/EquipoCodigo" instance=ExtResource("5_lienzo")]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="LienzoAstronauta6" parent="HSplit/PanelDerecho/VBox/EquipoCodigo" instance=ExtResource("5_lienzo")]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="LienzoAstronauta7" parent="HSplit/PanelDerecho/VBox/EquipoCodigo" instance=ExtResource("5_lienzo")]
 unique_name_in_owner = true
 layout_mode = 2
 
