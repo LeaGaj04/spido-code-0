@@ -44,6 +44,14 @@ extends Control
 @onready var btn_modal_siguiente: Button = %BtnModalSiguiente
 @onready var btn_modal_reintentar: Button = %BtnModalReintentar
 
+# Menu de pausa
+@onready var fondo_menu_pausa: ColorRect = %FondoMenuPausa
+@onready var menu_pausa: PanelContainer = %MenuPausa
+@onready var btn_continuar: Button = %BtnContinuar
+@onready var btn_volver_menu: Button = %BtnVolverMenu
+
+const ESCENA_MENU_PRINCIPAL := "res://escenas/menu_inicio.tscn"
+
 var niveles: Array[Dictionary] = []
 var indice_nivel_actual: int = 0
 
@@ -73,6 +81,8 @@ const COMANDOS_DISPONIBLES = {
 }
 
 func _ready() -> void:
+	process_mode = Node.PROCESS_MODE_ALWAYS
+	get_tree().paused = false
 	niveles = DatosNiveles.obtener_niveles()
 	_conectar_senales()
 	tabs_codigo.set_tab_title(0, "Astronauta 1")
@@ -95,7 +105,14 @@ func _ready() -> void:
 	tabs_codigo.set_tab_hidden(8, true)
 	tabs_codigo.set_tab_hidden(9, true)
 	panel_victoria.visible = false
+	fondo_menu_pausa.visible = false
+	menu_pausa.visible = false
 	cargar_nivel(0)
+
+func _input(event: InputEvent) -> void:
+	if event.is_action_pressed("ui_cancel"):
+		_cambiar_estado_pausa(not menu_pausa.visible)
+		get_viewport().set_input_as_handled()
 
 func cargar_nivel(indice: int) -> void:
 	if indice < 0 or indice >= niveles.size():
@@ -180,8 +197,9 @@ func _conectar_senales() -> void:
 	btn_modal_reintentar.pressed.connect(_on_modal_reintentar_pressed)
 	btn_guia_continuar.pressed.connect(_on_guia_continuar_pressed)
 	btn_pista.pressed.connect(_on_pista_pressed)
+	btn_continuar.pressed.connect(_on_continuar_pressed)
+	btn_volver_menu.pressed.connect(_on_volver_menu_pressed)
 	btn_pista.disabled = true
-
 	if mundo_3d:
 		if mundo_3d.astronauta:
 			mundo_3d.astronauta.accion_fallida.connect(_on_accion_fallida)
@@ -223,6 +241,20 @@ func _conectar_senales() -> void:
 			mundo_3d.astronauta_10.accion_fallida.connect(_on_accion_fallida)
 			mundo_3d.astronauta_10.pieza_recogida.connect(_on_pieza_recogida)
 			mundo_3d.astronauta_10.pieza_ensamblada.connect(_on_pieza_ensamblada)
+
+func _cambiar_estado_pausa(pausado: bool) -> void:
+	fondo_menu_pausa.visible = pausado
+	menu_pausa.visible = pausado
+	get_tree().paused = pausado
+	if pausado:
+		btn_continuar.grab_focus()
+
+func _on_continuar_pressed() -> void:
+	_cambiar_estado_pausa(false)
+
+func _on_volver_menu_pressed() -> void:
+	get_tree().paused = false
+	get_tree().change_scene_to_file(ESCENA_MENU_PRINCIPAL)
 
 func _on_ejecutar_pressed() -> void:
 	if en_ejecucion: return
