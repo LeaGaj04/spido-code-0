@@ -10,6 +10,9 @@ extends Node3D
 @onready var astronauta_5: AstronautaIngeniero = $Astronauta5
 @onready var astronauta_6: AstronautaIngeniero = $Astronauta6
 @onready var astronauta_7: AstronautaIngeniero = $Astronauta7
+@onready var astronauta_8: AstronautaIngeniero = $Astronauta8
+@onready var astronauta_9: AstronautaIngeniero = $Astronauta9
+@onready var astronauta_10: AstronautaIngeniero = $Astronauta10
 @onready var mesa_spid: MesaEnsamblaje = $MesaEnsamblaje
 @onready var baliza_meta: BalizaMeta = $BalizaMeta
 @onready var contenedor_piezas: Node3D = $ContenedorPiezas
@@ -43,6 +46,13 @@ func cargar_nivel(config: Dictionary) -> void:
 			if extra.visible:
 				extra.configurar_inicio(config.get("pos_astronauta_%d" % numero, Vector2i.ZERO), config.get("ori_astronauta_%d" % numero, 0))
 	for par in [[astronauta_6, 6], [astronauta_7, 7]]:
+		var extra: AstronautaIngeniero = par[0]
+		var numero: int = par[1]
+		if extra:
+			extra.visible = config.get("cantidad_astronautas", 1) >= numero
+			if extra.visible:
+				extra.configurar_inicio(config.get("pos_astronauta_%d" % numero, Vector2i.ZERO), config.get("ori_astronauta_%d" % numero, 0))
+	for par in [[astronauta_8, 8], [astronauta_9, 9], [astronauta_10, 10]]:
 		var extra: AstronautaIngeniero = par[0]
 		var numero: int = par[1]
 		if extra:
@@ -151,6 +161,12 @@ func reiniciar_mundo() -> void:
 		await astronauta_6.reiniciar()
 	if astronauta_7 and astronauta_7.visible:
 		await astronauta_7.reiniciar()
+	if astronauta_8 and astronauta_8.visible:
+		await astronauta_8.reiniciar()
+	if astronauta_9 and astronauta_9.visible:
+		await astronauta_9.reiniciar()
+	if astronauta_10 and astronauta_10.visible:
+		await astronauta_10.reiniciar()
 	if mesa_spid and mesa_spid.visible:
 		mesa_spid.reiniciar()
 	_recrear_piezas(config_nivel_actual.get("piezas", []))
