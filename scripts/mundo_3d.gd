@@ -20,6 +20,22 @@ extends Node3D
 var piezas_por_celda: Dictionary = {}
 var config_nivel_actual: Dictionary = {}
 
+func _ready() -> void:
+	_inicializar_roles_astronautas()
+
+func _inicializar_roles_astronautas() -> void:
+	if astronauta: astronauta.establecer_identidad("Ingeniero", Color(0.2, 0.85, 0.45))
+	if astronauta_2: astronauta_2.establecer_identidad("Tracción", Color(0.2, 0.75, 0.95))
+	if astronauta_3: astronauta_3.establecer_identidad("Sensores", Color(0.95, 0.8, 0.2))
+	if astronauta_4: astronauta_4.establecer_identidad("Brazos", Color(0.95, 0.5, 0.15))
+	if astronauta_5: astronauta_5.establecer_identidad("Energía", Color(0.85, 0.3, 0.85))
+
+func resaltar_astronauta_seleccionado(idx: int) -> void:
+	var lista = [astronauta, astronauta_2, astronauta_3, astronauta_4, astronauta_5, astronauta_6, astronauta_7, astronauta_8, astronauta_9, astronauta_10]
+	for i in range(lista.size()):
+		if is_instance_valid(lista[i]):
+			lista[i].resaltar_seleccion(i == idx)
+
 func cargar_nivel(config: Dictionary, preservar_estado: bool = false) -> void:
 	config_nivel_actual = config
 

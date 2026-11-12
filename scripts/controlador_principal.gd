@@ -167,6 +167,7 @@ func cargar_nivel(indice: int, continuo: bool = false) -> void:
 
 	# Cargar en el mundo 3D preservando el estado si es transicion continua
 	mundo_3d.cargar_nivel(nivel, continuo)
+	mundo_3d.resaltar_astronauta_seleccionado(tabs_codigo.current_tab)
 	if continuo:
 		_actualizar_estado("¡Mision continua! El equipo mantiene sus posiciones para la siguiente fase.")
 	else:
@@ -205,6 +206,7 @@ func _conectar_senales() -> void:
 	btn_continuar.pressed.connect(_on_continuar_pressed)
 	btn_volver_menu.pressed.connect(_on_volver_menu_pressed)
 	btn_pista.disabled = true
+	tabs_codigo.tab_changed.connect(_on_tab_codigo_changed)
 	if mundo_3d:
 		if mundo_3d.astronauta:
 			mundo_3d.astronauta.accion_fallida.connect(_on_accion_fallida)
@@ -517,6 +519,12 @@ func _on_duplicar_pressed() -> void:
 		_actualizar_estado("Secuencia duplicada. Ahora puedes reutilizarla o modificarla.")
 	else:
 		_actualizar_estado("No hay una secuencia para duplicar.")
+
+func _on_tab_codigo_changed(idx: int) -> void:
+	if mundo_3d:
+		mundo_3d.resaltar_astronauta_seleccionado(idx)
+	var nombre_tab = tabs_codigo.get_tab_title(idx)
+	_actualizar_estado("Programando secuencia para: %s" % nombre_tab)
 
 func _bloquear_interfaz(bloquear: bool) -> void:
 	btn_ejecutar.disabled = bloquear

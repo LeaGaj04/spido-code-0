@@ -9,6 +9,8 @@ signal accion_fallida(motivo: String)
 @export var tamano_celda: float = 2.0
 @export var tiempo_movimiento: float = 0.4
 @export var tiempo_giro: float = 0.35
+@export var color_identidad: Color = Color(0.13, 0.77, 0.45)
+@export var nombre_rol: String = "Ingeniero"
 
 var grid_x: int = 0
 var grid_z: int = 0
@@ -23,15 +25,48 @@ var pieza_en_mano: Node3D = null
 
 @onready var slot_manos: Marker3D = $SlotManos
 var casco_visor: MeshInstance3D = null
+var luz_seleccion: OmniLight3D = null
 
 func _ready() -> void:
 	casco_visor = find_child("Visor", true, false) as MeshInstance3D
+	_crear_luz_seleccion_si_falta()
 	posicion_inicial = global_position
 	rotacion_inicial = rotation
 	grid_x_inicial = int(round(position.x / tamano_celda))
 	grid_z_inicial = int(round(position.z / tamano_celda))
 	grid_x = grid_x_inicial
 	grid_z = grid_z_inicial
+	_set_color_visor(color_identidad)
+
+func _crear_luz_seleccion_si_falta() -> void:
+	if not luz_seleccion:
+		luz_seleccion = OmniLight3D.new()
+		luz_seleccion.name = "LuzSeleccion"
+		luz_seleccion.light_energy = 0.0
+		luz_seleccion.omni_range = 2.2
+		luz_seleccion.light_color = color_identidad
+		luz_seleccion.position = Vector3(0, 1.8, 0)
+		add_child(luz_seleccion)
+
+func establecer_identidad(p_rol: String, p_color: Color) -> void:
+	nombre_rol = p_rol
+	color_identidad = p_color
+	if luz_seleccion:
+		luz_seleccion.light_color = p_color
+	_set_color_visor(p_color)
+
+func resaltar_seleccion(activo: bool) -> void:
+	if not is_inside_tree() or not visible:
+		return
+	if luz_seleccion:
+		var tw_luz = create_tween()
+		tw_luz.tween_property(luz_seleccion, "light_energy", 1.8 if activo else 0.0, 0.2)
+
+	if activo:
+		_set_color_visor(color_identidad)
+		var tween = create_tween()
+		tween.tween_property(self, "position:y", position.y + 0.15, 0.12).set_trans(Tween.TRANS_SINE)
+		tween.tween_property(self, "position:y", position.y, 0.12).set_trans(Tween.TRANS_BOUNCE)
 
 func configurar_inicio(pos_grid: Vector2i, ori: int) -> void:
 	grid_x_inicial = pos_grid.x
@@ -68,7 +103,7 @@ func reiniciar() -> void:
 	grid_z = grid_z_inicial
 	orientacion_actual = int(round(-rad_to_deg(rotacion_inicial.y) / 90.0)) % 4
 	if orientacion_actual < 0: orientacion_actual += 4
-	_set_color_visor(Color(0.13, 0.77, 0.45))
+	_set_color_visor(color_identidad)
 
 func ejecutar_accion(accion: String) -> bool:
 	match accion:
@@ -276,7 +311,7 @@ func _animar_choque() -> void:
 	tween.tween_property(self, "position", pos_tope, 0.08)
 	tween.tween_property(self, "position", pos_curr, 0.12)
 	await tween.finished
-	_set_color_visor(Color(0.13, 0.77, 0.45))
+	_set_color_visor(color_identidad)
 	animacion_terminada.emit()
 
 func _animar_duda() -> void:
