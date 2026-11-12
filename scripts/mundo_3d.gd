@@ -20,47 +20,79 @@ extends Node3D
 var piezas_por_celda: Dictionary = {}
 var config_nivel_actual: Dictionary = {}
 
-func cargar_nivel(config: Dictionary) -> void:
+func cargar_nivel(config: Dictionary, preservar_estado: bool = false) -> void:
 	config_nivel_actual = config
 
-	# 1. Configurar astronauta
+	# 1. Configurar astronauta principal (Ingeniero)
 	var pos_astro = config.get("pos_astronauta", Vector2i(0, 2))
 	var ori_astro = config.get("ori_astronauta", 0)
 	if astronauta:
-		astronauta.configurar_inicio(pos_astro, ori_astro)
+		if preservar_estado:
+			astronauta.fijar_checkpoint_actual()
+		else:
+			astronauta.configurar_inicio(pos_astro, ori_astro)
+
+	# 2. Configurar astronautas secundarios
 	if astronauta_2:
 		var mostrar_astronauta_2 = config.get("cantidad_astronautas", 1) >= 2
+		var ya_estaba_activo = astronauta_2.visible
 		astronauta_2.visible = mostrar_astronauta_2
 		if mostrar_astronauta_2:
-			astronauta_2.configurar_inicio(config.get("pos_astronauta_2", Vector2i(1, 0)), config.get("ori_astronauta_2", 0))
+			if preservar_estado and ya_estaba_activo:
+				astronauta_2.fijar_checkpoint_actual()
+			else:
+				astronauta_2.configurar_inicio(config.get("pos_astronauta_2", Vector2i(1, 0)), config.get("ori_astronauta_2", 0))
+
 	if astronauta_3:
 		var mostrar_astronauta_3 = config.get("cantidad_astronautas", 1) >= 3
+		var ya_estaba_activo_3 = astronauta_3.visible
 		astronauta_3.visible = mostrar_astronauta_3
 		if mostrar_astronauta_3:
-			astronauta_3.configurar_inicio(config.get("pos_astronauta_3", Vector2i(-1, 0)), config.get("ori_astronauta_3", 0))
+			if preservar_estado and ya_estaba_activo_3:
+				astronauta_3.fijar_checkpoint_actual()
+			else:
+				astronauta_3.configurar_inicio(config.get("pos_astronauta_3", Vector2i(-1, 0)), config.get("ori_astronauta_3", 0))
+
 	for par in [[astronauta_4, 4], [astronauta_5, 5]]:
 		var extra: AstronautaIngeniero = par[0]
 		var numero: int = par[1]
 		if extra:
-			extra.visible = config.get("cantidad_astronautas", 1) >= numero
-			if extra.visible:
-				extra.configurar_inicio(config.get("pos_astronauta_%d" % numero, Vector2i.ZERO), config.get("ori_astronauta_%d" % numero, 0))
+			var debe_mostrar = config.get("cantidad_astronautas", 1) >= numero
+			var ya_activo = extra.visible
+			extra.visible = debe_mostrar
+			if debe_mostrar:
+				if preservar_estado and ya_activo:
+					extra.fijar_checkpoint_actual()
+				else:
+					extra.configurar_inicio(config.get("pos_astronauta_%d" % numero, Vector2i.ZERO), config.get("ori_astronauta_%d" % numero, 0))
+
 	for par in [[astronauta_6, 6], [astronauta_7, 7]]:
 		var extra: AstronautaIngeniero = par[0]
 		var numero: int = par[1]
 		if extra:
-			extra.visible = config.get("cantidad_astronautas", 1) >= numero
-			if extra.visible:
-				extra.configurar_inicio(config.get("pos_astronauta_%d" % numero, Vector2i.ZERO), config.get("ori_astronauta_%d" % numero, 0))
+			var debe_mostrar = config.get("cantidad_astronautas", 1) >= numero
+			var ya_activo = extra.visible
+			extra.visible = debe_mostrar
+			if debe_mostrar:
+				if preservar_estado and ya_activo:
+					extra.fijar_checkpoint_actual()
+				else:
+					extra.configurar_inicio(config.get("pos_astronauta_%d" % numero, Vector2i.ZERO), config.get("ori_astronauta_%d" % numero, 0))
+
 	for par in [[astronauta_8, 8], [astronauta_9, 9], [astronauta_10, 10]]:
 		var extra: AstronautaIngeniero = par[0]
 		var numero: int = par[1]
 		if extra:
-			extra.visible = config.get("cantidad_astronautas", 1) >= numero
-			if extra.visible:
-				extra.configurar_inicio(config.get("pos_astronauta_%d" % numero, Vector2i.ZERO), config.get("ori_astronauta_%d" % numero, 0))
+			var debe_mostrar = config.get("cantidad_astronautas", 1) >= numero
+			var ya_activo = extra.visible
+			extra.visible = debe_mostrar
+			if debe_mostrar:
+				if preservar_estado and ya_activo:
+					extra.fijar_checkpoint_actual()
+				else:
+					extra.configurar_inicio(config.get("pos_astronauta_%d" % numero, Vector2i.ZERO), config.get("ori_astronauta_%d" % numero, 0))
 
-	# 2. Configurar mesa de ensamblaje
+	# 3. Configurar mesa de ensamblaje
 	var mostrar_mesa = config.get("mostrar_mesa", false)
 	if mesa_spid:
 		mesa_spid.visible = mostrar_mesa
@@ -68,9 +100,10 @@ func cargar_nivel(config: Dictionary) -> void:
 			var pos_mesa = config.get("pos_mesa", Vector2i(0, -2))
 			mesa_spid.celda_mesa = pos_mesa
 			mesa_spid.position = Vector3(pos_mesa.x * 2.0, 0, pos_mesa.y * 2.0)
-			mesa_spid.reiniciar()
+			if not preservar_estado:
+				mesa_spid.reiniciar()
 
-	# 3. Configurar baliza meta
+	# 4. Configurar baliza meta
 	var tipo_meta = config.get("tipo_meta", "BALIZA")
 	if baliza_meta:
 		if tipo_meta == "BALIZA":
@@ -80,7 +113,7 @@ func cargar_nivel(config: Dictionary) -> void:
 		else:
 			baliza_meta.visible = false
 
-	# 4. Spawner de piezas
+	# 5. Spawner de piezas
 	_recrear_piezas(config.get("piezas", []))
 
 func _recrear_piezas(lista_piezas: Array) -> void:

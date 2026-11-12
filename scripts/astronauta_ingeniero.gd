@@ -44,6 +44,14 @@ func configurar_inicio(pos_grid: Vector2i, ori: int) -> void:
 	position = posicion_inicial
 	rotation = rotacion_inicial
 
+func fijar_checkpoint_actual() -> void:
+	grid_x_inicial = grid_x
+	grid_z_inicial = grid_z
+	orientacion_actual = int(round(-rad_to_deg(rotation.y) / 90.0)) % 4
+	if orientacion_actual < 0: orientacion_actual += 4
+	posicion_inicial = position
+	rotacion_inicial = rotation
+
 func reiniciar() -> void:
 	if is_instance_valid(pieza_en_mano):
 		pieza_en_mano.reparent(get_parent())
@@ -58,13 +66,24 @@ func reiniciar() -> void:
 
 	grid_x = grid_x_inicial
 	grid_z = grid_z_inicial
-	orientacion_actual = 0
+	orientacion_actual = int(round(-rad_to_deg(rotacion_inicial.y) / 90.0)) % 4
+	if orientacion_actual < 0: orientacion_actual += 4
 	_set_color_visor(Color(0.13, 0.77, 0.45))
 
 func ejecutar_accion(accion: String) -> bool:
 	match accion:
 		"AVANZAR":
 			return await avanzar()
+		"AVANZAR_2":
+			for k in range(2):
+				var r = await avanzar(0.25)
+				if not r: return false
+			return true
+		"AVANZAR_3":
+			for k in range(3):
+				var r = await avanzar(0.22)
+				if not r: return false
+			return true
 		"RETROCEDER":
 			return await retroceder()
 		"GIRAR_DER":
@@ -81,7 +100,8 @@ func ejecutar_accion(accion: String) -> bool:
 			push_warning("Comando no reconocido: %s" % accion)
 			return false
 
-func avanzar() -> bool:
+func avanzar(tiempo_custom: float = -1.0) -> bool:
+	var t_mov = tiempo_custom if tiempo_custom > 0 else tiempo_movimiento
 	var delta = _obtener_vector_orientacion(orientacion_actual)
 	var nueva_x = grid_x + delta.x
 	var nueva_z = grid_z + delta.y
@@ -102,16 +122,16 @@ func avanzar() -> bool:
 	var destino = Vector3(grid_x * tamano_celda, position.y, grid_z * tamano_celda)
 
 	var tween = create_tween().set_parallel(true)
-	tween.tween_property(self, "position:x", destino.x, tiempo_movimiento).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
-	tween.tween_property(self, "position:z", destino.z, tiempo_movimiento).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	tween.tween_property(self, "position:x", destino.x, t_mov).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	tween.tween_property(self, "position:z", destino.z, t_mov).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 
 	var tween_bob = create_tween()
-	tween_bob.tween_property(self, "position:y", position.y + 0.18, tiempo_movimiento * 0.5).set_trans(Tween.TRANS_SINE)
-	tween_bob.tween_property(self, "position:y", position.y, tiempo_movimiento * 0.5).set_trans(Tween.TRANS_SINE)
+	tween_bob.tween_property(self, "position:y", position.y + 0.18, t_mov * 0.5).set_trans(Tween.TRANS_SINE)
+	tween_bob.tween_property(self, "position:y", position.y, t_mov * 0.5).set_trans(Tween.TRANS_SINE)
 
 	var tween_roll = create_tween()
-	tween_roll.tween_property(self, "rotation:z", deg_to_rad(4.0), tiempo_movimiento * 0.5)
-	tween_roll.tween_property(self, "rotation:z", 0.0, tiempo_movimiento * 0.5)
+	tween_roll.tween_property(self, "rotation:z", deg_to_rad(4.0), t_mov * 0.5)
+	tween_roll.tween_property(self, "rotation:z", 0.0, t_mov * 0.5)
 
 	await tween.finished
 	animacion_terminada.emit()

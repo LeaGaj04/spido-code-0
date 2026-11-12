@@ -73,6 +73,8 @@ const PASOS_GUIA = [
 # Paleta exacta del rediseño oficial de SpidoCode.
 const COMANDOS_DISPONIBLES = {
 	"AVANZAR": {"tit": "Avanzar 1 Paso", "prefijo": "[AVZ]", "color": Color(0.545098, 0.796078, 0.568627, 1.0)},
+	"AVANZAR_2": {"tit": "Avanzar 2 Pasos (Auto)", "prefijo": "[2x AVZ]", "color": Color(0.35, 0.75, 0.85, 1.0)},
+	"AVANZAR_3": {"tit": "Avanzar 3 Pasos (Auto)", "prefijo": "[3x AVZ]", "color": Color(0.25, 0.65, 0.85, 1.0)},
 	"RETROCEDER": {"tit": "Retroceder 1 Paso", "prefijo": "[RET]", "color": Color(0.34902, 0.388235, 0.447059, 1.0)},
 	"GIRAR_DER": {"tit": "Girar Derecha 90", "prefijo": "[DER]", "color": Color(0.631373, 0.85098, 0.65098, 1.0)},
 	"GIRAR_IZQ": {"tit": "Girar Izquierda 90", "prefijo": "[IZQ]", "color": Color(0.631373, 0.85098, 0.65098, 1.0)},
@@ -114,7 +116,7 @@ func _input(event: InputEvent) -> void:
 		_cambiar_estado_pausa(not menu_pausa.visible)
 		get_viewport().set_input_as_handled()
 
-func cargar_nivel(indice: int) -> void:
+func cargar_nivel(indice: int, continuo: bool = false) -> void:
 	if indice < 0 or indice >= niveles.size():
 		return
 
@@ -163,9 +165,12 @@ func cargar_nivel(indice: int) -> void:
 	errores_durante_ejecucion = 0
 	indice_paso_actual = 0
 
-	# Cargar en el mundo 3D
-	mundo_3d.cargar_nivel(nivel)
-	_actualizar_estado("Nivel cargado. Organiza tus bloques y presiona 'Ejecutar'.")
+	# Cargar en el mundo 3D preservando el estado si es transicion continua
+	mundo_3d.cargar_nivel(nivel, continuo)
+	if continuo:
+		_actualizar_estado("¡Mision continua! El equipo mantiene sus posiciones para la siguiente fase.")
+	else:
+		_actualizar_estado("Nivel cargado. Organiza tus bloques y presiona 'Ejecutar'.")
 
 func _actualizar_paleta(bloques_permitidos: Array) -> void:
 	for child in paleta_contenedor.get_children():
@@ -282,7 +287,7 @@ func _on_ejecutar_pressed() -> void:
 	var nivel = niveles[indice_nivel_actual]
 	if nivel.get("modo_paralelo", false):
 		abortado = not await _ejecutar_equipo_paralelo(
-			[mundo_3d.astronauta, mundo_3d.astronauta_2, mundo_3d.astronauta_3, mundo_3d.astronauta_4, mundo_3d.astronauta_5, mundo_3d.astronauta_6, mundo_3d.astronauta_7],
+			[mundo_3d.astronauta, mundo_3d.astronauta_2, mundo_3d.astronauta_3, mundo_3d.astronauta_4, mundo_3d.astronauta_5, mundo_3d.astronauta_6, mundo_3d.astronauta_7, mundo_3d.astronauta_8, mundo_3d.astronauta_9, mundo_3d.astronauta_10],
 			[secuencia_a1, secuencia_a2, secuencia_a3, secuencia_a4, secuencia_a5, secuencia_a6, secuencia_a7, secuencia_a8, secuencia_a9, secuencia_a10]
 		)
 	else:
@@ -400,7 +405,7 @@ func _mostrar_victoria(estrellas: int, cant_bloques: int, optimo: int) -> void:
 
 func _on_modal_siguiente_pressed() -> void:
 	panel_victoria.visible = false
-	cargar_nivel(indice_nivel_actual + 1)
+	cargar_nivel(indice_nivel_actual + 1, true)
 
 func _on_modal_reintentar_pressed() -> void:
 	panel_victoria.visible = false
