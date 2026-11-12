@@ -64,10 +64,10 @@ var ultimo_error: String = ""
 var bloque_con_error: BloqueItem = null
 
 const PASOS_GUIA = [
-	{"titulo": "OBSERVA", "texto": "El astronauta está en el hangar y la baliza marca la meta. Cada bloque representa una acción."},
-	{"titulo": "PREDICE", "texto": "Antes de ejecutar, imagina dónde terminará el astronauta después de avanzar tres veces."},
-	{"titulo": "CONSTRUYE", "texto": "Arrastra 3 bloques AVANZAR desde la izquierda hacia el lienzo de instrucciones."},
-	{"titulo": "CORRIGE", "texto": "Si no llega a la baliza, revisa cuántos pasos necesita y vuelve a ordenar tu secuencia."}
+	{"titulo": "1. OBSERVA", "texto": "Tu Astronauta Ingeniero está en la posición inicial y la baliza brillante marca la meta de calibración."},
+	{"titulo": "2. PREDICE", "texto": "Cada bloque 'Avanzar 1 Paso' mueve al astronauta una casilla hacia adelante. Cuenta cuántas casillas hay hasta la baliza."},
+	{"titulo": "3. CONSTRUYE", "texto": "Arrastra 3 bloques 'Avanzar 1 Paso' desde la paleta izquierda hacia el lienzo del Astronauta 1."},
+	{"titulo": "4. EJECUTA & DEPURA", "texto": "Presiona 'Ejecutar' para correr tu primer algoritmo. También puedes usar 'Paso a Paso' para probar instrucción por instrucción."}
 ]
 
 # Paleta exacta del rediseño oficial de SpidoCode.
@@ -85,11 +85,11 @@ func _ready() -> void:
 	get_tree().paused = false
 	niveles = DatosNiveles.obtener_niveles()
 	_conectar_senales()
-	tabs_codigo.set_tab_title(0, "Astronauta 1")
-	tabs_codigo.set_tab_title(1, "Astronauta 2")
-	tabs_codigo.set_tab_title(2, "Astronauta 3")
-	tabs_codigo.set_tab_title(3, "Astronauta 4")
-	tabs_codigo.set_tab_title(4, "Astronauta 5")
+	tabs_codigo.set_tab_title(0, "Astro 1: Ingeniero")
+	tabs_codigo.set_tab_title(1, "Astro 2: Tracción")
+	tabs_codigo.set_tab_title(2, "Astro 3: Sensores")
+	tabs_codigo.set_tab_title(3, "Astro 4: Brazos")
+	tabs_codigo.set_tab_title(4, "Astro 5: Energía")
 	tabs_codigo.set_tab_title(5, "Astronauta 6")
 	tabs_codigo.set_tab_title(6, "Astronauta 7")
 	tabs_codigo.set_tab_title(7, "Astronauta 8")
@@ -367,7 +367,17 @@ func _evaluar_resultado_nivel(cant_bloques: int, abortado: bool) -> void:
 
 		_mostrar_victoria(estrellas, cant_bloques, nivel.bloques_optimos)
 	else:
-		_actualizar_estado("[FALLO] La meta no fue alcanzada. Revisa tu secuencia de bloques.")
+		if nivel.get("tipo_meta", "BALIZA") == "BALIZA":
+			var celda_actual = Vector2i(mundo_3d.astronauta.grid_x, mundo_3d.astronauta.grid_z)
+			var celda_meta = nivel.get("pos_baliza", Vector2i(0, -1))
+			if celda_actual.y > celda_meta.y:
+				ultimo_error = "El astronauta se detuvo antes de alcanzar la baliza."
+			elif celda_actual.y < celda_meta.y:
+				ultimo_error = "El astronauta sobrepaso la baliza."
+			else:
+				ultimo_error = "El astronauta no se encuentra en la casilla de la baliza."
+			btn_pista.disabled = false
+		_actualizar_estado("[FALLO] La meta no fue alcanzada. Presiona 'Pista' si necesitas ayuda o 'Reiniciar' para volver a intentar.")
 
 func _mostrar_victoria(estrellas: int, cant_bloques: int, optimo: int) -> void:
 	var texto_estrellas = ""
@@ -550,8 +560,12 @@ func _on_pista_pressed() -> void:
 		pista = "Pista: lleva la pieza hasta una casilla vecina a la mesa y orienta al astronauta hacia ella."
 	elif "requiere otra pieza" in ultimo_error:
 		pista = "Pista: revisa el orden de montaje; esta pieza todavia no corresponde a la siguiente etapa."
-	elif "limite" in ultimo_error or "Limite" in ultimo_error:
-		pista = "Pista: el astronauta no puede salir del area de trabajo; cambia la ruta."
+	elif "detuvo antes" in ultimo_error:
+		pista = "Pista: Te faltaron pasos. El astronauta necesita avanzar exactamente 3 casillas hacia el norte para alcanzar la baliza."
+	elif "sobrepaso" in ultimo_error:
+		pista = "Pista: Colocaste demasiados bloques. Elimina los bloques que sobran para detenerte justo sobre la baliza."
+	elif "no se encuentra en la casilla" in ultimo_error:
+		pista = "Pista: El astronauta no llego a la baliza. Revisa la direccion y cantidad de bloques 'Avanzar'."
 	_actualizar_estado(pista)
 
 func _actualizar_estado(mensaje: String) -> void:
