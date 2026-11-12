@@ -161,11 +161,12 @@ func registrar_piezas() -> void:
 	piezas_por_celda.clear()
 	for child in contenedor_piezas.get_children():
 		if child is PiezaTaller and child.visible and not child.is_queued_for_deletion():
-			var celda = Vector2i(
+			var celda_calc = Vector2i(
 				int(round(child.position.x / 2.0)),
 				int(round(child.position.z / 2.0))
 			)
-			piezas_por_celda[celda] = child
+			piezas_por_celda[child.celda_inicial] = child
+			piezas_por_celda[celda_calc] = child
 
 func es_celda_solida(celda: Vector2i) -> bool:
 	if mesa_spid and mesa_spid.visible and mesa_spid.celda_mesa == celda:

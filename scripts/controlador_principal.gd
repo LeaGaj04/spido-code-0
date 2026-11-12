@@ -149,6 +149,7 @@ func _aplicar_hito_actual() -> void:
 
 	# Configurar mundo 3D sin resetear las posiciones ni el robot Spido
 	if mundo_3d:
+		mundo_3d.config_nivel_actual = hito
 		# Baliza
 		if mundo_3d.baliza_meta:
 			var mostrar_b = hito.get("mostrar_baliza", false)
@@ -486,7 +487,9 @@ func _on_reiniciar_pressed() -> void:
 	errores_durante_ejecucion = 0
 	detener_solicitado = true
 	_limpiar_error()
-	await mundo_3d.reiniciar_mundo(true)
+	if mundo_3d:
+		mundo_3d.config_nivel_actual = hitos[indice_hito_actual]
+		await mundo_3d.reiniciar_mundo(true)
 	_actualizar_estado("Posiciones de astronautas reiniciadas. El robot Spido y tus bloques se mantienen intactos.")
 
 func _on_velocidad_pressed() -> void:

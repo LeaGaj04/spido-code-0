@@ -89,9 +89,7 @@ func fijar_checkpoint_actual() -> void:
 
 func reiniciar() -> void:
 	if is_instance_valid(pieza_en_mano):
-		pieza_en_mano.reparent(get_parent())
-		if pieza_en_mano.has_method("reiniciar"):
-			pieza_en_mano.reiniciar()
+		pieza_en_mano.queue_free()
 		pieza_en_mano = null
 
 	var tween = create_tween().set_parallel(true)
