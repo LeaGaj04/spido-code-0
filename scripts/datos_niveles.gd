@@ -17,7 +17,8 @@ static func obtener_niveles() -> Array[Dictionary]:
 			"ori_astronauta": 0,
 			"tipo_meta": "BALIZA",
 			"pos_baliza": Vector2i(0, -1),
-			"mostrar_mesa": false,
+			"mostrar_mesa": true,
+			"pos_mesa": Vector2i(0, -2),
 			"piezas": []
 		},
 		{
@@ -34,7 +35,8 @@ static func obtener_niveles() -> Array[Dictionary]:
 			"ori_astronauta": 0,
 			"tipo_meta": "BALIZA",
 			"pos_baliza": Vector2i(-2, -1),
-			"mostrar_mesa": false,
+			"mostrar_mesa": true,
+			"pos_mesa": Vector2i(0, -2),
 			"piezas": []
 		},
 		{

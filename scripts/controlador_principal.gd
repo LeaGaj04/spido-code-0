@@ -149,27 +149,35 @@ func cargar_nivel(indice: int, continuo: bool = false) -> void:
 	tabs_codigo.set_tab_hidden(8, nivel.get("cantidad_astronautas", 1) < 9)
 	tabs_codigo.set_tab_hidden(9, nivel.get("cantidad_astronautas", 1) < 10)
 
-	# Limpiar lienzo y estado
-	lienzo.limpiar_todo()
-	lienzo_a2.limpiar_todo()
-	lienzo_a3.limpiar_todo()
-	lienzo_a4.limpiar_todo()
-	lienzo_a5.limpiar_todo()
-	lienzo_a6.limpiar_todo()
-	lienzo_a7.limpiar_todo()
-	lienzo_a8.limpiar_todo()
-	lienzo_a9.limpiar_todo()
-	lienzo_a10.limpiar_todo()
+	# Limpiar lienzo y estado solo si no es transicion continua
+	if not continuo:
+		lienzo.limpiar_todo()
+		lienzo_a2.limpiar_todo()
+		lienzo_a3.limpiar_todo()
+		lienzo_a4.limpiar_todo()
+		lienzo_a5.limpiar_todo()
+		lienzo_a6.limpiar_todo()
+		lienzo_a7.limpiar_todo()
+		lienzo_a8.limpiar_todo()
+		lienzo_a9.limpiar_todo()
+		lienzo_a10.limpiar_todo()
+
 	_limpiar_error()
 	panel_victoria.visible = false
 	errores_durante_ejecucion = 0
 	indice_paso_actual = 0
 
+	# Destello sutil en el titulo del nivel para avisar del nuevo objetivo
+	if is_instance_valid(label_nivel_titulo):
+		var tw_tit = create_tween()
+		tw_tit.tween_property(label_nivel_titulo, "modulate", Color(0.4, 1.0, 0.7), 0.2)
+		tw_tit.tween_property(label_nivel_titulo, "modulate", Color(0.95, 0.96, 0.95), 0.4)
+
 	# Cargar en el mundo 3D preservando el estado si es transicion continua
 	mundo_3d.cargar_nivel(nivel, continuo)
 	mundo_3d.resaltar_astronauta_seleccionado(tabs_codigo.current_tab)
 	if continuo:
-		_actualizar_estado("¡Mision continua! El equipo mantiene sus posiciones para la siguiente fase.")
+		_actualizar_estado("¡Nueva fase activada! El escenario y tus bloques se conservan. Revisa la nueva instruccion.")
 	else:
 		_actualizar_estado("Nivel cargado. Organiza tus bloques y presiona 'Ejecutar'.")
 
@@ -372,7 +380,22 @@ func _evaluar_resultado_nivel(cant_bloques: int, abortado: bool) -> void:
 		if cant_bloques <= nivel.bloques_optimos:
 			estrellas += 1
 
-		_mostrar_victoria(estrellas, cant_bloques, nivel.bloques_optimos)
+		# Celebracion visual en el 3D manteniendo la pantalla intacta
+		if mundo_3d and mundo_3d.astronauta:
+			mundo_3d.astronauta.resaltar_seleccion(true)
+
+		var estrellas_str = ""
+		for s in range(estrellas): estrellas_str += "⭐"
+
+		if indice_nivel_actual < niveles.size() - 1:
+			_actualizar_estado("¡OBJETIVO CUMPLIDO %s! Actualizando al siguiente paso de montaje..." % estrellas_str)
+			await get_tree().create_timer(1.2).timeout
+			# Transicion fluida en la misma pantalla sin modales invasivos
+			cargar_nivel(indice_nivel_actual + 1, true)
+		else:
+			_actualizar_estado("🏆 ¡SPIDO COMPLETADO %s! Robot araña ensamblado y operativo." % estrellas_str)
+			if mundo_3d and mundo_3d.mesa_spid:
+				mundo_3d.mesa_spid.probar_sistemas()
 	else:
 		if nivel.get("tipo_meta", "BALIZA") == "BALIZA":
 			var celda_actual = Vector2i(mundo_3d.astronauta.grid_x, mundo_3d.astronauta.grid_z)
