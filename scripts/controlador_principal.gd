@@ -52,10 +52,13 @@ extends Control
 
 const ESCENA_MENU_PRINCIPAL := "res://escenas/menu_inicio.tscn"
 
-var niveles: Array[Dictionary] = []
-var indice_nivel_actual: int = 0
+var hitos: Array[Dictionary] = []
+var indice_hito_actual: int = 0
+var hitos_completados: Array[int] = []
 
 var en_ejecucion: bool = false
+var modo_bucle: bool = false
+var detener_solicitado: bool = false
 var indice_paso_actual: int = 0
 var errores_durante_ejecucion: int = 0
 var guia_activa: bool = false
@@ -79,107 +82,98 @@ const COMANDOS_DISPONIBLES = {
 	"GIRAR_DER": {"tit": "Girar Derecha 90", "prefijo": "[DER]", "color": Color(0.631373, 0.85098, 0.65098, 1.0)},
 	"GIRAR_IZQ": {"tit": "Girar Izquierda 90", "prefijo": "[IZQ]", "color": Color(0.631373, 0.85098, 0.65098, 1.0)},
 	"TOMAR_PIEZA": {"tit": "Tomar Pieza", "prefijo": "[TOM]", "color": Color(0.545098, 0.796078, 0.568627, 1.0)},
-	"ENSAMBLAR": {"tit": "Ensamblar en Spid", "prefijo": "[ENS]", "color": Color(0.435294, 0.686275, 0.470588, 1.0)}
+	"ENSAMBLAR": {"tit": "Ensamblar en Spid", "prefijo": "[ENS]", "color": Color(0.435294, 0.686275, 0.470588, 1.0)},
+	"DIAGNOSTICO": {"tit": "Diagnostico Spido", "prefijo": "[TEST]", "color": Color(0.2, 0.85, 1.0, 1.0)}
 }
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	get_tree().paused = false
-	niveles = DatosNiveles.obtener_niveles()
+	hitos = HitosSandbox.obtener_hitos()
+	indice_hito_actual = 0
+	hitos_completados.clear()
 	_conectar_senales()
 	tabs_codigo.set_tab_title(0, "Astro 1: Ingeniero")
 	tabs_codigo.set_tab_title(1, "Astro 2: Tracción")
 	tabs_codigo.set_tab_title(2, "Astro 3: Sensores")
 	tabs_codigo.set_tab_title(3, "Astro 4: Brazos")
 	tabs_codigo.set_tab_title(4, "Astro 5: Energía")
-	tabs_codigo.set_tab_title(5, "Astronauta 6")
-	tabs_codigo.set_tab_title(6, "Astronauta 7")
-	tabs_codigo.set_tab_title(7, "Astronauta 8")
-	tabs_codigo.set_tab_title(8, "Astronauta 9")
-	tabs_codigo.set_tab_title(9, "Astronauta 10")
-	tabs_codigo.set_tab_hidden(1, true)
-	tabs_codigo.set_tab_hidden(2, true)
-	tabs_codigo.set_tab_hidden(3, true)
-	tabs_codigo.set_tab_hidden(4, true)
-	tabs_codigo.set_tab_hidden(5, true)
-	tabs_codigo.set_tab_hidden(6, true)
-	tabs_codigo.set_tab_hidden(7, true)
-	tabs_codigo.set_tab_hidden(8, true)
-	tabs_codigo.set_tab_hidden(9, true)
+	for i in range(1, 10):
+		tabs_codigo.set_tab_hidden(i, true)
 	panel_victoria.visible = false
 	fondo_menu_pausa.visible = false
 	menu_pausa.visible = false
-	cargar_nivel(0)
+	btn_duplicar.text = "Bucle: OFF"
+	_aplicar_hito_actual()
 
 func _input(event: InputEvent) -> void:
 	if event.is_action_pressed("ui_cancel"):
 		_cambiar_estado_pausa(not menu_pausa.visible)
 		get_viewport().set_input_as_handled()
 
-func cargar_nivel(indice: int, continuo: bool = false) -> void:
-	if indice < 0 or indice >= niveles.size():
+func cambiar_hito(indice: int) -> void:
+	if indice < 0 or indice >= hitos.size():
 		return
+	indice_hito_actual = indice
+	_aplicar_hito_actual()
 
-	indice_nivel_actual = indice
-	var nivel = niveles[indice_nivel_actual]
+func _aplicar_hito_actual() -> void:
+	if indice_hito_actual < 0 or indice_hito_actual >= hitos.size():
+		return
+	var hito = hitos[indice_hito_actual]
 
-	# Actualizar cabecera didactica con tipografia y colores de SpidoCode
-	label_nivel_titulo.text = "[NIVEL %d] %s - %s" % [nivel.id, nivel.titulo, nivel.subtitulo]
-	label_ada_texto.text = nivel.instruccion
-	label_concepto.text = "Concepto: %s" % nivel.concepto_clave
-	if nivel.get("puente_spidocode", false):
-		label_concepto.text += "\nPuente a SpidoCode: Avanzar → spid.avanzar(), Girar → spid.girar(), Ensamblar → spid.ensamblar()"
-	guia_activa = nivel.get("guiada", false)
-	paso_guia = 0
-	panel_guia.visible = guia_activa
-	_actualizar_guia()
+	# Actualizar cabecera didactica del hito actual
+	label_nivel_titulo.text = "[HITO %d/%d] %s" % [hito.id, hitos.size(), hito.titulo]
+	label_ada_texto.text = hito.descripcion
+	label_concepto.text = "Objetivo: %s" % hito.meta_texto
 
-	btn_nivel_prev.disabled = (indice_nivel_actual == 0)
-	btn_nivel_next.disabled = (indice_nivel_actual == niveles.size() - 1)
+	btn_nivel_prev.disabled = (indice_hito_actual == 0)
+	btn_nivel_next.disabled = (indice_hito_actual == hitos.size() - 1)
 
-	# Actualizar paleta con SOLO los bloques autorizados en este nivel
-	_actualizar_paleta(nivel.bloques_permitidos)
-	tabs_codigo.set_tab_hidden(1, nivel.get("cantidad_astronautas", 1) < 2)
-	tabs_codigo.set_tab_hidden(2, nivel.get("cantidad_astronautas", 1) < 3)
-	tabs_codigo.set_tab_hidden(3, nivel.get("cantidad_astronautas", 1) < 4)
-	tabs_codigo.set_tab_hidden(4, nivel.get("cantidad_astronautas", 1) < 5)
-	tabs_codigo.set_tab_hidden(5, nivel.get("cantidad_astronautas", 1) < 6)
-	tabs_codigo.set_tab_hidden(6, nivel.get("cantidad_astronautas", 1) < 7)
-	tabs_codigo.set_tab_hidden(7, nivel.get("cantidad_astronautas", 1) < 8)
-	tabs_codigo.set_tab_hidden(8, nivel.get("cantidad_astronautas", 1) < 9)
-	tabs_codigo.set_tab_hidden(9, nivel.get("cantidad_astronautas", 1) < 10)
-
-	# Limpiar lienzo y estado solo si no es transicion continua
-	if not continuo:
-		lienzo.limpiar_todo()
-		lienzo_a2.limpiar_todo()
-		lienzo_a3.limpiar_todo()
-		lienzo_a4.limpiar_todo()
-		lienzo_a5.limpiar_todo()
-		lienzo_a6.limpiar_todo()
-		lienzo_a7.limpiar_todo()
-		lienzo_a8.limpiar_todo()
-		lienzo_a9.limpiar_todo()
-		lienzo_a10.limpiar_todo()
-
-	_limpiar_error()
-	panel_victoria.visible = false
-	errores_durante_ejecucion = 0
-	indice_paso_actual = 0
-
-	# Destello sutil en el titulo del nivel para avisar del nuevo objetivo
+	# Destello sutil en el titulo para avisar del hito activo
 	if is_instance_valid(label_nivel_titulo):
 		var tw_tit = create_tween()
-		tw_tit.tween_property(label_nivel_titulo, "modulate", Color(0.4, 1.0, 0.7), 0.2)
+		tw_tit.tween_property(label_nivel_titulo, "modulate", Color(0.35, 1.0, 0.65), 0.2)
 		tw_tit.tween_property(label_nivel_titulo, "modulate", Color(0.95, 0.96, 0.95), 0.4)
 
-	# Cargar en el mundo 3D preservando el estado si es transicion continua
-	mundo_3d.cargar_nivel(nivel, continuo)
-	mundo_3d.resaltar_astronauta_seleccionado(tabs_codigo.current_tab)
-	if continuo:
-		_actualizar_estado("¡Nueva fase activada! El escenario y tus bloques se conservan. Revisa la nueva instruccion.")
-	else:
-		_actualizar_estado("Nivel cargado. Organiza tus bloques y presiona 'Ejecutar'.")
+	# Actualizar paleta con los bloques disponibles en esta fase
+	_actualizar_paleta(hito.bloques_desbloqueados)
+
+	# Visibilidad de pestañas segun la cantidad de astronautas
+	var cant_astros = hito.get("cantidad_astronautas", 1)
+	for i in range(1, 10):
+		tabs_codigo.set_tab_hidden(i, i >= cant_astros)
+
+	# Configurar mundo 3D sin resetear las posiciones ni el robot Spido
+	if mundo_3d:
+		# Baliza
+		if mundo_3d.baliza_meta:
+			var mostrar_b = hito.get("mostrar_baliza", false)
+			mundo_3d.baliza_meta.visible = mostrar_b
+			if mostrar_b:
+				mundo_3d.baliza_meta.posicionar_en_celda(hito.get("pos_baliza", Vector2i(0, -1)))
+
+		# Activacion progresiva de nuevos astronautas
+		if cant_astros >= 2 and mundo_3d.astronauta_2 and not mundo_3d.astronauta_2.visible:
+			mundo_3d.astronauta_2.visible = true
+			mundo_3d.astronauta_2.configurar_inicio(hito.get("pos_astronauta_2", Vector2i(0, 2)), 0)
+		if cant_astros >= 3 and mundo_3d.astronauta_3 and not mundo_3d.astronauta_3.visible:
+			mundo_3d.astronauta_3.visible = true
+			mundo_3d.astronauta_3.configurar_inicio(hito.get("pos_astronauta_3", Vector2i(-1, 2)), 0)
+		if cant_astros >= 4 and mundo_3d.astronauta_4 and not mundo_3d.astronauta_4.visible:
+			mundo_3d.astronauta_4.visible = true
+			mundo_3d.astronauta_4.configurar_inicio(hito.get("pos_astronauta_4", Vector2i(1, 2)), 0)
+		if cant_astros >= 5 and mundo_3d.astronauta_5 and not mundo_3d.astronauta_5.visible:
+			mundo_3d.astronauta_5.visible = true
+			mundo_3d.astronauta_5.configurar_inicio(hito.get("pos_astronauta_5", Vector2i(0, 2)), 0)
+
+		# Piezas del hito en las bahias
+		if hito.has("piezas") and not hito.piezas.is_empty():
+			mundo_3d._recrear_piezas(hito.piezas)
+
+		mundo_3d.resaltar_astronauta_seleccionado(tabs_codigo.current_tab)
+
+	_actualizar_estado("Mundo Sandbox Activo. Automatiza y programa a tus astronautas.")
 
 func _actualizar_paleta(bloques_permitidos: Array) -> void:
 	for child in paleta_contenedor.get_children():
@@ -204,8 +198,8 @@ func _conectar_senales() -> void:
 	btn_limpiar.pressed.connect(_on_limpiar_pressed)
 	btn_duplicar.pressed.connect(_on_duplicar_pressed)
 
-	btn_nivel_prev.pressed.connect(func(): cargar_nivel(indice_nivel_actual - 1))
-	btn_nivel_next.pressed.connect(func(): cargar_nivel(indice_nivel_actual + 1))
+	btn_nivel_prev.pressed.connect(func(): cambiar_hito(indice_hito_actual - 1))
+	btn_nivel_next.pressed.connect(func(): cambiar_hito(indice_hito_actual + 1))
 
 	btn_modal_siguiente.pressed.connect(_on_modal_siguiente_pressed)
 	btn_modal_reintentar.pressed.connect(_on_modal_reintentar_pressed)
@@ -215,47 +209,24 @@ func _conectar_senales() -> void:
 	btn_volver_menu.pressed.connect(_on_volver_menu_pressed)
 	btn_pista.disabled = true
 	tabs_codigo.tab_changed.connect(_on_tab_codigo_changed)
+
 	if mundo_3d:
-		if mundo_3d.astronauta:
-			mundo_3d.astronauta.accion_fallida.connect(_on_accion_fallida)
-			mundo_3d.astronauta.pieza_recogida.connect(_on_pieza_recogida)
-			mundo_3d.astronauta.pieza_ensamblada.connect(_on_pieza_ensamblada)
-		if mundo_3d.astronauta_2:
-			mundo_3d.astronauta_2.accion_fallida.connect(_on_accion_fallida)
-			mundo_3d.astronauta_2.pieza_recogida.connect(_on_pieza_recogida)
-			mundo_3d.astronauta_2.pieza_ensamblada.connect(_on_pieza_ensamblada)
-		if mundo_3d.astronauta_3:
-			mundo_3d.astronauta_3.accion_fallida.connect(_on_accion_fallida)
-			mundo_3d.astronauta_3.pieza_recogida.connect(_on_pieza_recogida)
-			mundo_3d.astronauta_3.pieza_ensamblada.connect(_on_pieza_ensamblada)
-		if mundo_3d.astronauta_4:
-			mundo_3d.astronauta_4.accion_fallida.connect(_on_accion_fallida)
-			mundo_3d.astronauta_4.pieza_recogida.connect(_on_pieza_recogida)
-			mundo_3d.astronauta_4.pieza_ensamblada.connect(_on_pieza_ensamblada)
-		if mundo_3d.astronauta_5:
-			mundo_3d.astronauta_5.accion_fallida.connect(_on_accion_fallida)
-			mundo_3d.astronauta_5.pieza_recogida.connect(_on_pieza_recogida)
-			mundo_3d.astronauta_5.pieza_ensamblada.connect(_on_pieza_ensamblada)
-		if mundo_3d.astronauta_6:
-			mundo_3d.astronauta_6.accion_fallida.connect(_on_accion_fallida)
-			mundo_3d.astronauta_6.pieza_recogida.connect(_on_pieza_recogida)
-			mundo_3d.astronauta_6.pieza_ensamblada.connect(_on_pieza_ensamblada)
-		if mundo_3d.astronauta_7:
-			mundo_3d.astronauta_7.accion_fallida.connect(_on_accion_fallida)
-			mundo_3d.astronauta_7.pieza_recogida.connect(_on_pieza_recogida)
-			mundo_3d.astronauta_7.pieza_ensamblada.connect(_on_pieza_ensamblada)
-		if mundo_3d.astronauta_8:
-			mundo_3d.astronauta_8.accion_fallida.connect(_on_accion_fallida)
-			mundo_3d.astronauta_8.pieza_recogida.connect(_on_pieza_recogida)
-			mundo_3d.astronauta_8.pieza_ensamblada.connect(_on_pieza_ensamblada)
-		if mundo_3d.astronauta_9:
-			mundo_3d.astronauta_9.accion_fallida.connect(_on_accion_fallida)
-			mundo_3d.astronauta_9.pieza_recogida.connect(_on_pieza_recogida)
-			mundo_3d.astronauta_9.pieza_ensamblada.connect(_on_pieza_ensamblada)
-		if mundo_3d.astronauta_10:
-			mundo_3d.astronauta_10.accion_fallida.connect(_on_accion_fallida)
-			mundo_3d.astronauta_10.pieza_recogida.connect(_on_pieza_recogida)
-			mundo_3d.astronauta_10.pieza_ensamblada.connect(_on_pieza_ensamblada)
+		if mundo_3d.mesa_spid:
+			mundo_3d.mesa_spid.spid_actualizado.connect(func(_e, _t, _m): _verificar_hitos_sandbox())
+			mundo_3d.mesa_spid.spid_completado.connect(func(): _verificar_hitos_sandbox())
+
+		var todos_astros = [
+			mundo_3d.astronauta, mundo_3d.astronauta_2, mundo_3d.astronauta_3,
+			mundo_3d.astronauta_4, mundo_3d.astronauta_5
+		]
+		for a in todos_astros:
+			if a:
+				a.accion_fallida.connect(_on_accion_fallida)
+				a.pieza_recogida.connect(_on_pieza_recogida)
+				a.pieza_ensamblada.connect(func(tipo): 
+					_on_pieza_ensamblada(tipo)
+					_verificar_hitos_sandbox()
+				)
 
 func _cambiar_estado_pausa(pausado: bool) -> void:
 	fondo_menu_pausa.visible = pausado
@@ -272,168 +243,162 @@ func _on_volver_menu_pressed() -> void:
 	get_tree().change_scene_to_file(ESCENA_MENU_PRINCIPAL)
 
 func _on_ejecutar_pressed() -> void:
-	if en_ejecucion: return
-	var secuencia_a1 = lienzo.obtener_secuencia_comandos()
-	var secuencia_a2 = lienzo_a2.obtener_secuencia_comandos()
-	var secuencia_a3 = lienzo_a3.obtener_secuencia_comandos()
-	var secuencia_a4 = lienzo_a4.obtener_secuencia_comandos()
-	var secuencia_a5 = lienzo_a5.obtener_secuencia_comandos()
-	var secuencia_a6 = lienzo_a6.obtener_secuencia_comandos()
-	var secuencia_a7 = lienzo_a7.obtener_secuencia_comandos()
-	var secuencia_a8 = lienzo_a8.obtener_secuencia_comandos()
-	var secuencia_a9 = lienzo_a9.obtener_secuencia_comandos()
-	var secuencia_a10 = lienzo_a10.obtener_secuencia_comandos()
-	if secuencia_a1.is_empty() and secuencia_a2.is_empty() and secuencia_a3.is_empty() and secuencia_a4.is_empty() and secuencia_a5.is_empty() and secuencia_a6.is_empty() and secuencia_a7.is_empty() and secuencia_a8.is_empty() and secuencia_a9.is_empty() and secuencia_a10.is_empty():
-		_actualizar_estado("Los lienzos estan vacios. Arrastra bloques para programar al equipo.")
+	if en_ejecucion:
+		detener_solicitado = true
+		_actualizar_estado("Deteniendo automatización...")
+		btn_ejecutar.text = "Deteniendo..."
+		return
+
+	var secuencias = [
+		lienzo.obtener_secuencia_comandos(),
+		lienzo_a2.obtener_secuencia_comandos(),
+		lienzo_a3.obtener_secuencia_comandos(),
+		lienzo_a4.obtener_secuencia_comandos(),
+		lienzo_a5.obtener_secuencia_comandos()
+	]
+
+	var hay_instrucciones = false
+	for sec in secuencias:
+		if not sec.is_empty():
+			hay_instrucciones = true
+			break
+
+	if not hay_instrucciones:
+		_actualizar_estado("Los lienzos están vacíos. Arrastra bloques de instrucciones para programar al equipo.")
 		return
 
 	en_ejecucion = true
+	detener_solicitado = false
 	_limpiar_error()
+	btn_ejecutar.text = "Detener"
+	btn_ejecutar.modulate = Color(0.9, 0.4, 0.4)
 	_bloquear_interfaz(true)
-	errores_durante_ejecucion = 0
-	_actualizar_estado("Ejecutando las secuencias del equipo...")
+	btn_ejecutar.disabled = false
 
-	var abortado = false
-	var nivel = niveles[indice_nivel_actual]
-	if nivel.get("modo_paralelo", false):
-		abortado = not await _ejecutar_equipo_paralelo(
-			[mundo_3d.astronauta, mundo_3d.astronauta_2, mundo_3d.astronauta_3, mundo_3d.astronauta_4, mundo_3d.astronauta_5, mundo_3d.astronauta_6, mundo_3d.astronauta_7, mundo_3d.astronauta_8, mundo_3d.astronauta_9, mundo_3d.astronauta_10],
-			[secuencia_a1, secuencia_a2, secuencia_a3, secuencia_a4, secuencia_a5, secuencia_a6, secuencia_a7, secuencia_a8, secuencia_a9, secuencia_a10]
-		)
-	else:
-		if not secuencia_a1.is_empty():
-			abortado = not await _ejecutar_secuencia(mundo_3d.astronauta, secuencia_a1, "Astronauta 1")
-		if not abortado and not secuencia_a2.is_empty():
-			abortado = not await _ejecutar_secuencia(mundo_3d.astronauta_2, secuencia_a2, "Astronauta 2")
-		if not abortado and not secuencia_a3.is_empty():
-			abortado = not await _ejecutar_secuencia(mundo_3d.astronauta_3, secuencia_a3, "Astronauta 3")
-		if not abortado and not secuencia_a4.is_empty():
-			abortado = not await _ejecutar_secuencia(mundo_3d.astronauta_4, secuencia_a4, "Astronauta 4")
-		if not abortado and not secuencia_a5.is_empty():
-			abortado = not await _ejecutar_secuencia(mundo_3d.astronauta_5, secuencia_a5, "Astronauta 5")
-		if not abortado and not secuencia_a6.is_empty():
-			abortado = not await _ejecutar_secuencia(mundo_3d.astronauta_6, secuencia_a6, "Astronauta 6")
-		if not abortado and not secuencia_a7.is_empty():
-			abortado = not await _ejecutar_secuencia(mundo_3d.astronauta_7, secuencia_a7, "Astronauta 7")
-		if not abortado and not secuencia_a8.is_empty():
-			abortado = not await _ejecutar_secuencia(mundo_3d.astronauta_8, secuencia_a8, "Astronauta 8")
-		if not abortado and not secuencia_a9.is_empty():
-			abortado = not await _ejecutar_secuencia(mundo_3d.astronauta_9, secuencia_a9, "Astronauta 9")
-		if not abortado and not secuencia_a10.is_empty():
-			abortado = not await _ejecutar_secuencia(mundo_3d.astronauta_10, secuencia_a10, "Astronauta 10")
+	var ciclo = 1
+	var astronautas = [
+		mundo_3d.astronauta, mundo_3d.astronauta_2, mundo_3d.astronauta_3,
+		mundo_3d.astronauta_4, mundo_3d.astronauta_5
+	]
+
+	while en_ejecucion and not detener_solicitado:
+		errores_durante_ejecucion = 0
+		_actualizar_estado("Automatización en marcha (Ciclo %d)..." % ciclo)
+
+		var exito = await _ejecutar_equipo_paralelo(astronautas, secuencias)
+		_verificar_hitos_sandbox()
+
+		if not exito or not modo_bucle or detener_solicitado:
+			break
+
+		ciclo += 1
+		await get_tree().create_timer(0.25).timeout
 
 	en_ejecucion = false
+	detener_solicitado = false
+	btn_ejecutar.text = "Ejecutar"
+	btn_ejecutar.modulate = Color.WHITE
 	_bloquear_interfaz(false)
-
-	# Evaluar si se cumplio la meta
-	await get_tree().create_timer(0.2).timeout
-	_evaluar_resultado_nivel(secuencia_a1.size() + secuencia_a2.size() + secuencia_a3.size() + secuencia_a4.size() + secuencia_a5.size() + secuencia_a6.size() + secuencia_a7.size() + secuencia_a8.size() + secuencia_a9.size() + secuencia_a10.size(), abortado)
+	_verificar_hitos_sandbox()
 
 func _ejecutar_equipo_paralelo(astronautas: Array, secuencias: Array) -> bool:
 	var max_pasos = 0
-	for secuencia in secuencias:
-		max_pasos = maxi(max_pasos, secuencia.size())
+	for sec in secuencias:
+		max_pasos = maxi(max_pasos, sec.size())
+
 	for paso in range(max_pasos):
-		for indice in range(astronautas.size()):
-			var secuencia = secuencias[indice]
-			if paso >= secuencia.size() or not astronautas[indice].visible:
+		if detener_solicitado:
+			return false
+
+		for idx in range(min(astronautas.size(), secuencias.size())):
+			var astro: AstronautaIngeniero = astronautas[idx]
+			var sec: Array = secuencias[idx]
+			if paso >= sec.size() or not astro.visible:
 				continue
-			var bloque: BloqueItem = secuencia[paso]
-			var etiqueta = "Astronauta %d" % (indice + 1)
-			_actualizar_estado("%s - accion %d/%d" % [etiqueta, paso + 1, secuencia.size()])
+
+			var bloque: BloqueItem = sec[paso]
 			bloque.resaltar_ejecucion(true)
-			var exito = await astronautas[indice].ejecutar_accion(bloque.id_comando)
-			await get_tree().create_timer(0.08).timeout
+			var ok = await astro.ejecutar_accion(bloque.id_comando)
 			bloque.resaltar_ejecucion(false)
-			if not exito:
+
+			if not ok:
 				errores_durante_ejecucion += 1
 				bloque.resaltar_error(true)
 				bloque_con_error = bloque
-				_actualizar_estado("[ERROR] %s: %s" % [etiqueta, ultimo_error if not ultimo_error.is_empty() else "La accion no pudo completarse."])
+				_actualizar_estado("[ALERTA] %s se detuvo: %s" % [astro.nombre_rol, ultimo_error if not ultimo_error.is_empty() else "Acción bloqueada."])
 				return false
+
+		# Chequeo dinámico tras cada paso
+		_verificar_hitos_sandbox()
+		await get_tree().create_timer(0.06).timeout
+
 	return true
 
-func _ejecutar_secuencia(astronauta: AstronautaIngeniero, secuencia: Array[BloqueItem], etiqueta: String) -> bool:
-	for i in range(secuencia.size()):
-		var bloque = secuencia[i]
-		_actualizar_estado("%s - paso %d/%d: %s" % [etiqueta, i + 1, secuencia.size(), bloque.titulo])
-		bloque.resaltar_ejecucion(true)
-		var exito = await astronauta.ejecutar_accion(bloque.id_comando)
-		await get_tree().create_timer(0.12).timeout
-		bloque.resaltar_ejecucion(false)
-		if not exito:
-			errores_durante_ejecucion += 1
-			bloque.resaltar_error(true)
-			bloque_con_error = bloque
-			_actualizar_estado("[ERROR] %s - paso %d: %s" % [etiqueta, i + 1, ultimo_error if not ultimo_error.is_empty() else "La accion no pudo completarse."])
-			return false
-	return true
+func _verificar_hitos_sandbox() -> void:
+	if indice_hito_actual >= hitos.size():
+		return
+	var hito = hitos[indice_hito_actual]
+	var cumplido = false
 
-func _evaluar_resultado_nivel(cant_bloques: int, abortado: bool) -> void:
-	var nivel = niveles[indice_nivel_actual]
-	var cumplido = mundo_3d.verificar_objetivo_completado()
-
-	if cumplido:
-		var estrellas = 1
-		if errores_durante_ejecucion == 0 and not abortado:
-			estrellas += 1
-		if cant_bloques <= nivel.bloques_optimos:
-			estrellas += 1
-
-		# Celebracion visual en el 3D manteniendo la pantalla intacta
-		if mundo_3d and mundo_3d.astronauta:
-			mundo_3d.astronauta.resaltar_seleccion(true)
-
-		var estrellas_str = ""
-		for s in range(estrellas): estrellas_str += "⭐"
-
-		if indice_nivel_actual < niveles.size() - 1:
-			_actualizar_estado("¡OBJETIVO CUMPLIDO %s! Actualizando al siguiente paso de montaje..." % estrellas_str)
-			await get_tree().create_timer(1.2).timeout
-			# Transicion fluida en la misma pantalla sin modales invasivos
-			cargar_nivel(indice_nivel_actual + 1, true)
-		else:
-			_actualizar_estado("🏆 ¡SPIDO COMPLETADO %s! Robot araña ensamblado y operativo." % estrellas_str)
+	match hito.clave:
+		"CALIBRACION":
+			if mundo_3d and mundo_3d.astronauta:
+				var pos_actual = Vector2i(mundo_3d.astronauta.grid_x, mundo_3d.astronauta.grid_z)
+				if pos_actual == hito.get("pos_baliza", Vector2i(0, -1)):
+					cumplido = true
+		"MONTAR_CHASIS":
+			if mundo_3d and mundo_3d.mesa_spid and "CHASIS" in mundo_3d.mesa_spid.etapas_completadas:
+				cumplido = true
+		"SUMINISTRO_RUEDAS":
+			if mundo_3d and mundo_3d.mesa_spid and "RUEDAS" in mundo_3d.mesa_spid.etapas_completadas:
+				cumplido = true
+		"EQUIPO_CONCURRENTE":
+			if mundo_3d and mundo_3d.mesa_spid and "SENSOR" in mundo_3d.mesa_spid.etapas_completadas:
+				cumplido = true
+		"CADENA_AUTOMATIZADA":
 			if mundo_3d and mundo_3d.mesa_spid:
-				mundo_3d.mesa_spid.probar_sistemas()
+				if "BRAZOS" in mundo_3d.mesa_spid.etapas_completadas or "BATERIA" in mundo_3d.mesa_spid.etapas_completadas:
+					cumplido = true
+		"DESPERTAR_SPIDO":
+			if mundo_3d and mundo_3d.mesa_spid and mundo_3d.mesa_spid.etapas_completadas.size() >= 4:
+				cumplido = true
+
+	if cumplido and indice_hito_actual not in hitos_completados:
+		hitos_completados.append(indice_hito_actual)
+		_completar_hito_sandbox()
+
+func _completar_hito_sandbox() -> void:
+	var hito_terminado = hitos[indice_hito_actual]
+	_actualizar_estado("⭐ ¡HITO LOGRADO: %s! ⭐ Desbloqueando nuevas capacidades..." % hito_terminado.titulo)
+
+	if mundo_3d and mundo_3d.astronauta:
+		mundo_3d.astronauta.resaltar_seleccion(true)
+
+	if indice_hito_actual < hitos.size() - 1:
+		indice_hito_actual += 1
+		await get_tree().create_timer(1.2).timeout
+		_aplicar_hito_actual()
 	else:
-		if nivel.get("tipo_meta", "BALIZA") == "BALIZA":
-			var celda_actual = Vector2i(mundo_3d.astronauta.grid_x, mundo_3d.astronauta.grid_z)
-			var celda_meta = nivel.get("pos_baliza", Vector2i(0, -1))
-			if celda_actual.y > celda_meta.y:
-				ultimo_error = "El astronauta se detuvo antes de alcanzar la baliza."
-			elif celda_actual.y < celda_meta.y:
-				ultimo_error = "El astronauta sobrepaso la baliza."
-			else:
-				ultimo_error = "El astronauta no se encuentra en la casilla de la baliza."
-			btn_pista.disabled = false
-		_actualizar_estado("[FALLO] La meta no fue alcanzada. Presiona 'Pista' si necesitas ayuda o 'Reiniciar' para volver a intentar.")
+		_actualizar_estado("🏆 ¡PROYECTO SPIDO COMPLETADO! Robot araña totalmente automatizado.")
+		if mundo_3d and mundo_3d.mesa_spid:
+			mundo_3d.mesa_spid.probar_sistemas()
 
-func _mostrar_victoria(estrellas: int, cant_bloques: int, optimo: int) -> void:
-	var texto_estrellas = ""
-	for i in range(3):
-		texto_estrellas += "[*] " if i < estrellas else "[ ] "
-
-	label_estrellas.text = texto_estrellas
-	var detalle_aprendizaje = ""
-	if niveles[indice_nivel_actual].get("guiada", false):
-		detalle_aprendizaje = "\n\nAprendizaje: construiste y corregiste una secuencia."
-	label_victoria_detalle.text = (
-		"Calificacion: %d/3 Estrellas\n" +
-		"- Objetivo alcanzado con exito\n" +
-		"- Errores cometidos: %d\n" +
-		"- Bloques usados: %d (Optimo pedagogico: %d)%s"
-	) % [estrellas, errores_durante_ejecucion, cant_bloques, optimo, detalle_aprendizaje]
-
-	btn_modal_siguiente.visible = (indice_nivel_actual < niveles.size() - 1)
-	panel_victoria.visible = true
+func _on_duplicar_pressed() -> void:
+	modo_bucle = not modo_bucle
+	if modo_bucle:
+		btn_duplicar.text = "Bucle: ON [AUTO]"
+		btn_duplicar.modulate = Color(0.35, 0.95, 0.65)
+		_actualizar_estado("Modo Automatización Bucle: ACTIVO. Tus astronautas repetirán su rutina continuamente.")
+	else:
+		btn_duplicar.text = "Bucle: OFF"
+		btn_duplicar.modulate = Color.WHITE
+		_actualizar_estado("Modo Bucle: INACTIVO. Ejecución de un solo ciclo.")
 
 func _on_modal_siguiente_pressed() -> void:
-	panel_victoria.visible = false
-	cargar_nivel(indice_nivel_actual + 1, true)
+	if indice_hito_actual < hitos.size() - 1:
+		cambiar_hito(indice_hito_actual + 1)
 
 func _on_modal_reintentar_pressed() -> void:
-	panel_victoria.visible = false
 	_on_reiniciar_pressed()
 
 func _on_paso_pressed() -> void:
@@ -495,13 +460,15 @@ func _on_paso_pressed() -> void:
 	indice_paso_actual += 1
 	en_ejecucion = false
 	_bloquear_interfaz(false)
+	_verificar_hitos_sandbox()
 
 func _on_reiniciar_pressed() -> void:
 	indice_paso_actual = 0
 	errores_durante_ejecucion = 0
+	detener_solicitado = true
 	_limpiar_error()
 	await mundo_3d.reiniciar_mundo()
-	_actualizar_estado("Nivel reiniciado. Prueba otra vez tu algoritmo.")
+	_actualizar_estado("Posiciones de astronautas reiniciadas. Tus bloques se mantienen intactos.")
 
 func _on_limpiar_pressed() -> void:
 	if en_ejecucion: return
@@ -516,33 +483,6 @@ func _on_limpiar_pressed() -> void:
 	_limpiar_error()
 	_actualizar_estado("Lienzo vaciado.")
 
-func _on_duplicar_pressed() -> void:
-	if en_ejecucion:
-		return
-	var lienzo_actual = lienzo
-	if tabs_codigo.current_tab == 1:
-		lienzo_actual = lienzo_a2
-	elif tabs_codigo.current_tab == 2:
-		lienzo_actual = lienzo_a3
-	elif tabs_codigo.current_tab == 3:
-		lienzo_actual = lienzo_a4
-	elif tabs_codigo.current_tab == 4:
-		lienzo_actual = lienzo_a5
-	elif tabs_codigo.current_tab == 5:
-		lienzo_actual = lienzo_a6
-	elif tabs_codigo.current_tab == 6:
-		lienzo_actual = lienzo_a7
-	elif tabs_codigo.current_tab == 7:
-		lienzo_actual = lienzo_a8
-	elif tabs_codigo.current_tab == 8:
-		lienzo_actual = lienzo_a9
-	elif tabs_codigo.current_tab == 9:
-		lienzo_actual = lienzo_a10
-	if lienzo_actual.duplicar_secuencia():
-		_actualizar_estado("Secuencia duplicada. Ahora puedes reutilizarla o modificarla.")
-	else:
-		_actualizar_estado("No hay una secuencia para duplicar.")
-
 func _on_tab_codigo_changed(idx: int) -> void:
 	if mundo_3d:
 		mundo_3d.resaltar_astronauta_seleccionado(idx)
@@ -550,12 +490,11 @@ func _on_tab_codigo_changed(idx: int) -> void:
 	_actualizar_estado("Programando secuencia para: %s" % nombre_tab)
 
 func _bloquear_interfaz(bloquear: bool) -> void:
-	btn_ejecutar.disabled = bloquear
+	btn_ejecutar.disabled = false
 	btn_paso.disabled = bloquear
 	btn_limpiar.disabled = bloquear
-	btn_duplicar.disabled = bloquear
-	btn_nivel_prev.disabled = bloquear or (indice_nivel_actual == 0)
-	btn_nivel_next.disabled = bloquear or (indice_nivel_actual == niveles.size() - 1)
+	btn_nivel_prev.disabled = bloquear or (indice_hito_actual == 0)
+	btn_nivel_next.disabled = bloquear or (indice_hito_actual == hitos.size() - 1)
 	btn_guia_continuar.disabled = bloquear
 	btn_pista.disabled = bloquear or ultimo_error.is_empty()
 
