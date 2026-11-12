@@ -51,6 +51,7 @@ extends Control
 @onready var btn_volver_menu: Button = %BtnVolverMenu
 
 const ESCENA_MENU_PRINCIPAL := "res://escenas/menu_inicio.tscn"
+const HitosSandboxClass = preload("res://scripts/hitos_sandbox.gd")
 
 var hitos: Array[Dictionary] = []
 var indice_hito_actual: int = 0
@@ -89,7 +90,7 @@ const COMANDOS_DISPONIBLES = {
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	get_tree().paused = false
-	hitos = HitosSandbox.obtener_hitos()
+	hitos = HitosSandboxClass.obtener_hitos()
 	indice_hito_actual = 0
 	hitos_completados.clear()
 	_conectar_senales()
