@@ -3,11 +3,13 @@ extends Node3D
 
 signal spid_actualizado(etapa: int, total: int, mensaje: String)
 signal spid_completado
+signal diagnostico_realizado
 
 @export var celda_mesa: Vector2i = Vector2i(0, -2)
 
 var etapas_completadas: Array[String] = []
 var orden_esperado: Array[String] = ["CHASIS", "RUEDAS", "SENSOR", "BRAZOS", "BATERIA"]
+var diagnostico_ejecutado: bool = false
 
 @onready var spid_chasis: MeshInstance3D = $SoporteSpid/SpidChasis
 @onready var spid_ruedas: Node3D = $SoporteSpid/SpidRuedas
@@ -69,6 +71,7 @@ func _crear_componentes_extra_si_faltan() -> void:
 
 func reiniciar() -> void:
 	etapas_completadas.clear()
+	diagnostico_ejecutado = false
 	if spid_chasis: spid_chasis.visible = false
 	if spid_ruedas: spid_ruedas.visible = false
 	if spid_sensor: spid_sensor.visible = false
@@ -80,6 +83,10 @@ func reiniciar() -> void:
 	spid_actualizado.emit(0, orden_esperado.size(), "Mesa lista. Esperando montaje del Chasis.")
 
 func ensamblar_componente(tipo: String) -> bool:
+	if tipo in etapas_completadas:
+		# Ya estaba ensamblado este componente
+		return true
+
 	etapas_completadas.append(tipo)
 
 	var tween = create_tween()
@@ -89,42 +96,65 @@ func ensamblar_componente(tipo: String) -> bool:
 			spid_chasis.scale = Vector3.ZERO
 			tween.tween_property(spid_chasis, "scale", Vector3.ONE, 0.35).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 			spid_actualizado.emit(etapas_completadas.size(), orden_esperado.size(), "Chasis de Spido fijado en el banco de montaje.")
+			if luz_plataforma:
+				luz_plataforma.light_color = Color(0.3, 0.7, 0.4)
+				luz_plataforma.light_energy = 1.0
 		"RUEDAS":
 			spid_ruedas.visible = true
 			spid_ruedas.scale = Vector3.ZERO
 			tween.tween_property(spid_ruedas, "scale", Vector3.ONE, 0.35).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 			spid_actualizado.emit(etapas_completadas.size(), orden_esperado.size(), "Sistemas de traccion y 4 ruedas montadas.")
+			if luz_plataforma:
+				luz_plataforma.light_color = Color(0.2, 0.8, 0.9)
+				luz_plataforma.light_energy = 1.3
 		"SENSOR":
 			spid_sensor.visible = true
 			spid_sensor.scale = Vector3.ZERO
 			tween.tween_property(spid_sensor, "scale", Vector3.ONE, 0.35).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 			spid_actualizado.emit(etapas_completadas.size(), orden_esperado.size(), "Sensor optico y procesador A.D.A. conectado.")
+			if luz_plataforma:
+				luz_plataforma.light_color = Color(0.9, 0.8, 0.2)
+				luz_plataforma.light_energy = 1.6
 		"BRAZOS":
 			if spid_brazos:
 				spid_brazos.visible = true
 				spid_brazos.scale = Vector3.ZERO
 				tween.tween_property(spid_brazos, "scale", Vector3.ONE, 0.35).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 			spid_actualizado.emit(etapas_completadas.size(), orden_esperado.size(), "Brazos manipuladores acoplados con exito.")
+			if luz_plataforma:
+				luz_plataforma.light_color = Color(0.95, 0.5, 0.2)
+				luz_plataforma.light_energy = 1.9
 		"BATERIA", "NUCLEO":
 			if spid_bateria:
 				spid_bateria.visible = true
 				spid_bateria.scale = Vector3.ZERO
 				tween.tween_property(spid_bateria, "scale", Vector3.ONE, 0.35).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 			spid_actualizado.emit(etapas_completadas.size(), orden_esperado.size(), "Nucleo de energia instalado y cargado.")
+			if luz_plataforma:
+				luz_plataforma.light_color = Color(0.3, 0.9, 1.0)
+				luz_plataforma.light_energy = 2.4
 
 	await tween.finished
 
-	if etapas_completadas.size() >= 3:
+	if etapas_completadas.size() >= orden_esperado.size():
 		await _activar_spid()
 		spid_completado.emit()
+	elif etapas_completadas.size() >= 3:
+		_pulso_parcial()
 
 	return true
+
+func _pulso_parcial() -> void:
+	if luz_plataforma:
+		var tw = create_tween()
+		tw.tween_property(luz_plataforma, "light_energy", 2.2, 0.2)
+		tw.tween_property(luz_plataforma, "light_energy", 1.5, 0.2)
 
 func _activar_spid() -> void:
 	if luz_plataforma:
 		var tw_luz = create_tween().set_loops(3)
 		tw_luz.tween_property(luz_plataforma, "light_energy", 3.5, 0.2)
-		tw_luz.tween_property(luz_plataforma, "light_energy", 1.2, 0.2)
+		tw_luz.tween_property(luz_plataforma, "light_energy", 1.5, 0.2)
 		luz_plataforma.light_color = Color(0.2, 1.0, 0.5)
 
 	var tw_spid = create_tween()
@@ -133,11 +163,17 @@ func _activar_spid() -> void:
 	await tw_spid.finished
 
 func probar_sistemas() -> bool:
-	if etapas_completadas.size() < orden_esperado.size():
-		return false
+	diagnostico_ejecutado = true
+	diagnostico_realizado.emit()
 
-	var tw = create_tween()
+	if luz_plataforma:
+		luz_plataforma.light_color = Color(0.2, 1.0, 0.6)
+		luz_plataforma.light_energy = 4.0
+
+	var tw = create_tween().set_parallel(false)
+	tw.tween_property($SoporteSpid, "position:y", 0.90, 0.25).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 	tw.tween_property($SoporteSpid, "rotation:y", deg_to_rad(360), 0.8).as_relative()
+	tw.tween_property($SoporteSpid, "position:y", 0.70, 0.25).set_trans(Tween.TRANS_BOUNCE)
 	await tw.finished
 	return true
 

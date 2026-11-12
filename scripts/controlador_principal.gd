@@ -36,6 +36,7 @@ extends Control
 @onready var btn_reiniciar: Button = %BtnReiniciar
 @onready var btn_limpiar: Button = %BtnLimpiar
 @onready var btn_duplicar: Button = %BtnDuplicar
+@onready var btn_velocidad: Button = %BtnVelocidad
 
 # Popup / Modal de Victoria
 @onready var panel_victoria: PanelContainer = %ModalVictoria
@@ -60,6 +61,7 @@ var hitos_completados: Array[int] = []
 var en_ejecucion: bool = false
 var modo_bucle: bool = false
 var detener_solicitado: bool = false
+var factor_velocidad: int = 1
 var indice_paso_actual: int = 0
 var errores_durante_ejecucion: int = 0
 var guia_activa: bool = false
@@ -168,9 +170,21 @@ func _aplicar_hito_actual() -> void:
 			mundo_3d.astronauta_5.visible = true
 			mundo_3d.astronauta_5.configurar_inicio(hito.get("pos_astronauta_5", Vector2i(0, 2)), 0)
 
-		# Piezas del hito en las bahias
+		# Piezas del hito en las bahias (sin borrar las ya montadas)
 		if hito.has("piezas") and not hito.piezas.is_empty():
-			mundo_3d._recrear_piezas(hito.piezas)
+			mundo_3d._recrear_piezas(hito.piezas, true)
+
+		# Fijar checkpoint actual en los astronautas activos para que si reinician no vuelvan al inicio de los tiempos
+		if mundo_3d.astronauta:
+			mundo_3d.astronauta.fijar_checkpoint_actual()
+		if mundo_3d.astronauta_2 and mundo_3d.astronauta_2.visible:
+			mundo_3d.astronauta_2.fijar_checkpoint_actual()
+		if mundo_3d.astronauta_3 and mundo_3d.astronauta_3.visible:
+			mundo_3d.astronauta_3.fijar_checkpoint_actual()
+		if mundo_3d.astronauta_4 and mundo_3d.astronauta_4.visible:
+			mundo_3d.astronauta_4.fijar_checkpoint_actual()
+		if mundo_3d.astronauta_5 and mundo_3d.astronauta_5.visible:
+			mundo_3d.astronauta_5.fijar_checkpoint_actual()
 
 		mundo_3d.resaltar_astronauta_seleccionado(tabs_codigo.current_tab)
 
@@ -198,6 +212,8 @@ func _conectar_senales() -> void:
 	btn_reiniciar.pressed.connect(_on_reiniciar_pressed)
 	btn_limpiar.pressed.connect(_on_limpiar_pressed)
 	btn_duplicar.pressed.connect(_on_duplicar_pressed)
+	if btn_velocidad:
+		btn_velocidad.pressed.connect(_on_velocidad_pressed)
 
 	btn_nivel_prev.pressed.connect(func(): cambiar_hito(indice_hito_actual - 1))
 	btn_nivel_next.pressed.connect(func(): cambiar_hito(indice_hito_actual + 1))
@@ -215,6 +231,7 @@ func _conectar_senales() -> void:
 		if mundo_3d.mesa_spid:
 			mundo_3d.mesa_spid.spid_actualizado.connect(func(_e, _t, _m): _verificar_hitos_sandbox())
 			mundo_3d.mesa_spid.spid_completado.connect(func(): _verificar_hitos_sandbox())
+			mundo_3d.mesa_spid.diagnostico_realizado.connect(func(): _verificar_hitos_sandbox())
 
 		var todos_astros = [
 			mundo_3d.astronauta, mundo_3d.astronauta_2, mundo_3d.astronauta_3,
@@ -240,6 +257,7 @@ func _on_continuar_pressed() -> void:
 	_cambiar_estado_pausa(false)
 
 func _on_volver_menu_pressed() -> void:
+	Engine.time_scale = 1.0
 	get_tree().paused = false
 	get_tree().change_scene_to_file(ESCENA_MENU_PRINCIPAL)
 
@@ -358,10 +376,10 @@ func _verificar_hitos_sandbox() -> void:
 				cumplido = true
 		"CADENA_AUTOMATIZADA":
 			if mundo_3d and mundo_3d.mesa_spid:
-				if "BRAZOS" in mundo_3d.mesa_spid.etapas_completadas or "BATERIA" in mundo_3d.mesa_spid.etapas_completadas:
+				if "BRAZOS" in mundo_3d.mesa_spid.etapas_completadas and "BATERIA" in mundo_3d.mesa_spid.etapas_completadas:
 					cumplido = true
 		"DESPERTAR_SPIDO":
-			if mundo_3d and mundo_3d.mesa_spid and mundo_3d.mesa_spid.etapas_completadas.size() >= 4:
+			if mundo_3d and mundo_3d.mesa_spid and (mundo_3d.mesa_spid.diagnostico_ejecutado or mundo_3d.mesa_spid.etapas_completadas.size() >= 5):
 				cumplido = true
 
 	if cumplido and indice_hito_actual not in hitos_completados:
@@ -468,8 +486,29 @@ func _on_reiniciar_pressed() -> void:
 	errores_durante_ejecucion = 0
 	detener_solicitado = true
 	_limpiar_error()
-	await mundo_3d.reiniciar_mundo()
-	_actualizar_estado("Posiciones de astronautas reiniciadas. Tus bloques se mantienen intactos.")
+	await mundo_3d.reiniciar_mundo(true)
+	_actualizar_estado("Posiciones de astronautas reiniciadas. El robot Spido y tus bloques se mantienen intactos.")
+
+func _on_velocidad_pressed() -> void:
+	match factor_velocidad:
+		1:
+			factor_velocidad = 2
+			Engine.time_scale = 2.0
+			btn_velocidad.text = "Vel: 2x"
+			btn_velocidad.modulate = Color(0.3, 0.9, 1.0)
+			_actualizar_estado("Velocidad de simulación acelerada a 2x.")
+		2:
+			factor_velocidad = 3
+			Engine.time_scale = 3.5
+			btn_velocidad.text = "Vel: 3.5x"
+			btn_velocidad.modulate = Color(1.0, 0.8, 0.2)
+			_actualizar_estado("Velocidad de simulación máxima (3.5x).")
+		_:
+			factor_velocidad = 1
+			Engine.time_scale = 1.0
+			btn_velocidad.text = "Vel: 1x"
+			btn_velocidad.modulate = Color.WHITE
+			_actualizar_estado("Velocidad de simulación normal (1x).")
 
 func _on_limpiar_pressed() -> void:
 	if en_ejecucion: return

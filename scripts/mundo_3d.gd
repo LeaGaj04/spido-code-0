@@ -132,19 +132,24 @@ func cargar_nivel(config: Dictionary, preservar_estado: bool = false) -> void:
 	# 5. Spawner de piezas
 	_recrear_piezas(config.get("piezas", []))
 
-func _recrear_piezas(lista_piezas: Array) -> void:
+func _recrear_piezas(lista_piezas: Array, filtrar_ya_ensambladas: bool = true) -> void:
 	for child in contenedor_piezas.get_children():
 		child.queue_free()
 	piezas_por_celda.clear()
 
 	for p_data in lista_piezas:
+		var tipo = p_data.get("tipo", "CHASIS")
+		# Si la pieza ya fue ensamblada fisicamente en Spido, no la volvemos a generar en el piso
+		if filtrar_ya_ensambladas and mesa_spid and tipo in mesa_spid.etapas_completadas:
+			continue
+
 		var p_nodo: PiezaTaller
 		if escena_pieza:
 			p_nodo = escena_pieza.instantiate() as PiezaTaller
 		else:
 			p_nodo = PiezaTaller.new()
 
-		p_nodo.tipo_pieza = p_data.get("tipo", "CHASIS")
+		p_nodo.tipo_pieza = tipo
 		p_nodo.celda_inicial = p_data.get("celda", Vector2i(0, 0))
 		contenedor_piezas.add_child(p_nodo)
 
@@ -195,7 +200,7 @@ func verificar_objetivo_completado() -> bool:
 			return mesa_spid and mesa_spid.etapas_completadas.size() >= config_nivel_actual.get("componentes_objetivo", 2)
 	return false
 
-func reiniciar_mundo() -> void:
+func reiniciar_mundo(preservar_spido: bool = true) -> void:
 	if astronauta:
 		await astronauta.reiniciar()
 	if astronauta_2 and astronauta_2.visible:
@@ -216,6 +221,8 @@ func reiniciar_mundo() -> void:
 		await astronauta_9.reiniciar()
 	if astronauta_10 and astronauta_10.visible:
 		await astronauta_10.reiniciar()
-	if mesa_spid and mesa_spid.visible:
+
+	if not preservar_spido and mesa_spid and mesa_spid.visible:
 		mesa_spid.reiniciar()
-	_recrear_piezas(config_nivel_actual.get("piezas", []))
+
+	_recrear_piezas(config_nivel_actual.get("piezas", []), preservar_spido)
