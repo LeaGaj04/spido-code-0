@@ -84,14 +84,14 @@ func _construir_tablero_ajedrez() -> void:
 	add_child(contenedor_tablero)
 
 	var mat_oscuro = StandardMaterial3D.new()
-	mat_oscuro.albedo_color = Color(0.08, 0.10, 0.14)
-	mat_oscuro.metallic = 0.35
-	mat_oscuro.roughness = 0.65
+	mat_oscuro.albedo_color = Color(0.65, 0.70, 0.77) # Gris tecnológico suave
+	mat_oscuro.metallic = 0.2
+	mat_oscuro.roughness = 0.55
 
 	var mat_claro = StandardMaterial3D.new()
-	mat_claro.albedo_color = Color(0.14, 0.17, 0.24)
-	mat_claro.metallic = 0.45
-	mat_claro.roughness = 0.55
+	mat_claro.albedo_color = Color(0.92, 0.94, 0.97) # Blanco puro limpio
+	mat_claro.metallic = 0.15
+	mat_claro.roughness = 0.45
 
 	var box_mesh = BoxMesh.new()
 	box_mesh.size = Vector3(1.92, 0.08, 1.92)
@@ -108,10 +108,10 @@ func _construir_tablero_ajedrez() -> void:
 
 	# Borde perimetral metálico iluminado
 	var mat_borde = StandardMaterial3D.new()
-	mat_borde.albedo_color = Color(0.25, 0.32, 0.42)
+	mat_borde.albedo_color = Color(0.80, 0.84, 0.90)
 	mat_borde.emission_enabled = true
-	mat_borde.emission = Color(0.2, 0.7, 0.5)
-	mat_borde.emission_energy_multiplier = 0.5
+	mat_borde.emission = Color(0.3, 0.95, 0.65)
+	mat_borde.emission_energy_multiplier = 0.6
 
 	var rail_norte = MeshInstance3D.new()
 	var rail_mesh_h = BoxMesh.new()
@@ -139,8 +139,8 @@ func _construir_decoracion_nave() -> void:
 	contenedor_decoracion.add_child(nodo_mainframe)
 
 	var mat_gabinete = StandardMaterial3D.new()
-	mat_gabinete.albedo_color = Color(0.12, 0.15, 0.2)
-	mat_gabinete.metallic = 0.8
+	mat_gabinete.albedo_color = Color(0.91, 0.93, 0.96) # Blanco limpio de nave
+	mat_gabinete.metallic = 0.25
 	mat_gabinete.roughness = 0.25
 
 	var gabinete = MeshInstance3D.new()
@@ -166,13 +166,18 @@ func _construir_decoracion_nave() -> void:
 	pantalla.position = Vector3(0, 2.0, 0.62)
 	nodo_mainframe.add_child(pantalla)
 
-	# Bastidores laterales del servidor
+	# Puertas laterales del servidor en verde menta como la referencia oficial
+	var mat_puerta = StandardMaterial3D.new()
+	mat_puerta.albedo_color = Color(0.42, 0.76, 0.58)
+	mat_puerta.metallic = 0.2
+	mat_puerta.roughness = 0.35
+
 	for lado in [-1.0, 1.0]:
 		var rack = MeshInstance3D.new()
 		var m_rack = BoxMesh.new()
 		m_rack.size = Vector3(0.65, 3.0, 0.7)
 		rack.mesh = m_rack
-		rack.material_override = mat_gabinete
+		rack.material_override = mat_puerta
 		rack.position = Vector3(lado * 2.1, 1.5, 0.2)
 		nodo_mainframe.add_child(rack)
 
@@ -250,8 +255,9 @@ func _crear_cluster_cristal(pos_base: Vector3, col_energia: Color) -> void:
 	m_ped.height = 0.4
 	base_pedestal.mesh = m_ped
 	var mat_ped = StandardMaterial3D.new()
-	mat_ped.albedo_color = Color(0.15, 0.18, 0.24)
-	mat_ped.metallic = 0.7
+	mat_ped.albedo_color = Color(0.72, 0.76, 0.82)
+	mat_ped.metallic = 0.3
+	mat_ped.roughness = 0.5
 	base_pedestal.material_override = mat_ped
 	base_pedestal.position = pos_base + Vector3(0, 0.2, 0)
 	contenedor_decoracion.add_child(base_pedestal)
