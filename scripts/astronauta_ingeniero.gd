@@ -103,10 +103,15 @@ func reiniciar() -> void:
 	if orientacion_actual < 0: orientacion_actual += 4
 	_set_color_visor(color_identidad)
 
-func ejecutar_accion(accion: String) -> bool:
+func ejecutar_accion(accion: String, parametro: int = 1) -> bool:
 	match accion:
 		"AVANZAR":
-			return await avanzar()
+			var cantidad = max(1, parametro)
+			var tiempo_paso = 0.28 if cantidad > 1 else -1.0
+			for k in range(cantidad):
+				var r = await avanzar(tiempo_paso)
+				if not r: return false
+			return true
 		"AVANZAR_2":
 			for k in range(2):
 				var r = await avanzar(0.25)

@@ -18,67 +18,65 @@ extends Control
 @onready var tabs_codigo: TabContainer = %EquipoCodigo
 @onready var mundo_3d: Mundo3D = %Mundo3D
 
-# Elementos Didacticos
+# Botones Superiores (Cápsulas Verdes)
+@onready var btn_tienda: Button = %BtnTienda
+@onready var btn_codice: Button = %BtnCodice
+@onready var btn_guia: Button = %BtnGuia
+
+# Tarjeta de Misión / Fase
 @onready var label_nivel_titulo: Label = %LabelNivelTitulo
 @onready var btn_nivel_prev: Button = %BtnNivelPrev
 @onready var btn_nivel_next: Button = %BtnNivelNext
-@onready var label_ada_texto: Label = %LabelADATexto
 @onready var label_concepto: Label = %LabelConcepto
-@onready var label_estado: Label = %LabelEstado
-@onready var btn_pista: Button = %BtnPista
-@onready var panel_guia: PanelContainer = %PanelGuia
-@onready var label_guia_texto: Label = %LabelGuiaTexto
-@onready var btn_guia_continuar: Button = %BtnGuiaContinuar
+@onready var label_mision_desc: Label = %LabelMisionDesc
+@onready var label_estado_fase: Label = %LabelEstadoFase
+@onready var barra_progreso_fase: ProgressBar = %BarraProgresoFase
+@onready var label_progreso: Label = %LabelProgreso
 
-# Botones de Ejecucion
+# Badges Superiores Derechos
+@onready var label_spido_piezas: Label = %LabelSpidoPiezas
+@onready var label_creditos: Label = %LabelCreditos
+
+# Terminal A.D.A.
+@onready var btn_toggle_ada: Button = %BtnToggleADA
+@onready var card_ada: PanelContainer = %CardADA
+@onready var label_ada_texto: Label = %LabelADATexto
+
+# Consola Flotante y Paleta Desplegable
+@onready var consola_astronauta: PanelContainer = %ConsolaAstronauta
+@onready var btn_minimizar_consola: Button = %BtnMinimizarConsola
+@onready var btn_toggle_paleta: Button = %BtnTogglePaleta
+@onready var drawer_paleta: PanelContainer = %DrawerPaleta
+@onready var btn_cerrar_paleta: Button = %BtnCerrarPaleta
+
+# Botones de Ejecución y Consola
 @onready var btn_ejecutar: Button = %BtnEjecutar
 @onready var btn_paso: Button = %BtnPaso
 @onready var btn_reiniciar: Button = %BtnReiniciar
 @onready var btn_limpiar: Button = %BtnLimpiar
 @onready var btn_duplicar: Button = %BtnDuplicar
 @onready var btn_velocidad: Button = %BtnVelocidad
+@onready var btn_pista: Button = %BtnPista
+@onready var label_estado: Label = %LabelEstado
 
-# Mercado / Tienda de Algoritmia
-@onready var label_creditos: Label = %LabelCreditos
-@onready var btn_tienda: Button = %BtnTienda
+# Modal Centro de Mejoras
 @onready var modal_tienda: PanelContainer = %ModalTienda
 @onready var label_saldo_tienda: Label = %LabelSaldoTienda
 @onready var btn_cerrar_tienda: Button = %BtnCerrarTienda
+@onready var grid_mejoras: GridContainer = %GridMejoras
 @onready var lista_bloques: VBoxContainer = %ListaBloquesTienda
 @onready var lista_astronautas: VBoxContainer = %ListaAstronautasTienda
 @onready var lista_estaciones: VBoxContainer = %ListaEstacionesTienda
 
-var creditos: int = 150
-var bloques_adquiridos: Array[String] = ["AVANZAR", "GIRAR_IZQ", "GIRAR_DER", "TOMAR_PIEZA", "ENSAMBLAR"]
-var astronautas_desbloqueados: Array[int] = [1]
-var estaciones_desbloqueadas: Array[String] = []
-
-const CATALOGO_TIENDA = {
-	"bloques": [
-		{"id": "AVANZAR_2", "nombre": "Avanzar 2 Pasos (Turbo)", "desc": "Mueve al astronauta 2 casillas rápidamente.", "precio": 60},
-		{"id": "AVANZAR_3", "nombre": "Avanzar 3 Pasos (Sprint)", "desc": "Cubre distancias largas de extremo a extremo.", "precio": 100},
-		{"id": "DIAGNOSTICO", "nombre": "Diagnóstico de Sistemas", "desc": "Comando para calibrar y despertar a Spido.", "precio": 120}
-	],
-	"astronautas": [
-		{"id": 2, "nombre": "Astronauta 2 (Tracción - Azul)", "desc": "Segundo operario para transportar o ensamblar.", "precio": 100},
-		{"id": 3, "nombre": "Astronauta 3 (Sensores - Amarillo)", "desc": "Técnico especializado en óptica y cableado.", "precio": 200},
-		{"id": 4, "nombre": "Astronauta 4 (Brazos - Naranja)", "desc": "Operador para montaje de pinzas mecánicas.", "precio": 350},
-		{"id": 5, "nombre": "Astronauta 5 (Energía - Magenta)", "desc": "Ingeniero en jefe para energizar el núcleo.", "precio": 500}
-	],
-	"estaciones": [
-		{"id": "MESON_PATAS", "nombre": "Mesón de Patas & Tracción", "desc": "Transforma tornillos en ruedas y patas mecánicas.", "precio": 120},
-		{"id": "MESON_SENSORES", "nombre": "Mesón de Sensores Ópticos", "desc": "Transforma microchips en procesadores oculares.", "precio": 180}
-	]
-}
-
-# Popup / Modal de Victoria
+# Guía y Modales Auxiliares
+@onready var panel_guia: PanelContainer = %PanelGuia
+@onready var label_guia_texto: Label = %LabelGuiaTexto
+@onready var btn_guia_continuar: Button = %BtnGuiaContinuar
 @onready var panel_victoria: PanelContainer = %ModalVictoria
 @onready var label_estrellas: Label = %LabelEstrellas
 @onready var label_victoria_detalle: Label = %LabelDetalle
 @onready var btn_modal_siguiente: Button = %BtnModalSiguiente
 @onready var btn_modal_reintentar: Button = %BtnModalReintentar
-
-# Menu de pausa
 @onready var fondo_menu_pausa: ColorRect = %FondoMenuPausa
 @onready var menu_pausa: PanelContainer = %MenuPausa
 @onready var btn_continuar: Button = %BtnContinuar
@@ -86,6 +84,63 @@ const CATALOGO_TIENDA = {
 
 const ESCENA_MENU_PRINCIPAL := "res://escenas/menu_inicio.tscn"
 const HitosSandboxClass = preload("res://scripts/hitos_sandbox.gd")
+
+var creditos: int = 150
+var bloques_adquiridos: Array[String] = ["AVANZAR", "GIRAR_IZQ", "GIRAR_DER", "TOMAR_PIEZA", "ENSAMBLAR"]
+var astronautas_desbloqueados: Array[int] = [1]
+var estaciones_desbloqueadas: Array[String] = []
+
+const ARBOL_MEJORAS = [
+	{
+		"fase": "FASE 0 / BASE 1x1",
+		"desc": "Hangar inicial de montaje. Control y calibración de Spido.",
+		"costo": 0,
+		"cat": "fase",
+		"id": "FASE_0"
+	},
+	{
+		"fase": "FASE 1 / SECTOR 1x3",
+		"desc": "Corredor logístico. Bucle continuo de transporte de piezas.",
+		"costo": 60,
+		"cat": "fase",
+		"id": "FASE_1"
+	},
+	{
+		"fase": "FASE 2 / SECTOR 3x3",
+		"desc": "Expansión del hangar y Astronauta 2 (Tracción - Azul).",
+		"costo": 100,
+		"cat": "astronauta",
+		"id": 2
+	},
+	{
+		"fase": "FASE 3 / MESÓN PATAS",
+		"desc": "Estación de subensamblaje: transforma tornillos en ruedas y patas.",
+		"costo": 120,
+		"cat": "estacion",
+		"id": "MESON_PATAS"
+	},
+	{
+		"fase": "FASE 4 / MESÓN SENSORES",
+		"desc": "Estación óptica: transforma microchips en procesadores Spido.",
+		"costo": 180,
+		"cat": "estacion",
+		"id": "MESON_SENSORES"
+	},
+	{
+		"fase": "FASE 5 / SECTOR 5x5",
+		"desc": "Hangar ampliado y Astronauta 3 (Sensores - Amarillo).",
+		"costo": 200,
+		"cat": "astronauta",
+		"id": 3
+	},
+	{
+		"fase": "FASE 6 / PROTOCOLO MAESTRO",
+		"desc": "Sincronización multi-hilo completa con 5 astronautas y diagnóstico.",
+		"costo": 300,
+		"cat": "astronauta",
+		"id": 5
+	}
+]
 
 var hitos: Array[Dictionary] = []
 var indice_hito_actual: int = 0
@@ -104,22 +159,21 @@ var bloque_con_error: BloqueItem = null
 
 const PASOS_GUIA = [
 	{"titulo": "1. OBSERVA", "texto": "Tu Astronauta Ingeniero está en la posición inicial y la baliza brillante marca la meta de calibración."},
-	{"titulo": "2. PREDICE", "texto": "Cada bloque 'Avanzar 1 Paso' mueve al astronauta una casilla hacia adelante. Cuenta cuántas casillas hay hasta la baliza."},
-	{"titulo": "3. CONSTRUYE", "texto": "Arrastra 3 bloques 'Avanzar 1 Paso' desde la paleta izquierda hacia el lienzo del Astronauta 1."},
-	{"titulo": "4. EJECUTA & DEPURA", "texto": "Presiona 'Ejecutar' para correr tu primer algoritmo. También puedes usar 'Paso a Paso' para probar instrucción por instrucción."}
+	{"titulo": "2. PREDICE", "texto": "Cada bloque 'Avanzar' mueve al astronauta la cantidad de pasos configurada. Cuenta cuántas casillas hay hasta la baliza."},
+	{"titulo": "3. CONSTRUYE", "texto": "Arrastra el bloque 'Avanzar' desde la paleta y selecciona el número de pasos deseado directamente en el bloque."},
+	{"titulo": "4. EJECUTA & DEPURA", "texto": "Presiona 'Ejecutar' para correr tu algoritmo. También puedes usar 'Paso a Paso' para probar paso a paso."}
 ]
 
-# Paleta exacta del rediseño oficial de SpidoCode.
 const COMANDOS_DISPONIBLES = {
-	"AVANZAR": {"tit": "Avanzar 1 Paso", "prefijo": "[AVZ]", "color": Color(0.545098, 0.796078, 0.568627, 1.0)},
+	"AVANZAR": {"tit": "Avanzar", "prefijo": "[AVZ]", "color": Color(0.545098, 0.796078, 0.568627, 1.0)},
 	"AVANZAR_2": {"tit": "Avanzar 2 Pasos (Auto)", "prefijo": "[2x AVZ]", "color": Color(0.35, 0.75, 0.85, 1.0)},
 	"AVANZAR_3": {"tit": "Avanzar 3 Pasos (Auto)", "prefijo": "[3x AVZ]", "color": Color(0.25, 0.65, 0.85, 1.0)},
 	"RETROCEDER": {"tit": "Retroceder 1 Paso", "prefijo": "[RET]", "color": Color(0.34902, 0.388235, 0.447059, 1.0)},
-	"GIRAR_DER": {"tit": "Girar Derecha 90", "prefijo": "[DER]", "color": Color(0.631373, 0.85098, 0.65098, 1.0)},
-	"GIRAR_IZQ": {"tit": "Girar Izquierda 90", "prefijo": "[IZQ]", "color": Color(0.631373, 0.85098, 0.65098, 1.0)},
+	"GIRAR_DER": {"tit": "Girar Derecha 90°", "prefijo": "[DER]", "color": Color(0.631373, 0.85098, 0.65098, 1.0)},
+	"GIRAR_IZQ": {"tit": "Girar Izquierda 90°", "prefijo": "[IZQ]", "color": Color(0.631373, 0.85098, 0.65098, 1.0)},
 	"TOMAR_PIEZA": {"tit": "Tomar Pieza", "prefijo": "[TOM]", "color": Color(0.545098, 0.796078, 0.568627, 1.0)},
 	"ENSAMBLAR": {"tit": "Ensamblar en Spid", "prefijo": "[ENS]", "color": Color(0.435294, 0.686275, 0.470588, 1.0)},
-	"DIAGNOSTICO": {"tit": "Diagnostico Spido", "prefijo": "[TEST]", "color": Color(0.2, 0.85, 1.0, 1.0)}
+	"DIAGNOSTICO": {"tit": "Diagnóstico Spido", "prefijo": "[TEST]", "color": Color(0.2, 0.85, 1.0, 1.0)}
 }
 
 func _ready() -> void:
@@ -129,6 +183,7 @@ func _ready() -> void:
 	indice_hito_actual = 0
 	hitos_completados.clear()
 	_conectar_senales()
+
 	tabs_codigo.set_tab_title(0, "Astro 1: Ingeniero")
 	tabs_codigo.set_tab_title(1, "Astro 2: Tracción")
 	tabs_codigo.set_tab_title(2, "Astro 3: Sensores")
@@ -136,13 +191,18 @@ func _ready() -> void:
 	tabs_codigo.set_tab_title(4, "Astro 5: Energía")
 	for i in range(1, 10):
 		tabs_codigo.set_tab_hidden(i, true)
+
 	panel_victoria.visible = false
 	fondo_menu_pausa.visible = false
 	menu_pausa.visible = false
 	if is_instance_valid(modal_tienda):
 		modal_tienda.visible = false
+	if is_instance_valid(drawer_paleta):
+		drawer_paleta.visible = true
+
 	btn_duplicar.text = "Bucle: OFF"
 	actualizar_creditos_ui()
+	_actualizar_badge_spido()
 	_aplicar_hito_actual()
 
 func _input(event: InputEvent) -> void:
@@ -161,40 +221,46 @@ func _aplicar_hito_actual() -> void:
 		return
 	var hito = hitos[indice_hito_actual]
 
-	# Actualizar cabecera didactica del hito actual
-	label_nivel_titulo.text = "[HITO %d/%d] %s" % [hito.id, hitos.size(), hito.titulo]
+	# Cabecera de la Tarjeta de Misión
+	label_nivel_titulo.text = "◆ FASE %d: %s" % [indice_hito_actual, hito.titulo.to_upper()]
+	label_concepto.text = hito.meta_texto.to_upper()
+	if is_instance_valid(label_mision_desc):
+		label_mision_desc.text = hito.descripcion
 	label_ada_texto.text = hito.descripcion
-	label_concepto.text = "Objetivo: %s" % hito.meta_texto
+
+	var total_hitos = max(1, hitos.size() - 1)
+	var pct = int(round(float(indice_hito_actual) / float(total_hitos) * 100.0))
+	if is_instance_valid(barra_progreso_fase):
+		barra_progreso_fase.value = pct
+	if is_instance_valid(label_progreso):
+		label_progreso.text = "FASE %d/%d // Progresión (%d%%)" % [indice_hito_actual, total_hitos, pct]
+	if is_instance_valid(label_estado_fase):
+		var compl = (indice_hito_actual in hitos_completados)
+		label_estado_fase.text = "COMPLETADO ✔" if compl else "EN CURSO"
+		label_estado_fase.modulate = Color(0.4, 0.95, 0.6) if compl else Color(0.35, 0.95, 0.55)
 
 	btn_nivel_prev.disabled = (indice_hito_actual == 0)
 	btn_nivel_next.disabled = (indice_hito_actual == hitos.size() - 1)
 
-	# Destello sutil en el titulo para avisar del hito activo
-	if is_instance_valid(label_nivel_titulo):
-		var tw_tit = create_tween()
-		tw_tit.tween_property(label_nivel_titulo, "modulate", Color(0.35, 1.0, 0.65), 0.2)
-		tw_tit.tween_property(label_nivel_titulo, "modulate", Color(0.95, 0.96, 0.95), 0.4)
-
-	# Actualizar paleta con los bloques disponibles en esta fase y los comprados en la tienda
+	# Paleta de bloques disponibles
 	_actualizar_paleta(_obtener_bloques_disponibles_actuales())
 
-	# Visibilidad de pestañas segun la cantidad de astronautas
+	# Visibilidad de pestañas según astronautas activos
 	var cant_astros = hito.get("cantidad_astronautas", 1)
 	for i in range(1, 10):
 		var desbloqueado_por_tienda = astronautas_desbloqueados.has(i + 1)
 		tabs_codigo.set_tab_hidden(i, i >= cant_astros and not desbloqueado_por_tienda)
 
-	# Configurar mundo 3D sin resetear las posiciones ni el robot Spido
+	# Configurar mundo 3D sin destruir robot Spido
 	if mundo_3d:
 		mundo_3d.config_nivel_actual = hito
-		# Baliza
 		if mundo_3d.baliza_meta:
 			var mostrar_b = hito.get("mostrar_baliza", false)
 			mundo_3d.baliza_meta.visible = mostrar_b
 			if mostrar_b:
 				mundo_3d.baliza_meta.posicionar_en_celda(hito.get("pos_baliza", Vector2i(0, -1)))
 
-		# Activacion progresiva de nuevos astronautas (o los comprados en tienda)
+		# Activación progresiva de astronautas
 		if (cant_astros >= 2 or 2 in astronautas_desbloqueados) and mundo_3d.astronauta_2 and not mundo_3d.astronauta_2.visible:
 			mundo_3d.astronauta_2.visible = true
 			mundo_3d.astronauta_2.configurar_inicio(hito.get("pos_astronauta_2", Vector2i(0, 2)), 0)
@@ -216,11 +282,9 @@ func _aplicar_hito_actual() -> void:
 			var debe_sensores = ("MESON_SENSORES" in estaciones_desbloqueadas) or (indice_hito_actual >= 3)
 			mundo_3d.meson_sensores.visible = debe_sensores
 
-		# Piezas del hito en las bahias (sin borrar las ya montadas)
 		if hito.has("piezas") and not hito.piezas.is_empty():
 			mundo_3d._recrear_piezas(hito.piezas, true)
 
-		# Fijar checkpoint actual en los astronautas activos para que si reinician no vuelvan al inicio de los tiempos
 		if mundo_3d.astronauta:
 			mundo_3d.astronauta.fijar_checkpoint_actual()
 		if mundo_3d.astronauta_2 and mundo_3d.astronauta_2.visible:
@@ -234,7 +298,18 @@ func _aplicar_hito_actual() -> void:
 
 		mundo_3d.resaltar_astronauta_seleccionado(tabs_codigo.current_tab)
 
-	_actualizar_estado("Mundo Sandbox Activo. Automatiza y programa a tus astronautas.")
+	_actualizar_badge_spido()
+	_actualizar_estado("Mundo Nave Activo. Automatiza y programa a tus astronautas.")
+
+func _obtener_bloques_disponibles_actuales() -> Array:
+	if indice_hito_actual < 0 or indice_hito_actual >= hitos.size():
+		return bloques_adquiridos
+	var lista_base = hitos[indice_hito_actual].get("bloques_disponibles", ["AVANZAR", "GIRAR_IZQ", "GIRAR_DER", "TOMAR_PIEZA", "ENSAMBLAR"])
+	var combinada = lista_base.duplicate()
+	for b in bloques_adquiridos:
+		if not combinada.has(b):
+			combinada.append(b)
+	return combinada
 
 func _actualizar_paleta(bloques_permitidos: Array) -> void:
 	for child in paleta_contenedor.get_children():
@@ -260,10 +335,39 @@ func _conectar_senales() -> void:
 	btn_duplicar.pressed.connect(_on_duplicar_pressed)
 	if btn_velocidad:
 		btn_velocidad.pressed.connect(_on_velocidad_pressed)
+
 	if btn_tienda:
 		btn_tienda.pressed.connect(func(): _abrir_tienda(true))
 	if btn_cerrar_tienda:
 		btn_cerrar_tienda.pressed.connect(func(): _abrir_tienda(false))
+
+	if btn_codice:
+		btn_codice.pressed.connect(_on_btn_codice_pressed)
+	if btn_guia:
+		btn_guia.pressed.connect(func(): panel_guia.visible = not panel_guia.visible)
+
+	if btn_toggle_ada:
+		btn_toggle_ada.pressed.connect(func():
+			card_ada.visible = not card_ada.visible
+			btn_toggle_ada.text = "SISTEMA A.D.A. ▲" if card_ada.visible else "SISTEMA A.D.A. ▼"
+		)
+
+	if btn_toggle_paleta:
+		btn_toggle_paleta.pressed.connect(func():
+			if is_instance_valid(drawer_paleta):
+				drawer_paleta.visible = not drawer_paleta.visible
+		)
+	if btn_cerrar_paleta:
+		btn_cerrar_paleta.pressed.connect(func():
+			if is_instance_valid(drawer_paleta):
+				drawer_paleta.visible = false
+		)
+
+	if btn_minimizar_consola:
+		btn_minimizar_consola.pressed.connect(func():
+			tabs_codigo.visible = not tabs_codigo.visible
+			btn_minimizar_consola.text = "+" if not tabs_codigo.visible else "-"
+		)
 
 	btn_nivel_prev.pressed.connect(func(): cambiar_hito(indice_hito_actual - 1))
 	btn_nivel_next.pressed.connect(func(): cambiar_hito(indice_hito_actual + 1))
@@ -279,8 +383,14 @@ func _conectar_senales() -> void:
 
 	if mundo_3d:
 		if mundo_3d.mesa_spid:
-			mundo_3d.mesa_spid.spid_actualizado.connect(func(_e, _t, _m): _verificar_hitos_sandbox())
-			mundo_3d.mesa_spid.spid_completado.connect(func(): _verificar_hitos_sandbox())
+			mundo_3d.mesa_spid.spid_actualizado.connect(func(_e, _t, _m):
+				_actualizar_badge_spido()
+				_verificar_hitos_sandbox()
+			)
+			mundo_3d.mesa_spid.spid_completado.connect(func():
+				_actualizar_badge_spido()
+				_verificar_hitos_sandbox()
+			)
 			mundo_3d.mesa_spid.diagnostico_realizado.connect(func(): _verificar_hitos_sandbox())
 
 		if mundo_3d.meson_patas:
@@ -303,8 +413,22 @@ func _conectar_senales() -> void:
 				)
 				a.pieza_ensamblada.connect(func(tipo): 
 					_on_pieza_ensamblada(tipo)
+					_actualizar_badge_spido()
 					_verificar_hitos_sandbox()
 				)
+
+func _actualizar_badge_spido() -> void:
+	if not is_instance_valid(label_spido_piezas):
+		return
+	var montadas = 0
+	if mundo_3d and mundo_3d.mesa_spid:
+		montadas = mundo_3d.mesa_spid.etapas_completadas.size()
+	label_spido_piezas.text = "🔋 %d/5" % montadas
+
+func _on_btn_codice_pressed() -> void:
+	if is_instance_valid(panel_guia):
+		label_guia_texto.text = "CÓDICE DE LA NAVE SPIDO:\n\n• Cada astronauta obedece la secuencia de su pestaña en la consola.\n• Ajusta los pasos en el bloque 'Avanzar' directamente con los controles +/-.\n• Activa 'Bucle' para automatizar un transporte continuo A <-> B.\n• En 'MEJORAS' puedes ampliar la nave y activar más operarios."
+		panel_guia.visible = true
 
 func _cambiar_estado_pausa(pausado: bool) -> void:
 	fondo_menu_pausa.visible = pausado
@@ -360,12 +484,50 @@ func _on_ejecutar_pressed() -> void:
 		mundo_3d.astronauta_4, mundo_3d.astronauta_5
 	]
 
-	while en_ejecucion and not detener_solicitado:
-		errores_durante_ejecucion = 0
-		_actualizar_estado("Automatización en marcha (Ciclo %d)..." % ciclo)
+	while true:
+		if detener_solicitado:
+			break
 
-		# Re-leer dinamicamente los lienzos de cada astronauta en cada ciclo
-		# Permite programar a Astro 2 en vivo mientras Astro 1 sigue trabajando en bucle
+		_actualizar_estado("Ejecutando algoritmos del equipo (Ciclo %d)..." % ciclo)
+		var exito_ciclo = await _ejecutar_un_ciclo(astronautas)
+
+		if not exito_ciclo:
+			break
+
+		if not modo_bucle or detener_solicitado:
+			break
+
+		ciclo += 1
+		await get_tree().create_timer(0.2).timeout
+
+	en_ejecucion = false
+	detener_solicitado = false
+	btn_ejecutar.text = "EJECUTAR"
+	btn_ejecutar.modulate = Color.WHITE
+	_bloquear_interfaz(false)
+
+	if errores_durante_ejecucion == 0:
+		_actualizar_estado("Ejecución completada sin errores.")
+		_verificar_hitos_sandbox()
+
+func _ejecutar_un_ciclo(astronautas: Array) -> bool:
+	var secuencias = [
+		lienzo.obtener_secuencia_comandos(),
+		lienzo_a2.obtener_secuencia_comandos(),
+		lienzo_a3.obtener_secuencia_comandos(),
+		lienzo_a4.obtener_secuencia_comandos(),
+		lienzo_a5.obtener_secuencia_comandos()
+	]
+
+	var max_pasos = 0
+	for sec in secuencias:
+		max_pasos = max(max_pasos, sec.size())
+
+	for paso in range(max_pasos):
+		if detener_solicitado:
+			return false
+
+		# Lectura dinámica de secuencias para permitir cambios en vivo
 		secuencias = [
 			lienzo.obtener_secuencia_comandos(),
 			lienzo_a2.obtener_secuencia_comandos(),
@@ -373,31 +535,6 @@ func _on_ejecutar_pressed() -> void:
 			lienzo_a4.obtener_secuencia_comandos(),
 			lienzo_a5.obtener_secuencia_comandos()
 		]
-
-		var exito = await _ejecutar_equipo_paralelo(astronautas, secuencias)
-		_verificar_hitos_sandbox()
-
-		if not exito or not modo_bucle or detener_solicitado:
-			break
-
-		ciclo += 1
-		await get_tree().create_timer(0.25).timeout
-
-	en_ejecucion = false
-	detener_solicitado = false
-	btn_ejecutar.text = "Ejecutar"
-	btn_ejecutar.modulate = Color.WHITE
-	_bloquear_interfaz(false)
-	_verificar_hitos_sandbox()
-
-func _ejecutar_equipo_paralelo(astronautas: Array, secuencias: Array) -> bool:
-	var max_pasos = 0
-	for sec in secuencias:
-		max_pasos = maxi(max_pasos, sec.size())
-
-	for paso in range(max_pasos):
-		if detener_solicitado:
-			return false
 
 		for idx in range(min(astronautas.size(), secuencias.size())):
 			var astro: AstronautaIngeniero = astronautas[idx]
@@ -407,7 +544,7 @@ func _ejecutar_equipo_paralelo(astronautas: Array, secuencias: Array) -> bool:
 
 			var bloque: BloqueItem = sec[paso]
 			bloque.resaltar_ejecucion(true)
-			var ok = await astro.ejecutar_accion(bloque.id_comando)
+			var ok = await astro.ejecutar_accion(bloque.id_comando, bloque.parametro_valor)
 			bloque.resaltar_ejecucion(false)
 
 			if not ok:
@@ -417,135 +554,81 @@ func _ejecutar_equipo_paralelo(astronautas: Array, secuencias: Array) -> bool:
 				_actualizar_estado("[ALERTA] %s se detuvo: %s" % [astro.nombre_rol, ultimo_error if not ultimo_error.is_empty() else "Acción bloqueada."])
 				return false
 
-		# Chequeo dinámico tras cada paso
 		_verificar_hitos_sandbox()
 		await get_tree().create_timer(0.06).timeout
 
 	return true
 
-func _verificar_hitos_sandbox() -> void:
-	if indice_hito_actual >= hitos.size():
-		return
-	var hito = hitos[indice_hito_actual]
-	var cumplido = false
-
-	match hito.clave:
-		"CALIBRACION":
-			if mundo_3d and mundo_3d.astronauta:
-				var pos_actual = Vector2i(mundo_3d.astronauta.grid_x, mundo_3d.astronauta.grid_z)
-				if pos_actual == hito.get("pos_baliza", Vector2i(0, -1)):
-					cumplido = true
-		"TOMAR_PIEZA":
-			if mundo_3d and mundo_3d.astronauta:
-				if is_instance_valid(mundo_3d.astronauta.pieza_en_mano):
-					cumplido = true
-		"ENSAMBLAR_EN_MESA":
-			if mundo_3d and mundo_3d.mesa_spid and "CHASIS" in mundo_3d.mesa_spid.etapas_completadas:
-				cumplido = true
-		"AUTOMATIZAR_BUCLE":
-			if mundo_3d and mundo_3d.mesa_spid and "RUEDAS" in mundo_3d.mesa_spid.etapas_completadas:
-				cumplido = true
-		"EQUIPO_CONCURRENTE":
-			if mundo_3d and mundo_3d.mesa_spid and "SENSOR" in mundo_3d.mesa_spid.etapas_completadas:
-				cumplido = true
-		"DESPERTAR_SPIDO":
-			if mundo_3d and mundo_3d.mesa_spid and (mundo_3d.mesa_spid.diagnostico_ejecutado or mundo_3d.mesa_spid.etapas_completadas.size() >= 3):
-				cumplido = true
-
-	if cumplido and indice_hito_actual not in hitos_completados:
-		hitos_completados.append(indice_hito_actual)
-		_completar_hito_sandbox()
-
-func _completar_hito_sandbox() -> void:
-	var hito_terminado = hitos[indice_hito_actual]
-	ganar_creditos(60, "¡Hito Completado!")
-	_actualizar_estado("⭐ ¡HITO LOGRADO: %s! (+60 ⚙️ Bits) ⭐ Desbloqueando nuevas capacidades..." % hito_terminado.titulo)
-
-	if mundo_3d and mundo_3d.astronauta:
-		mundo_3d.astronauta.resaltar_seleccion(true)
-
-	if indice_hito_actual < hitos.size() - 1:
-		indice_hito_actual += 1
-		await get_tree().create_timer(1.2).timeout
-		_aplicar_hito_actual()
-	else:
-		_actualizar_estado("🏆 ¡PROYECTO SPIDO COMPLETADO! Robot araña totalmente automatizado.")
-		if mundo_3d and mundo_3d.mesa_spid:
-			mundo_3d.mesa_spid.probar_sistemas()
-
 func _on_duplicar_pressed() -> void:
 	modo_bucle = not modo_bucle
 	if modo_bucle:
-		btn_duplicar.text = "Bucle: ON [AUTO]"
+		btn_duplicar.text = "Bucle: ON"
 		btn_duplicar.modulate = Color(0.35, 0.95, 0.65)
-		_actualizar_estado("Modo Automatización Bucle: ACTIVO. Tus astronautas repetirán su rutina continuamente.")
+		_actualizar_estado("Modo bucle continuo activado. Los algoritmos se repetirán sin fin.")
 	else:
 		btn_duplicar.text = "Bucle: OFF"
 		btn_duplicar.modulate = Color.WHITE
-		_actualizar_estado("Modo Bucle: INACTIVO. Ejecución de un solo ciclo.")
+		_actualizar_estado("Modo de ejecución simple (un solo ciclo).")
 
-func _on_modal_siguiente_pressed() -> void:
-	if indice_hito_actual < hitos.size() - 1:
-		cambiar_hito(indice_hito_actual + 1)
-
-func _on_modal_reintentar_pressed() -> void:
-	_on_reiniciar_pressed()
+func _on_velocidad_pressed() -> void:
+	match factor_velocidad:
+		1:
+			factor_velocidad = 2
+			Engine.time_scale = 1.8
+			btn_velocidad.text = "2x"
+			btn_velocidad.modulate = Color(0.35, 0.95, 0.65)
+		2:
+			factor_velocidad = 3
+			Engine.time_scale = 2.8
+			btn_velocidad.text = "3x"
+			btn_velocidad.modulate = Color(1.0, 0.85, 0.3)
+		3:
+			factor_velocidad = 1
+			Engine.time_scale = 1.0
+			btn_velocidad.text = "1x"
+			btn_velocidad.modulate = Color.WHITE
 
 func _on_paso_pressed() -> void:
 	if en_ejecucion: return
-	var lienzo_actual = lienzo
-	var astronauta_actual = mundo_3d.astronauta
-	if tabs_codigo.current_tab == 1:
-		lienzo_actual = lienzo_a2
-		astronauta_actual = mundo_3d.astronauta_2
-	elif tabs_codigo.current_tab == 2:
-		lienzo_actual = lienzo_a3
-		astronauta_actual = mundo_3d.astronauta_3
-	elif tabs_codigo.current_tab == 3:
-		lienzo_actual = lienzo_a4
-		astronauta_actual = mundo_3d.astronauta_4
-	elif tabs_codigo.current_tab == 4:
-		lienzo_actual = lienzo_a5
-		astronauta_actual = mundo_3d.astronauta_5
-	elif tabs_codigo.current_tab == 5:
-		lienzo_actual = lienzo_a6
-		astronauta_actual = mundo_3d.astronauta_6
-	elif tabs_codigo.current_tab == 6:
-		lienzo_actual = lienzo_a7
-		astronauta_actual = mundo_3d.astronauta_7
-	elif tabs_codigo.current_tab == 7:
-		lienzo_actual = lienzo_a8
-		astronauta_actual = mundo_3d.astronauta_8
-	elif tabs_codigo.current_tab == 8:
-		lienzo_actual = lienzo_a9
-		astronauta_actual = mundo_3d.astronauta_9
-	elif tabs_codigo.current_tab == 9:
-		lienzo_actual = lienzo_a10
-		astronauta_actual = mundo_3d.astronauta_10
+
+	var astronautas = [
+		mundo_3d.astronauta, mundo_3d.astronauta_2, mundo_3d.astronauta_3,
+		mundo_3d.astronauta_4, mundo_3d.astronauta_5
+	]
+	var lienzos = [lienzo, lienzo_a2, lienzo_a3, lienzo_a4, lienzo_a5]
+
+	var idx_actual = tabs_codigo.current_tab
+	if idx_actual < 0 or idx_actual >= astronautas.size():
+		return
+
+	var astronauta_actual: AstronautaIngeniero = astronautas[idx_actual]
+	var lienzo_actual: LienzoCodigo = lienzos[idx_actual]
 	var secuencia = lienzo_actual.obtener_secuencia_comandos()
+
 	if secuencia.is_empty():
-		_actualizar_estado("Agrega bloques al lienzo del astronauta seleccionado.")
+		_actualizar_estado("El lienzo de %s está vacío." % astronauta_actual.nombre_rol)
 		return
 
 	if indice_paso_actual >= secuencia.size():
 		indice_paso_actual = 0
+		_limpiar_resaltados(secuencia)
 
-	var bloque = secuencia[indice_paso_actual]
-	_actualizar_estado("Paso manual %d/%d: %s" % [indice_paso_actual + 1, secuencia.size(), bloque.titulo])
+	var bloque: BloqueItem = secuencia[indice_paso_actual]
+	_limpiar_resaltados(secuencia)
 
 	en_ejecucion = true
 	_limpiar_error()
 	_bloquear_interfaz(true)
 	bloque.resaltar_ejecucion(true)
 
-	var exito = await astronauta_actual.ejecutar_accion(bloque.id_comando)
+	var exito = await astronauta_actual.ejecutar_accion(bloque.id_comando, bloque.parametro_valor)
 	await get_tree().create_timer(0.08).timeout
 	bloque.resaltar_ejecucion(false)
 	if not exito:
 		errores_durante_ejecucion += 1
 		bloque.resaltar_error(true)
 		bloque_con_error = bloque
-		_actualizar_estado("[ERROR] Paso manual: %s" % (ultimo_error if not ultimo_error.is_empty() else "La accion no pudo completarse."))
+		_actualizar_estado("[ERROR] Paso manual: %s" % (ultimo_error if not ultimo_error.is_empty() else "La acción no pudo completarse."))
 
 	indice_paso_actual += 1
 	en_ejecucion = false
@@ -553,246 +636,259 @@ func _on_paso_pressed() -> void:
 	_verificar_hitos_sandbox()
 
 func _on_reiniciar_pressed() -> void:
-	indice_paso_actual = 0
-	errores_durante_ejecucion = 0
-	detener_solicitado = true
+	if en_ejecucion:
+		detener_solicitado = true
+		await get_tree().create_timer(0.15).timeout
+
 	_limpiar_error()
+	indice_paso_actual = 0
+
+	var secuencias = [
+		lienzo.obtener_secuencia_comandos(),
+		lienzo_a2.obtener_secuencia_comandos(),
+		lienzo_a3.obtener_secuencia_comandos(),
+		lienzo_a4.obtener_secuencia_comandos(),
+		lienzo_a5.obtener_secuencia_comandos()
+	]
+	for sec in secuencias:
+		_limpiar_resaltados(sec)
+
 	if mundo_3d:
 		mundo_3d.config_nivel_actual = hitos[indice_hito_actual]
 		await mundo_3d.reiniciar_mundo(true)
-	_actualizar_estado("Posiciones de astronautas reiniciadas. El robot Spido y tus bloques se mantienen intactos.")
+		mundo_3d.resaltar_astronauta_seleccionado(tabs_codigo.current_tab)
 
-func _on_velocidad_pressed() -> void:
-	match factor_velocidad:
-		1:
-			factor_velocidad = 2
-			Engine.time_scale = 2.0
-			btn_velocidad.text = "Vel: 2x"
-			btn_velocidad.modulate = Color(0.3, 0.9, 1.0)
-			_actualizar_estado("Velocidad de simulación acelerada a 2x.")
-		2:
-			factor_velocidad = 3
-			Engine.time_scale = 3.5
-			btn_velocidad.text = "Vel: 3.5x"
-			btn_velocidad.modulate = Color(1.0, 0.8, 0.2)
-			_actualizar_estado("Velocidad de simulación máxima (3.5x).")
-		_:
-			factor_velocidad = 1
-			Engine.time_scale = 1.0
-			btn_velocidad.text = "Vel: 1x"
-			btn_velocidad.modulate = Color.WHITE
-			_actualizar_estado("Velocidad de simulación normal (1x).")
+	_actualizar_estado("Vuelta a base: astronautas restablecidos en sus posiciones.")
 
 func _on_limpiar_pressed() -> void:
 	if en_ejecucion: return
-	lienzo.limpiar_todo()
-	lienzo_a2.limpiar_todo()
-	lienzo_a3.limpiar_todo()
-	lienzo_a4.limpiar_todo()
-	lienzo_a5.limpiar_todo()
-	lienzo_a6.limpiar_todo()
-	lienzo_a7.limpiar_todo()
-	indice_paso_actual = 0
-	_limpiar_error()
-	_actualizar_estado("Lienzo vaciado.")
+	var lienzos = [lienzo, lienzo_a2, lienzo_a3, lienzo_a4, lienzo_a5]
+	var idx = tabs_codigo.current_tab
+	if idx >= 0 and idx < lienzos.size():
+		lienzos[idx].limpiar()
+		_actualizar_estado("Lienzo del Astronauta %d limpiado." % (idx + 1))
 
-func _on_tab_codigo_changed(idx: int) -> void:
+func _on_tab_codigo_changed(tab_idx: int) -> void:
 	if mundo_3d:
-		mundo_3d.resaltar_astronauta_seleccionado(idx)
-	var nombre_tab = tabs_codigo.get_tab_title(idx)
-	_actualizar_estado("Programando secuencia para: %s" % nombre_tab)
+		mundo_3d.resaltar_astronauta_seleccionado(tab_idx)
+	var nombres = ["Ingeniero", "Tracción", "Sensores", "Brazos", "Energía"]
+	var rol = nombres[tab_idx] if tab_idx < nombres.size() else "Operador"
+	_actualizar_estado("Editando algoritmo para Astronauta %d: %s." % [tab_idx + 1, rol])
 
-func _bloquear_interfaz(bloquear: bool) -> void:
-	btn_ejecutar.disabled = false
-	btn_paso.disabled = bloquear
-	btn_limpiar.disabled = bloquear
-	btn_nivel_prev.disabled = bloquear or (indice_hito_actual == 0)
-	btn_nivel_next.disabled = bloquear or (indice_hito_actual == hitos.size() - 1)
-	btn_guia_continuar.disabled = bloquear
-	btn_pista.disabled = bloquear or ultimo_error.is_empty()
-
-func _on_guia_continuar_pressed() -> void:
-	if not guia_activa:
+func _verificar_hitos_sandbox() -> void:
+	if indice_hito_actual < 0 or indice_hito_actual >= hitos.size():
 		return
-	if paso_guia < PASOS_GUIA.size() - 1:
-		paso_guia += 1
-		_actualizar_guia()
+	var hito = hitos[indice_hito_actual]
+	var completado = false
+
+	match hito.tipo_meta:
+		"BALIZA":
+			if mundo_3d and mundo_3d.baliza_meta:
+				var pos_a = Vector2i(mundo_3d.astronauta.grid_x, mundo_3d.astronauta.grid_z)
+				var pos_b = hito.get("pos_baliza", Vector2i(0, -1))
+				if pos_a == pos_b:
+					mundo_3d.baliza_meta.activar_exito()
+					completado = true
+		"TOMAR_PIEZA":
+			if mundo_3d and mundo_3d.astronauta and is_instance_valid(mundo_3d.astronauta.pieza_en_mano):
+				completado = true
+		"ENSAMBLAR":
+			if mundo_3d and mundo_3d.mesa_spid:
+				completado = (mundo_3d.mesa_spid.etapas_completadas.size() >= hito.get("piezas_requeridas", 1))
+		"SUBENSAMBLAJE":
+			if mundo_3d and mundo_3d.meson_patas and mundo_3d.meson_patas.cantidad_actual >= 1:
+				completado = true
+		"CADENA_PRODUCCION":
+			if mundo_3d and mundo_3d.mesa_spid:
+				completado = (mundo_3d.mesa_spid.etapas_completadas.size() >= 2)
+		"DIAGNOSTICO":
+			if mundo_3d and mundo_3d.mesa_spid and mundo_3d.mesa_spid.diagnostico_ok:
+				completado = true
+
+	if completado and not (indice_hito_actual in hitos_completados):
+		hitos_completados.append(indice_hito_actual)
+		_celebrar_hito(hito)
+
+func _celebrar_hito(hito: Dictionary) -> void:
+	ganar_creditos(hito.get("recompensa_creditos", 50), "¡Hito superado: %s!" % hito.titulo)
+
+	if is_instance_valid(label_estado_fase):
+		label_estado_fase.text = "COMPLETADO ✔"
+		label_estado_fase.modulate = Color(0.4, 0.95, 0.6)
+
+	if is_instance_valid(label_victoria_detalle):
+		label_victoria_detalle.text = "%s\n\nRecompensa: +%d Bits de Mejoras." % [hito.get("mensaje_ada", "¡Excelente!"), hito.get("recompensa_creditos", 50)]
+	panel_victoria.visible = true
+
+func _on_modal_siguiente_pressed() -> void:
+	panel_victoria.visible = false
+	if indice_hito_actual < hitos.size() - 1:
+		cambiar_hito(indice_hito_actual + 1)
 	else:
-		panel_guia.visible = false
-		_actualizar_estado("Guia completada. Ahora construye y ejecuta tu propia secuencia.")
+		_actualizar_estado("🎉 ¡Todas las fases del hangar completadas! Spido está ensamblado y calibrado.")
 
-func _actualizar_guia() -> void:
-	if not guia_activa or not is_instance_valid(label_guia_texto):
-		return
-	var paso = PASOS_GUIA[paso_guia]
-	label_guia_texto.text = "%s\n%s" % [paso.titulo, paso.texto]
-	btn_guia_continuar.text = "Comenzar" if paso_guia == PASOS_GUIA.size() - 1 else "Continuar"
-
-func _limpiar_error() -> void:
-	ultimo_error = ""
-	if is_instance_valid(bloque_con_error):
-		bloque_con_error.resaltar_error(false)
-	bloque_con_error = null
-	if is_instance_valid(btn_pista):
-		btn_pista.disabled = true
+func _on_modal_reintentar_pressed() -> void:
+	panel_victoria.visible = false
 
 func _on_pista_pressed() -> void:
-	if ultimo_error.is_empty():
-		return
-	var pista = "Revisa la instruccion marcada y prueba otra vez."
-	if "ninguna pieza frente" in ultimo_error:
-		pista = "Pista: acerca al astronauta a la pieza y orientalo hacia ella antes de usar Tomar Pieza."
-	elif "No tienes ninguna pieza" in ultimo_error:
-		pista = "Pista: primero recoge una pieza; despues podras llevarla a la mesa."
-	elif "No estas frente a la mesa" in ultimo_error:
-		pista = "Pista: lleva la pieza hasta una casilla vecina a la mesa y orienta al astronauta hacia ella."
-	elif "requiere otra pieza" in ultimo_error:
-		pista = "Pista: revisa el orden de montaje; esta pieza todavia no corresponde a la siguiente etapa."
-	elif "detuvo antes" in ultimo_error:
-		pista = "Pista: Te faltaron pasos. El astronauta necesita avanzar exactamente 3 casillas hacia el norte para alcanzar la baliza."
-	elif "sobrepaso" in ultimo_error:
-		pista = "Pista: Colocaste demasiados bloques. Elimina los bloques que sobran para detenerte justo sobre la baliza."
-	elif "no se encuentra en la casilla" in ultimo_error:
-		pista = "Pista: El astronauta no llego a la baliza. Revisa la direccion y cantidad de bloques 'Avanzar'."
-	_actualizar_estado(pista)
+	if indice_hito_actual < 0 or indice_hito_actual >= hitos.size(): return
+	var hito = hitos[indice_hito_actual]
+	var pista = hito.get("pista", "Verifica la secuencia de bloques en la consola.")
+	_actualizar_estado("[PISTA A.D.A.] %s" % pista)
+	label_ada_texto.text = pista
 
-func _actualizar_estado(mensaje: String) -> void:
-	if label_estado:
-		label_estado.text = mensaje
+func _on_guia_continuar_pressed() -> void:
+	panel_guia.visible = false
 
 func _on_accion_fallida(motivo: String) -> void:
 	ultimo_error = motivo
-	btn_pista.disabled = false
 	_actualizar_estado("[ALERTA] %s" % motivo)
 
-func _on_pieza_recogida(nombre: String) -> void:
-	_actualizar_estado("[ITEM] Astronauta tomo: %s" % nombre)
+func _on_pieza_recogida(tipo: String) -> void:
+	ganar_creditos(10, "Pieza %s asegurada" % tipo)
 
 func _on_pieza_ensamblada(tipo: String) -> void:
-	ganar_creditos(30, "Pieza %s acoplada con éxito" % tipo)
-	_actualizar_estado("[OK] Pieza %s montada. (+30 ⚙️ Bits)" % tipo)
+	ganar_creditos(30, "¡%s acoplada en Spido!" % tipo)
+	_actualizar_badge_spido()
 
-func _obtener_bloques_disponibles_actuales() -> Array:
-	var lista: Array = []
-	if indice_hito_actual >= 0 and indice_hito_actual < hitos.size():
-		var hito = hitos[indice_hito_actual]
-		for b in hito.get("bloques_desbloqueados", []):
-			if b not in lista: lista.append(b)
-	for b in bloques_adquiridos:
-		if b not in lista: lista.append(b)
-	return lista
-
-func ganar_creditos(monto: int, razon: String = "") -> void:
-	creditos += monto
+func ganar_creditos(cantidad: int, motivo: String = "") -> void:
+	creditos += cantidad
 	actualizar_creditos_ui()
-	if not razon.is_empty():
-		_actualizar_estado("+%d ⚙️ Bits recibidos: %s" % [monto, razon])
-
-	if is_instance_valid(label_creditos):
-		var tw = create_tween()
-		tw.tween_property(label_creditos, "modulate", Color(0.3, 1.0, 0.5), 0.15)
-		tw.tween_property(label_creditos, "modulate", Color.WHITE, 0.3)
+	if not motivo.is_empty():
+		_actualizar_estado("%s (+%d Bits)" % [motivo, cantidad])
 
 func actualizar_creditos_ui() -> void:
 	if is_instance_valid(label_creditos):
 		label_creditos.text = "⚙️ %d Bits" % creditos
 	if is_instance_valid(label_saldo_tienda):
-		label_saldo_tienda.text = "Créditos disponibles: ⚙️ %d Bits" % creditos
+		label_saldo_tienda.text = "⚙️ Saldo: %d Bits" % creditos
 
 func _abrir_tienda(abrir: bool) -> void:
 	if is_instance_valid(modal_tienda):
 		modal_tienda.visible = abrir
 		if abrir:
 			actualizar_creditos_ui()
-			_renderizar_catalogo_tienda()
+			_renderizar_centro_mejoras()
 
-func _renderizar_catalogo_tienda() -> void:
-	_renderizar_categoria_tienda(lista_bloques, CATALOGO_TIENDA["bloques"], "bloques")
-	_renderizar_categoria_tienda(lista_astronautas, CATALOGO_TIENDA["astronautas"], "astronautas")
-	_renderizar_categoria_tienda(lista_estaciones, CATALOGO_TIENDA["estaciones"], "estaciones")
+func _renderizar_centro_mejoras() -> void:
+	if not is_instance_valid(grid_mejoras):
+		return
 
-func _renderizar_categoria_tienda(contenedor: VBoxContainer, items: Array, categoria: String) -> void:
-	if not is_instance_valid(contenedor): return
-	for child in contenedor.get_children():
+	for child in grid_mejoras.get_children():
 		child.queue_free()
 
-	for item in items:
+	for item in ARBOL_MEJORAS:
 		var panel = PanelContainer.new()
-		var hbox = HBoxContainer.new()
-		hbox.add_theme_constant_override("separation", 12)
+		var st = StyleBoxFlat.new()
+		st.bg_color = Color(0.12, 0.15, 0.20, 0.95)
+		st.set_corner_radius_all(14)
+		st.set_content_margin_all(12)
+		st.border_width_left = 2
+		st.border_width_top = 2
+		st.border_width_right = 2
+		st.border_width_bottom = 2
 
-		var vbox_info = VBoxContainer.new()
-		vbox_info.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		var ya_desbloqueado = false
+		match item.cat:
+			"fase":
+				ya_desbloqueado = (item.id == "FASE_0" or indice_hito_actual >= 1)
+			"astronauta":
+				ya_desbloqueado = (item.id in astronautas_desbloqueados)
+			"estacion":
+				ya_desbloqueado = (item.id in estaciones_desbloqueadas)
 
-		var lbl_nom = Label.new()
-		lbl_nom.text = "%s (⚙️ %d Bits)" % [item.nombre, item.precio]
-		lbl_nom.add_theme_color_override("font_color", Color(0.95, 0.95, 0.95))
-		lbl_nom.add_theme_font_size_override("font_size", 14)
+		if ya_desbloqueado:
+			st.border_color = Color(0.35, 0.85, 0.55, 0.9)
+		else:
+			st.border_color = Color(0.25, 0.32, 0.42, 0.8)
+
+		panel.add_theme_stylebox_override("panel", st)
+		panel.custom_minimum_size = Vector2(270, 140)
+
+		var vbox = VBoxContainer.new()
+		vbox.add_theme_constant_override("separation", 6)
+
+		var lbl_tit = Label.new()
+		lbl_tit.text = item.fase
+		lbl_tit.add_theme_color_override("font_color", Color(0.55, 0.85, 0.6) if ya_desbloqueado else Color(0.95, 0.96, 0.98))
+		lbl_tit.add_theme_font_size_override("font_size", 13)
+		vbox.add_child(lbl_tit)
 
 		var lbl_desc = Label.new()
 		lbl_desc.text = item.desc
-		lbl_desc.add_theme_color_override("font_color", Color(0.65, 0.7, 0.75))
+		lbl_desc.add_theme_color_override("font_color", Color(0.72, 0.78, 0.82))
 		lbl_desc.add_theme_font_size_override("font_size", 12)
 		lbl_desc.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		lbl_desc.size_flags_vertical = Control.SIZE_EXPAND_FILL
+		vbox.add_child(lbl_desc)
 
-		vbox_info.add_child(lbl_nom)
-		vbox_info.add_child(lbl_desc)
+		var btn_accion = Button.new()
+		btn_accion.custom_minimum_size = Vector2(0, 32)
+		btn_accion.theme_type_variation = &"SecondaryButton" if not ya_desbloqueado else &""
 
-		var btn_comprar = Button.new()
-		btn_comprar.custom_minimum_size = Vector2(140, 36)
-
-		var ya_adquirido = false
-		match categoria:
-			"bloques":
-				ya_adquirido = (item.id in bloques_adquiridos)
-			"astronautas":
-				ya_adquirido = (item.id in astronautas_desbloqueados)
-			"estaciones":
-				ya_adquirido = (item.id in estaciones_desbloqueadas)
-
-		if ya_adquirido:
-			btn_comprar.text = "Adquirido ✔️"
-			btn_comprar.disabled = true
-			btn_comprar.modulate = Color(0.5, 0.8, 0.5)
-		elif creditos >= item.precio:
-			btn_comprar.text = "Comprar"
-			btn_comprar.modulate = Color(0.35, 0.95, 0.65)
-			btn_comprar.pressed.connect(func(): _comprar_item(categoria, item))
+		if ya_desbloqueado:
+			btn_accion.text = "DESBLOQUEADO ✔"
+			btn_accion.disabled = true
+			btn_accion.modulate = Color(0.5, 0.85, 0.5)
+		elif creditos >= item.costo:
+			btn_accion.text = "ADQUIRIR (⚙️ %d Bits)" % item.costo
+			btn_accion.modulate = Color(0.35, 0.95, 0.65)
+			btn_accion.pressed.connect(func(): _comprar_mejora_arbol(item))
 		else:
-			btn_comprar.text = "Insuficiente"
-			btn_comprar.disabled = true
-			btn_comprar.modulate = Color(0.7, 0.7, 0.7)
+			btn_accion.text = "REQUIERE: %d Bits" % item.costo
+			btn_accion.disabled = true
+			btn_accion.modulate = Color(0.7, 0.75, 0.8)
 
-		hbox.add_child(vbox_info)
-		hbox.add_child(btn_comprar)
-		panel.add_child(hbox)
-		contenedor.add_child(panel)
+		vbox.add_child(btn_accion)
+		panel.add_child(vbox)
+		grid_mejoras.add_child(panel)
 
-func _comprar_item(categoria: String, item: Dictionary) -> void:
-	if creditos < item.precio: return
-	creditos -= item.precio
+func _comprar_mejora_arbol(item: Dictionary) -> void:
+	if creditos < item.costo: return
+	creditos -= item.costo
 	actualizar_creditos_ui()
 
-	match categoria:
-		"bloques":
-			bloques_adquiridos.append(item.id)
-			_actualizar_paleta(_obtener_bloques_disponibles_actuales())
-			_actualizar_estado("🎉 ¡Nuevo bloque adquirido: %s!" % item.nombre)
-		"astronautas":
-			astronautas_desbloqueados.append(item.id)
-			var idx_tab = item.id - 1
+	match item.cat:
+		"astronauta":
+			var id_astro = item.id
+			astronautas_desbloqueados.append(id_astro)
+			var idx_tab = id_astro - 1
 			tabs_codigo.set_tab_hidden(idx_tab, false)
 			if mundo_3d:
 				var astros = [mundo_3d.astronauta, mundo_3d.astronauta_2, mundo_3d.astronauta_3, mundo_3d.astronauta_4, mundo_3d.astronauta_5]
 				if idx_tab < astros.size() and is_instance_valid(astros[idx_tab]):
 					astros[idx_tab].visible = true
-			_actualizar_estado("🚀 ¡Nuevo astronauta contratado: %s!" % item.nombre)
-		"estaciones":
+			_actualizar_estado("🚀 ¡Mejora activada: %s!" % item.fase)
+		"estacion":
 			estaciones_desbloqueadas.append(item.id)
 			if item.id == "MESON_PATAS" and mundo_3d and mundo_3d.meson_patas:
 				mundo_3d.meson_patas.visible = true
 			elif item.id == "MESON_SENSORES" and mundo_3d and mundo_3d.meson_sensores:
 				mundo_3d.meson_sensores.visible = true
-			_actualizar_estado("🏭 ¡Nueva estación instalada en el hangar: %s!" % item.nombre)
+			_actualizar_estado("🏭 ¡Mejora de estación activada: %s!" % item.fase)
+		"fase":
+			_actualizar_estado("⭐ ¡Sector desbloqueado: %s!" % item.fase)
 
-	_renderizar_catalogo_tienda()
+	_renderizar_centro_mejoras()
+
+func _limpiar_resaltados(secuencia: Array) -> void:
+	for b in secuencia:
+		if is_instance_valid(b) and b is BloqueItem:
+			b.resaltar_ejecucion(false)
+
+func _limpiar_error() -> void:
+	ultimo_error = ""
+	if is_instance_valid(bloque_con_error):
+		bloque_con_error.resaltar_error(false)
+		bloque_con_error = null
+
+func _actualizar_estado(mensaje: String) -> void:
+	if is_instance_valid(label_estado):
+		label_estado.text = mensaje
+
+func _bloquear_interfaz(bloquear: bool) -> void:
+	btn_paso.disabled = bloquear
+	btn_reiniciar.disabled = bloquear
+	btn_limpiar.disabled = bloquear
+	btn_nivel_prev.disabled = bloquear or (indice_hito_actual == 0)
+	btn_nivel_next.disabled = bloquear or (indice_hito_actual == hitos.size() - 1)

@@ -3,19 +3,20 @@
 [ext_resource type="Script" path="res://scripts/bloque_item.gd" id="1_script"]
 
 [node name="BloqueItem" type="PanelContainer"]
-custom_minimum_size = Vector2(200, 54)
-offset_right = 200.0
+custom_minimum_size = Vector2(210, 54)
+offset_right = 210.0
 offset_bottom = 54.0
 mouse_filter = 0
 script = ExtResource("1_script")
 
 [node name="HBox" type="HBoxContainer" parent="."]
 layout_mode = 2
-theme_override_constants/separation = 8
+theme_override_constants/separation = 6
 
 [node name="Prefijo" type="Label" parent="HBox"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.545098, 0.796078, 0.568627, 1)
+theme_override_font_sizes/font_size = 14
 text = "[AVZ]"
 horizontal_alignment = 1
 vertical_alignment = 1
@@ -24,11 +25,45 @@ vertical_alignment = 1
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_colors/font_color = Color(0.956863, 0.964706, 0.94902, 1)
-text = "Avanzar 1 Paso"
+theme_override_font_sizes/font_size = 14
+text = "Avanzar"
+vertical_alignment = 1
+
+[node name="BoxParametro" type="HBoxContainer" parent="HBox"]
+visible = false
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="BtnMenos" type="Button" parent="HBox/BoxParametro"]
+custom_minimum_size = Vector2(24, 24)
+layout_mode = 2
+theme_override_font_sizes/font_size = 13
+text = "-"
+
+[node name="LabelValor" type="Label" parent="HBox/BoxParametro"]
+custom_minimum_size = Vector2(22, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.545098, 0.796078, 0.568627, 1)
+theme_override_font_sizes/font_size = 14
+text = "1"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="BtnMas" type="Button" parent="HBox/BoxParametro"]
+custom_minimum_size = Vector2(24, 24)
+layout_mode = 2
+theme_override_font_sizes/font_size = 13
+text = "+"
+
+[node name="LabelSufijo" type="Label" parent="HBox/BoxParametro"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.75, 0.78, 0.78, 1)
+theme_override_font_sizes/font_size = 13
+text = "pasos"
 vertical_alignment = 1
 
 [node name="BtnEliminar" type="Button" parent="HBox"]
-custom_minimum_size = Vector2(28, 28)
+custom_minimum_size = Vector2(26, 26)
 layout_mode = 2
 theme_override_colors/font_color = Color(0.75, 0.78, 0.78, 1)
 theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
