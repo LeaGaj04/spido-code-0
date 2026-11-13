@@ -144,9 +144,10 @@ func avanzar(tiempo_custom: float = -1.0) -> bool:
 	var nueva_x = grid_x + delta.x
 	var nueva_z = grid_z + delta.y
 
-	if abs(nueva_x) > 4 or abs(nueva_z) > 4:
+	# Limite del tablero de 12x12 casillas (gx de -6 a 5, gz de -6 a 5)
+	if nueva_x < -6 or nueva_x > 5 or nueva_z < -6 or nueva_z > 5:
 		await _animar_choque()
-		accion_fallida.emit("El astronauta alcanzo el limite de la zona.")
+		accion_fallida.emit("El astronauta alcanzó el límite del tablero de 12x12.")
 		return false
 
 	var mundo = get_parent()
@@ -180,9 +181,9 @@ func retroceder() -> bool:
 	var nueva_x = grid_x - delta.x
 	var nueva_z = grid_z - delta.y
 
-	if abs(nueva_x) > 4 or abs(nueva_z) > 4:
+	if nueva_x < -6 or nueva_x > 5 or nueva_z < -6 or nueva_z > 5:
 		await _animar_choque()
-		accion_fallida.emit("Limite del taller alcanzado.")
+		accion_fallida.emit("Límite del tablero alcanzado.")
 		return false
 
 	var mundo = get_parent()

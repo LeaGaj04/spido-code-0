@@ -25,15 +25,6 @@ tonemap_mode = 2
 glow_enabled = true
 glow_bloom = 0.1
 
-[sub_resource type="StandardMaterial3D" id="MatSueloHangar"]
-albedo_color = Color(0.66, 0.70, 0.76, 1)
-metallic = 0.15
-roughness = 0.6
-
-[sub_resource type="PlaneMesh" id="MeshSuelo"]
-material = SubResource("MatSueloHangar")
-size = Vector2(24, 24)
-
 [node name="Mundo3D" type="Node3D" unique_id=867094500]
 script = ExtResource("1_script")
 escena_pieza = ExtResource("4_pieza")
@@ -48,11 +39,8 @@ light_energy = 1.15
 shadow_enabled = true
 
 [node name="Camera3D" type="Camera3D" parent="." unique_id=1784270914]
-transform = Transform3D(1, 0, 0, 0, 0.7880111, 0.6156611, 0, -0.6156611, 0.7880111, 0, 10.28046, 16.106438)
-fov = 46.0
-
-[node name="SueloHangar" type="MeshInstance3D" parent="." unique_id=1389275597]
-mesh = SubResource("MeshSuelo")
+transform = Transform3D(1, 0, 0, 0, 0.7880111, 0.6156611, 0, -0.6156611, 0.7880111, -1, 11.2, 14.5)
+fov = 48.0
 
 [node name="MesaEnsamblaje" parent="." unique_id=744348960 instance=ExtResource("3_mesa")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -4)
