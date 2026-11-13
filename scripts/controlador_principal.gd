@@ -297,7 +297,10 @@ func _conectar_senales() -> void:
 		for a in todos_astros:
 			if a:
 				a.accion_fallida.connect(_on_accion_fallida)
-				a.pieza_recogida.connect(_on_pieza_recogida)
+				a.pieza_recogida.connect(func(nom):
+					_on_pieza_recogida(nom)
+					_verificar_hitos_sandbox()
+				)
 				a.pieza_ensamblada.connect(func(tipo): 
 					_on_pieza_ensamblada(tipo)
 					_verificar_hitos_sandbox()
@@ -422,21 +425,21 @@ func _verificar_hitos_sandbox() -> void:
 				var pos_actual = Vector2i(mundo_3d.astronauta.grid_x, mundo_3d.astronauta.grid_z)
 				if pos_actual == hito.get("pos_baliza", Vector2i(0, -1)):
 					cumplido = true
-		"MONTAR_CHASIS":
+		"TOMAR_PIEZA":
+			if mundo_3d and mundo_3d.astronauta:
+				if is_instance_valid(mundo_3d.astronauta.pieza_en_mano):
+					cumplido = true
+		"ENSAMBLAR_EN_MESA":
 			if mundo_3d and mundo_3d.mesa_spid and "CHASIS" in mundo_3d.mesa_spid.etapas_completadas:
 				cumplido = true
-		"SUMINISTRO_RUEDAS":
+		"AUTOMATIZAR_BUCLE":
 			if mundo_3d and mundo_3d.mesa_spid and "RUEDAS" in mundo_3d.mesa_spid.etapas_completadas:
 				cumplido = true
 		"EQUIPO_CONCURRENTE":
 			if mundo_3d and mundo_3d.mesa_spid and "SENSOR" in mundo_3d.mesa_spid.etapas_completadas:
 				cumplido = true
-		"CADENA_AUTOMATIZADA":
-			if mundo_3d and mundo_3d.mesa_spid:
-				if "BRAZOS" in mundo_3d.mesa_spid.etapas_completadas and "BATERIA" in mundo_3d.mesa_spid.etapas_completadas:
-					cumplido = true
 		"DESPERTAR_SPIDO":
-			if mundo_3d and mundo_3d.mesa_spid and (mundo_3d.mesa_spid.diagnostico_ejecutado or mundo_3d.mesa_spid.etapas_completadas.size() >= 5):
+			if mundo_3d and mundo_3d.mesa_spid and (mundo_3d.mesa_spid.diagnostico_ejecutado or mundo_3d.mesa_spid.etapas_completadas.size() >= 3):
 				cumplido = true
 
 	if cumplido and indice_hito_actual not in hitos_completados:
