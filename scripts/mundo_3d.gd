@@ -238,8 +238,25 @@ func obtener_pieza_en(celda: Vector2i) -> Node3D:
 	if piezas_por_celda.has(celda):
 		var pieza = piezas_por_celda[celda]
 		piezas_por_celda.erase(celda)
+		_reabastecer_bahia(celda, pieza.tipo_pieza)
 		return pieza
 	return null
+
+func _reabastecer_bahia(celda: Vector2i, tipo: String) -> void:
+	# Reponer automaticamente la bahia para que los bucles continuos nunca se queden sin piezas
+	await get_tree().create_timer(1.2).timeout
+	if not is_instance_valid(contenedor_piezas): return
+	if piezas_por_celda.has(celda): return
+
+	var p_nodo: PiezaTaller
+	if escena_pieza:
+		p_nodo = escena_pieza.instantiate() as PiezaTaller
+	else:
+		p_nodo = PiezaTaller.new()
+	p_nodo.tipo_pieza = tipo
+	p_nodo.celda_inicial = celda
+	contenedor_piezas.add_child(p_nodo)
+	piezas_por_celda[celda] = p_nodo
 
 func obtener_mesa_en(celda: Vector2i) -> MesaEnsamblaje:
 	if mesa_spid and mesa_spid.visible and mesa_spid.celda_mesa == celda:

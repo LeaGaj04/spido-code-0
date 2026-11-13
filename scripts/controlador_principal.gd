@@ -364,6 +364,16 @@ func _on_ejecutar_pressed() -> void:
 		errores_durante_ejecucion = 0
 		_actualizar_estado("Automatización en marcha (Ciclo %d)..." % ciclo)
 
+		# Re-leer dinamicamente los lienzos de cada astronauta en cada ciclo
+		# Permite programar a Astro 2 en vivo mientras Astro 1 sigue trabajando en bucle
+		secuencias = [
+			lienzo.obtener_secuencia_comandos(),
+			lienzo_a2.obtener_secuencia_comandos(),
+			lienzo_a3.obtener_secuencia_comandos(),
+			lienzo_a4.obtener_secuencia_comandos(),
+			lienzo_a5.obtener_secuencia_comandos()
+		]
+
 		var exito = await _ejecutar_equipo_paralelo(astronautas, secuencias)
 		_verificar_hitos_sandbox()
 
@@ -392,7 +402,7 @@ func _ejecutar_equipo_paralelo(astronautas: Array, secuencias: Array) -> bool:
 		for idx in range(min(astronautas.size(), secuencias.size())):
 			var astro: AstronautaIngeniero = astronautas[idx]
 			var sec: Array = secuencias[idx]
-			if paso >= sec.size() or not astro.visible:
+			if paso >= sec.size() or not astro.visible or sec.is_empty():
 				continue
 
 			var bloque: BloqueItem = sec[paso]
