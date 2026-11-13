@@ -1,12 +1,11 @@
-[gd_scene load_steps=18 format=3 uid="uid://cxq62g0k1m005"]
+[gd_scene format=3 uid="uid://cxq62g0k1m005"]
 
-[ext_resource type="Script" path="res://scripts/controlador_principal.gd" id="1_script"]
+[ext_resource type="Script" uid="uid://xd7ntxckab0n" path="res://scripts/controlador_principal.gd" id="1_script"]
 [ext_resource type="PackedScene" uid="uid://df24k8b6lm001" path="res://escenas/bloque_item.tscn" id="2_bloque"]
 [ext_resource type="PackedScene" uid="uid://c83prmweaa004" path="res://escenas/mundo_3d.tscn" id="3_mundo"]
-[ext_resource type="Script" path="res://scripts/lienzo_codigo.gd" id="4_lienzo"]
 [ext_resource type="PackedScene" path="res://escenas/lienzo_codigo.tscn" id="5_lienzo"]
-[ext_resource type="Script" path="res://scripts/ada_visualizador.gd" id="6_adaviz"]
-[ext_resource type="Theme" path="res://assets/tema_global.tres" id="7_tema"]
+[ext_resource type="Script" uid="uid://bjjc1je5nqmfy" path="res://scripts/ada_visualizador.gd" id="6_adaviz"]
+[ext_resource type="Theme" uid="uid://byer3tm7qo247" path="res://assets/tema_global.tres" id="7_tema"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_CardMision"]
 content_margin_left = 14.0
@@ -26,6 +25,20 @@ corner_radius_bottom_left = 16
 shadow_color = Color(0.06, 0.08, 0.1, 0.75)
 shadow_size = 4
 shadow_offset = Vector2(0, 4)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ProgressBg"]
+bg_color = Color(0.08, 0.1, 0.13, 0.9)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ProgressFill"]
+bg_color = Color(0.35, 0.85, 0.55, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_Badge"]
 content_margin_left = 12.0
@@ -116,21 +129,7 @@ shadow_color = Color(0.05, 0.07, 0.09, 0.95)
 shadow_size = 8
 shadow_offset = Vector2(0, 8)
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ProgressBg"]
-bg_color = Color(0.08, 0.1, 0.13, 0.9)
-corner_radius_top_left = 4
-corner_radius_top_right = 4
-corner_radius_bottom_right = 4
-corner_radius_bottom_left = 4
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ProgressFill"]
-bg_color = Color(0.35, 0.85, 0.55, 1)
-corner_radius_top_left = 4
-corner_radius_top_right = 4
-corner_radius_bottom_right = 4
-corner_radius_bottom_left = 4
-
-[node name="Principal" type="Control"]
+[node name="Principal" type="Control" unique_id=196062371]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -141,7 +140,7 @@ theme = ExtResource("7_tema")
 script = ExtResource("1_script")
 escena_bloque = ExtResource("2_bloque")
 
-[node name="SubViewportContainer" type="SubViewportContainer" parent="."]
+[node name="SubViewportContainer" type="SubViewportContainer" parent="." unique_id=1557558519]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -150,15 +149,16 @@ grow_horizontal = 2
 grow_vertical = 2
 stretch = true
 
-[node name="SubViewport" type="SubViewport" parent="SubViewportContainer"]
+[node name="SubViewport" type="SubViewport" parent="SubViewportContainer" unique_id=1889955267]
 handle_input_locally = false
-size = Vector2i(1280, 720)
+size = Vector2i(1920, 1080)
 render_target_update_mode = 4
 
-[node name="Mundo3D" parent="SubViewportContainer/SubViewport" instance=ExtResource("3_mundo")]
+[node name="Mundo3D" parent="SubViewportContainer/SubViewport" unique_id=1401468770 instance=ExtResource("3_mundo")]
 unique_name_in_owner = true
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.009523392, 0.05901909, -0.03185463)
 
-[node name="HUD" type="Control" parent="."]
+[node name="HUD" type="Control" parent="." unique_id=112261856]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -167,7 +167,7 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 
-[node name="TopLeftContainer" type="VBoxContainer" parent="HUD"]
+[node name="TopLeftContainer" type="VBoxContainer" parent="HUD" unique_id=165131346]
 layout_mode = 0
 offset_left = 16.0
 offset_top = 16.0
@@ -175,48 +175,48 @@ offset_right = 380.0
 offset_bottom = 240.0
 theme_override_constants/separation = 8
 
-[node name="HBoxCapsulas" type="HBoxContainer" parent="HUD/TopLeftContainer"]
+[node name="HBoxCapsulas" type="HBoxContainer" parent="HUD/TopLeftContainer" unique_id=1926087931]
 layout_mode = 2
 theme_override_constants/separation = 8
 
-[node name="BtnTienda" type="Button" parent="HUD/TopLeftContainer/HBoxCapsulas"]
+[node name="BtnTienda" type="Button" parent="HUD/TopLeftContainer/HBoxCapsulas" unique_id=2047849241]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(100, 34)
 layout_mode = 2
 text = "MEJORAS"
 
-[node name="BtnCodice" type="Button" parent="HUD/TopLeftContainer/HBoxCapsulas"]
+[node name="BtnCodice" type="Button" parent="HUD/TopLeftContainer/HBoxCapsulas" unique_id=1205038407]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(90, 34)
 layout_mode = 2
 text = "CÓDICE"
 
-[node name="BtnGuia" type="Button" parent="HUD/TopLeftContainer/HBoxCapsulas"]
+[node name="BtnGuia" type="Button" parent="HUD/TopLeftContainer/HBoxCapsulas" unique_id=797899911]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(80, 34)
 layout_mode = 2
 text = "GUÍA"
 
-[node name="TarjetaMision" type="PanelContainer" parent="HUD/TopLeftContainer"]
+[node name="TarjetaMision" type="PanelContainer" parent="HUD/TopLeftContainer" unique_id=880540550]
 custom_minimum_size = Vector2(360, 0)
 layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_CardMision")
 
-[node name="VBox" type="VBoxContainer" parent="HUD/TopLeftContainer/TarjetaMision"]
+[node name="VBox" type="VBoxContainer" parent="HUD/TopLeftContainer/TarjetaMision" unique_id=1263644399]
 layout_mode = 2
 theme_override_constants/separation = 6
 
-[node name="HBoxTituloFase" type="HBoxContainer" parent="HUD/TopLeftContainer/TarjetaMision/VBox"]
+[node name="HBoxTituloFase" type="HBoxContainer" parent="HUD/TopLeftContainer/TarjetaMision/VBox" unique_id=1329557828]
 layout_mode = 2
 
-[node name="BtnNivelPrev" type="Button" parent="HUD/TopLeftContainer/TarjetaMision/VBox/HBoxTituloFase"]
+[node name="BtnNivelPrev" type="Button" parent="HUD/TopLeftContainer/TarjetaMision/VBox/HBoxTituloFase" unique_id=1678529888]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(26, 26)
 layout_mode = 2
 theme_type_variation = &"SecondaryButton"
 text = "<"
 
-[node name="LabelNivelTitulo" type="Label" parent="HUD/TopLeftContainer/TarjetaMision/VBox/HBoxTituloFase"]
+[node name="LabelNivelTitulo" type="Label" parent="HUD/TopLeftContainer/TarjetaMision/VBox/HBoxTituloFase" unique_id=444634649]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
@@ -225,21 +225,21 @@ theme_override_font_sizes/font_size = 14
 text = "◆ FASE 0: INDUCCIÓN BÁSICA"
 vertical_alignment = 1
 
-[node name="BtnNivelNext" type="Button" parent="HUD/TopLeftContainer/TarjetaMision/VBox/HBoxTituloFase"]
+[node name="BtnNivelNext" type="Button" parent="HUD/TopLeftContainer/TarjetaMision/VBox/HBoxTituloFase" unique_id=2073994819]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(26, 26)
 layout_mode = 2
 theme_type_variation = &"SecondaryButton"
 text = ">"
 
-[node name="LabelConcepto" type="Label" parent="HUD/TopLeftContainer/TarjetaMision/VBox"]
+[node name="LabelConcepto" type="Label" parent="HUD/TopLeftContainer/TarjetaMision/VBox" unique_id=1544947122]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(0.95, 0.96, 0.98, 1)
 theme_override_font_sizes/font_size = 15
 text = "RECOLECTAR PRIMER CHASIS"
 
-[node name="LabelMisionDesc" type="Label" parent="HUD/TopLeftContainer/TarjetaMision/VBox"]
+[node name="LabelMisionDesc" type="Label" parent="HUD/TopLeftContainer/TarjetaMision/VBox" unique_id=334573284]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(0.72, 0.78, 0.82, 1)
@@ -247,42 +247,41 @@ theme_override_font_sizes/font_size = 13
 text = "Muestra de chasis detectada. Traslada la pieza y acóplala en la mesa Spido."
 autowrap_mode = 3
 
-[node name="HBoxEstadoFase" type="HBoxContainer" parent="HUD/TopLeftContainer/TarjetaMision/VBox"]
+[node name="HBoxEstadoFase" type="HBoxContainer" parent="HUD/TopLeftContainer/TarjetaMision/VBox" unique_id=1064291026]
 layout_mode = 2
 theme_override_constants/separation = 6
 
-[node name="IndicadorPunto" type="Label" parent="HUD/TopLeftContainer/TarjetaMision/VBox/HBoxEstadoFase"]
+[node name="IndicadorPunto" type="Label" parent="HUD/TopLeftContainer/TarjetaMision/VBox/HBoxEstadoFase" unique_id=1040938795]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.35, 0.95, 0.55, 1)
 theme_override_font_sizes/font_size = 12
 text = "●"
 
-[node name="LabelEstadoFase" type="Label" parent="HUD/TopLeftContainer/TarjetaMision/VBox/HBoxEstadoFase"]
+[node name="LabelEstadoFase" type="Label" parent="HUD/TopLeftContainer/TarjetaMision/VBox/HBoxEstadoFase" unique_id=2009212181]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(0.35, 0.95, 0.55, 1)
 theme_override_font_sizes/font_size = 12
 text = "EN CURSO"
 
-[node name="BarraProgresoFase" type="ProgressBar" parent="HUD/TopLeftContainer/TarjetaMision/VBox"]
+[node name="BarraProgresoFase" type="ProgressBar" parent="HUD/TopLeftContainer/TarjetaMision/VBox" unique_id=398814146]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 6)
 layout_mode = 2
 theme_override_styles/background = SubResource("StyleBoxFlat_ProgressBg")
 theme_override_styles/fill = SubResource("StyleBoxFlat_ProgressFill")
-max_value = 100.0
 step = 1.0
 value = 15.0
 show_percentage = false
 
-[node name="LabelProgreso" type="Label" parent="HUD/TopLeftContainer/TarjetaMision/VBox"]
+[node name="LabelProgreso" type="Label" parent="HUD/TopLeftContainer/TarjetaMision/VBox" unique_id=818890507]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(0.6, 0.68, 0.75, 1)
 theme_override_font_sizes/font_size = 12
 text = "FASE 0/6 // Controles y Montaje (0%)"
 
-[node name="TopRightContainer" type="HBoxContainer" parent="HUD"]
+[node name="TopRightContainer" type="HBoxContainer" parent="HUD" unique_id=2103102108]
 layout_mode = 1
 anchors_preset = 1
 anchor_left = 1.0
@@ -295,11 +294,11 @@ grow_horizontal = 0
 theme_override_constants/separation = 8
 alignment = 2
 
-[node name="BadgeSpido" type="PanelContainer" parent="HUD/TopRightContainer"]
+[node name="BadgeSpido" type="PanelContainer" parent="HUD/TopRightContainer" unique_id=774878976]
 layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_Badge")
 
-[node name="LabelSpidoPiezas" type="Label" parent="HUD/TopRightContainer/BadgeSpido"]
+[node name="LabelSpidoPiezas" type="Label" parent="HUD/TopRightContainer/BadgeSpido" unique_id=590701507]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(0.4, 0.95, 0.6, 1)
@@ -307,62 +306,62 @@ theme_override_font_sizes/font_size = 14
 text = "🔋 0/5"
 vertical_alignment = 1
 
-[node name="BadgeBits" type="PanelContainer" parent="HUD/TopRightContainer"]
+[node name="BadgeTuercas" type="PanelContainer" parent="HUD/TopRightContainer" unique_id=816462134]
 layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_Badge")
 
-[node name="LabelCreditos" type="Label" parent="HUD/TopRightContainer/BadgeBits"]
+[node name="LabelCreditos" type="Label" parent="HUD/TopRightContainer/BadgeTuercas" unique_id=782046220]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 0.85, 0.3, 1)
 theme_override_font_sizes/font_size = 14
-text = "⚙️ 150 Bits"
+text = "🔩 0 Tuercas"
 vertical_alignment = 1
 
-[node name="RightSidebarADA" type="VBoxContainer" parent="HUD"]
+[node name="RightSidebarADA" type="VBoxContainer" parent="HUD" unique_id=746682798]
 layout_mode = 1
 anchors_preset = 1
 anchor_left = 1.0
 anchor_right = 1.0
-offset_left = -340.0
+offset_left = -580.0
 offset_top = 64.0
 offset_right = -16.0
-offset_bottom = 360.0
+offset_bottom = 370.0
 grow_horizontal = 0
 theme_override_constants/separation = 6
 
-[node name="BtnToggleADA" type="Button" parent="HUD/RightSidebarADA"]
+[node name="BtnToggleADA" type="Button" parent="HUD/RightSidebarADA" unique_id=1547970552]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 32)
 layout_mode = 2
 text = "SISTEMA A.D.A. ▲"
 
-[node name="CardADA" type="PanelContainer" parent="HUD/RightSidebarADA"]
+[node name="CardADA" type="PanelContainer" parent="HUD/RightSidebarADA" unique_id=627830607]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_CardADA")
 
-[node name="VBox" type="VBoxContainer" parent="HUD/RightSidebarADA/CardADA"]
+[node name="VBox" type="VBoxContainer" parent="HUD/RightSidebarADA/CardADA" unique_id=494084703]
 layout_mode = 2
 theme_override_constants/separation = 8
 
-[node name="HBoxHeader" type="HBoxContainer" parent="HUD/RightSidebarADA/CardADA/VBox"]
+[node name="HBoxHeader" type="HBoxContainer" parent="HUD/RightSidebarADA/CardADA/VBox" unique_id=1744191824]
 layout_mode = 2
 
-[node name="LabelTituloADA" type="Label" parent="HUD/RightSidebarADA/CardADA/VBox/HBoxHeader"]
+[node name="LabelTituloADA" type="Label" parent="HUD/RightSidebarADA/CardADA/VBox/HBoxHeader" unique_id=1290208081]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_colors/font_color = Color(0.545098, 0.796078, 0.568627, 1)
 theme_override_font_sizes/font_size = 15
 text = "A.D.A."
 
-[node name="LabelEstadoADA" type="Label" parent="HUD/RightSidebarADA/CardADA/VBox/HBoxHeader"]
+[node name="LabelEstadoADA" type="Label" parent="HUD/RightSidebarADA/CardADA/VBox/HBoxHeader" unique_id=781667830]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.35, 0.95, 0.55, 1)
 theme_override_font_sizes/font_size = 12
 text = "● EN CURSO"
 
-[node name="LabelADATexto" type="Label" parent="HUD/RightSidebarADA/CardADA/VBox"]
+[node name="LabelADATexto" type="Label" parent="HUD/RightSidebarADA/CardADA/VBox" unique_id=790022577]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(0.85, 0.9, 0.92, 1)
@@ -370,47 +369,50 @@ theme_override_font_sizes/font_size = 13
 text = "Unidad astronauta, enlace establecido. Soy A.D.A., tu asistente de ensamblaje en el hangar."
 autowrap_mode = 3
 
-[node name="VisualizadorADA" type="Control" parent="HUD/RightSidebarADA/CardADA/VBox"]
+[node name="VisualizadorADA" type="Control" parent="HUD/RightSidebarADA/CardADA/VBox" unique_id=1739255826]
 custom_minimum_size = Vector2(0, 56)
 layout_mode = 2
 script = ExtResource("6_adaviz")
 
-[node name="LabelCanal" type="Label" parent="HUD/RightSidebarADA/CardADA/VBox"]
+[node name="LabelCanal" type="Label" parent="HUD/RightSidebarADA/CardADA/VBox" unique_id=1904918761]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.45, 0.55, 0.6, 1)
 theme_override_font_sizes/font_size = 11
 text = "CANAL NAVE 01 // SEÑAL ESTABLE"
 horizontal_alignment = 1
 
-[node name="ConsolaAstronauta" type="PanelContainer" parent="HUD"]
+[node name="ConsolaAstronauta" type="PanelContainer" parent="HUD" unique_id=702950994]
 unique_name_in_owner = true
 layout_mode = 1
-anchors_preset = 2
+anchors_preset = 3
+anchor_left = 1.0
 anchor_top = 1.0
+anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 16.0
-offset_top = -340.0
-offset_right = 530.0
+offset_left = -580.0
+offset_top = -650.0
+offset_right = -16.0
 offset_bottom = -16.0
+grow_horizontal = 0
 grow_vertical = 0
 theme_override_styles/panel = SubResource("StyleBoxFlat_Consola")
 
-[node name="VBox" type="VBoxContainer" parent="HUD/ConsolaAstronauta"]
+[node name="VBox" type="VBoxContainer" parent="HUD/ConsolaAstronauta" unique_id=1212541523]
 layout_mode = 2
 theme_override_constants/separation = 6
 
-[node name="HBoxConsolaTop" type="HBoxContainer" parent="HUD/ConsolaAstronauta/VBox"]
+[node name="HBoxConsolaTop" type="HBoxContainer" parent="HUD/ConsolaAstronauta/VBox" unique_id=1810149091]
 layout_mode = 2
 theme_override_constants/separation = 8
 
-[node name="Titulo" type="Label" parent="HUD/ConsolaAstronauta/VBox/HBoxConsolaTop"]
+[node name="Titulo" type="Label" parent="HUD/ConsolaAstronauta/VBox/HBoxConsolaTop" unique_id=2126602604]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_colors/font_color = Color(0.545098, 0.796078, 0.568627, 1)
 theme_override_font_sizes/font_size = 15
 text = "◆ CONSOLA ASTRONAUTA"
 
-[node name="BtnPista" type="Button" parent="HUD/ConsolaAstronauta/VBox/HBoxConsolaTop"]
+[node name="BtnPista" type="Button" parent="HUD/ConsolaAstronauta/VBox/HBoxConsolaTop" unique_id=1174410878]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(60, 24)
 layout_mode = 2
@@ -418,189 +420,212 @@ theme_type_variation = &"SecondaryButton"
 theme_override_font_sizes/font_size = 12
 text = "Pista"
 
-[node name="BtnTogglePaleta" type="Button" parent="HUD/ConsolaAstronauta/VBox/HBoxConsolaTop"]
+[node name="BtnTogglePaleta" type="Button" parent="HUD/ConsolaAstronauta/VBox/HBoxConsolaTop" unique_id=2085183986]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(85, 24)
 layout_mode = 2
 theme_override_font_sizes/font_size = 12
-text = "[+ BLOQUES]"
+text = "[◀ BLOQUES]"
 
-[node name="BtnMinimizarConsola" type="Button" parent="HUD/ConsolaAstronauta/VBox/HBoxConsolaTop"]
+[node name="BtnMinimizarConsola" type="Button" parent="HUD/ConsolaAstronauta/VBox/HBoxConsolaTop" unique_id=1739064218]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(24, 24)
+custom_minimum_size = Vector2(75, 24)
 layout_mode = 2
 theme_type_variation = &"SecondaryButton"
-text = "-"
+text = "Plegar ▶"
 
-[node name="EquipoCodigo" type="TabContainer" parent="HUD/ConsolaAstronauta/VBox"]
+[node name="EquipoCodigo" type="TabContainer" parent="HUD/ConsolaAstronauta/VBox" unique_id=1987048986]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 3
 current_tab = 0
 
-[node name="LienzoAstronauta1" parent="HUD/ConsolaAstronauta/VBox/EquipoCodigo" instance=ExtResource("5_lienzo")]
+[node name="LienzoAstronauta1" parent="HUD/ConsolaAstronauta/VBox/EquipoCodigo" unique_id=75565874 instance=ExtResource("5_lienzo")]
 unique_name_in_owner = true
 layout_mode = 2
-escena_bloque = ExtResource("2_bloque")
 metadata/_tab_index = 0
 
-[node name="LienzoAstronauta2" parent="HUD/ConsolaAstronauta/VBox/EquipoCodigo" instance=ExtResource("5_lienzo")]
+[node name="LienzoAstronauta2" parent="HUD/ConsolaAstronauta/VBox/EquipoCodigo" unique_id=953661548 instance=ExtResource("5_lienzo")]
 unique_name_in_owner = true
 visible = false
 layout_mode = 2
-escena_bloque = ExtResource("2_bloque")
 metadata/_tab_index = 1
 
-[node name="LienzoAstronauta3" parent="HUD/ConsolaAstronauta/VBox/EquipoCodigo" instance=ExtResource("5_lienzo")]
+[node name="LienzoAstronauta3" parent="HUD/ConsolaAstronauta/VBox/EquipoCodigo" unique_id=317174954 instance=ExtResource("5_lienzo")]
 unique_name_in_owner = true
 visible = false
 layout_mode = 2
-escena_bloque = ExtResource("2_bloque")
 metadata/_tab_index = 2
 
-[node name="LienzoAstronauta4" parent="HUD/ConsolaAstronauta/VBox/EquipoCodigo" instance=ExtResource("5_lienzo")]
+[node name="LienzoAstronauta4" parent="HUD/ConsolaAstronauta/VBox/EquipoCodigo" unique_id=1053358751 instance=ExtResource("5_lienzo")]
 unique_name_in_owner = true
 visible = false
 layout_mode = 2
-escena_bloque = ExtResource("2_bloque")
 metadata/_tab_index = 3
 
-[node name="LienzoAstronauta5" parent="HUD/ConsolaAstronauta/VBox/EquipoCodigo" instance=ExtResource("5_lienzo")]
+[node name="LienzoAstronauta5" parent="HUD/ConsolaAstronauta/VBox/EquipoCodigo" unique_id=435264228 instance=ExtResource("5_lienzo")]
 unique_name_in_owner = true
 visible = false
 layout_mode = 2
-escena_bloque = ExtResource("2_bloque")
 metadata/_tab_index = 4
 
-[node name="LienzoAstronauta6" parent="HUD/ConsolaAstronauta/VBox/EquipoCodigo" instance=ExtResource("5_lienzo")]
+[node name="LienzoAstronauta6" parent="HUD/ConsolaAstronauta/VBox/EquipoCodigo" unique_id=171770415 instance=ExtResource("5_lienzo")]
 unique_name_in_owner = true
 visible = false
 layout_mode = 2
-escena_bloque = ExtResource("2_bloque")
 metadata/_tab_index = 5
 
-[node name="LienzoAstronauta7" parent="HUD/ConsolaAstronauta/VBox/EquipoCodigo" instance=ExtResource("5_lienzo")]
+[node name="LienzoAstronauta7" parent="HUD/ConsolaAstronauta/VBox/EquipoCodigo" unique_id=690292820 instance=ExtResource("5_lienzo")]
 unique_name_in_owner = true
 visible = false
 layout_mode = 2
-escena_bloque = ExtResource("2_bloque")
 metadata/_tab_index = 6
 
-[node name="LienzoAstronauta8" parent="HUD/ConsolaAstronauta/VBox/EquipoCodigo" instance=ExtResource("5_lienzo")]
+[node name="LienzoAstronauta8" parent="HUD/ConsolaAstronauta/VBox/EquipoCodigo" unique_id=1916616958 instance=ExtResource("5_lienzo")]
 unique_name_in_owner = true
 visible = false
 layout_mode = 2
-escena_bloque = ExtResource("2_bloque")
 metadata/_tab_index = 7
 
-[node name="LienzoAstronauta9" parent="HUD/ConsolaAstronauta/VBox/EquipoCodigo" instance=ExtResource("5_lienzo")]
+[node name="LienzoAstronauta9" parent="HUD/ConsolaAstronauta/VBox/EquipoCodigo" unique_id=682752485 instance=ExtResource("5_lienzo")]
 unique_name_in_owner = true
 visible = false
 layout_mode = 2
-escena_bloque = ExtResource("2_bloque")
 metadata/_tab_index = 8
 
-[node name="LienzoAstronauta10" parent="HUD/ConsolaAstronauta/VBox/EquipoCodigo" instance=ExtResource("5_lienzo")]
+[node name="LienzoAstronauta10" parent="HUD/ConsolaAstronauta/VBox/EquipoCodigo" unique_id=2138454276 instance=ExtResource("5_lienzo")]
 unique_name_in_owner = true
 visible = false
 layout_mode = 2
-escena_bloque = ExtResource("2_bloque")
 metadata/_tab_index = 9
 
-[node name="HBoxConsolaBottom" type="HBoxContainer" parent="HUD/ConsolaAstronauta/VBox"]
+[node name="HBoxConsolaBottom" type="HBoxContainer" parent="HUD/ConsolaAstronauta/VBox" unique_id=1314763075]
 layout_mode = 2
 theme_override_constants/separation = 8
 
-[node name="BtnReiniciar" type="Button" parent="HUD/ConsolaAstronauta/VBox/HBoxConsolaBottom"]
+[node name="BtnReiniciar" type="Button" parent="HUD/ConsolaAstronauta/VBox/HBoxConsolaBottom" unique_id=1998988950]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(130, 36)
 layout_mode = 2
 theme_type_variation = &"SecondaryButton"
 text = "VUELTA A BASE"
 
-[node name="BtnLimpiar" type="Button" parent="HUD/ConsolaAstronauta/VBox/HBoxConsolaBottom"]
+[node name="BtnLimpiar" type="Button" parent="HUD/ConsolaAstronauta/VBox/HBoxConsolaBottom" unique_id=530467116]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(32, 36)
 layout_mode = 2
 theme_type_variation = &"SecondaryButton"
 text = "🗑"
 
-[node name="BtnDuplicar" type="Button" parent="HUD/ConsolaAstronauta/VBox/HBoxConsolaBottom"]
+[node name="BtnDuplicar" type="Button" parent="HUD/ConsolaAstronauta/VBox/HBoxConsolaBottom" unique_id=242185581]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(85, 36)
 layout_mode = 2
 theme_type_variation = &"SecondaryButton"
 text = "Bucle: OFF"
 
-[node name="BtnVelocidad" type="Button" parent="HUD/ConsolaAstronauta/VBox/HBoxConsolaBottom"]
+[node name="BtnVelocidad" type="Button" parent="HUD/ConsolaAstronauta/VBox/HBoxConsolaBottom" unique_id=1193255383]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(40, 36)
 layout_mode = 2
 theme_type_variation = &"SecondaryButton"
 text = "1x"
 
-[node name="Spacer" type="Control" parent="HUD/ConsolaAstronauta/VBox/HBoxConsolaBottom"]
+[node name="Spacer" type="Control" parent="HUD/ConsolaAstronauta/VBox/HBoxConsolaBottom" unique_id=143657832]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="BtnPaso" type="Button" parent="HUD/ConsolaAstronauta/VBox/HBoxConsolaBottom"]
+[node name="BtnPaso" type="Button" parent="HUD/ConsolaAstronauta/VBox/HBoxConsolaBottom" unique_id=1050761407]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(105, 36)
 layout_mode = 2
 theme_type_variation = &"SecondaryButton"
 text = "PASO A PASO"
 
-[node name="BtnEjecutar" type="Button" parent="HUD/ConsolaAstronauta/VBox/HBoxConsolaBottom"]
+[node name="BtnEjecutar" type="Button" parent="HUD/ConsolaAstronauta/VBox/HBoxConsolaBottom" unique_id=522079552]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(105, 36)
 layout_mode = 2
 text = "EJECUTAR"
 
-[node name="DrawerPaleta" type="PanelContainer" parent="HUD"]
+[node name="DrawerPaleta" type="PanelContainer" parent="HUD" unique_id=14304313]
 unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 2
 anchor_top = 1.0
 anchor_bottom = 1.0
-offset_left = 554.0
-offset_top = -340.0
-offset_right = 780.0
+offset_left = 16.0
+offset_top = -650.0
+offset_right = 380.0
 offset_bottom = -16.0
 grow_vertical = 0
 theme_override_styles/panel = SubResource("StyleBoxFlat_Drawer")
 
-[node name="VBox" type="VBoxContainer" parent="HUD/DrawerPaleta"]
+[node name="VBox" type="VBoxContainer" parent="HUD/DrawerPaleta" unique_id=861876635]
 layout_mode = 2
-theme_override_constants/separation = 6
+theme_override_constants/separation = 8
 
-[node name="HBoxTit" type="HBoxContainer" parent="HUD/DrawerPaleta/VBox"]
+[node name="HBoxTit" type="HBoxContainer" parent="HUD/DrawerPaleta/VBox" unique_id=245162358]
 layout_mode = 2
 
-[node name="Titulo" type="Label" parent="HUD/DrawerPaleta/VBox/HBoxTit"]
+[node name="Titulo" type="Label" parent="HUD/DrawerPaleta/VBox/HBoxTit" unique_id=890743176]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_colors/font_color = Color(0.545098, 0.796078, 0.568627, 1)
-theme_override_font_sizes/font_size = 13
-text = "PALETA DE BLOQUES"
+theme_override_font_sizes/font_size = 14
+text = "◆ PALETA DE BLOQUES"
 
-[node name="BtnCerrarPaleta" type="Button" parent="HUD/DrawerPaleta/VBox/HBoxTit"]
+[node name="BtnCerrarPaleta" type="Button" parent="HUD/DrawerPaleta/VBox/HBoxTit" unique_id=1434780341]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(20, 20)
+custom_minimum_size = Vector2(70, 24)
 layout_mode = 2
 theme_type_variation = &"SecondaryButton"
-text = "×"
+text = "◀ Plegar"
 
-[node name="PaletaScroll" type="ScrollContainer" parent="HUD/DrawerPaleta/VBox"]
+[node name="PaletaScroll" type="ScrollContainer" parent="HUD/DrawerPaleta/VBox" unique_id=546687741]
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="ListaBloques" type="VBoxContainer" parent="HUD/DrawerPaleta/VBox/PaletaScroll"]
+[node name="ListaBloques" type="VBoxContainer" parent="HUD/DrawerPaleta/VBox/PaletaScroll" unique_id=955164439]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_constants/separation = 6
+theme_override_constants/separation = 8
 
-[node name="LabelEstado" type="Label" parent="HUD"]
+[node name="BtnAbrirPaletaFlotante" type="Button" parent="HUD" unique_id=1797948005]
+unique_name_in_owner = true
+visible = false
+custom_minimum_size = Vector2(144, 38)
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 16.0
+offset_top = -54.0
+offset_right = 160.0
+offset_bottom = -16.0
+grow_vertical = 0
+text = "▶ BLOQUES"
+
+[node name="BtnAbrirConsolaFlotante" type="Button" parent="HUD" unique_id=1867511666]
+unique_name_in_owner = true
+visible = false
+custom_minimum_size = Vector2(144, 38)
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -160.0
+offset_top = -54.0
+offset_right = -16.0
+offset_bottom = -16.0
+grow_horizontal = 0
+grow_vertical = 0
+text = "◀ CONSOLA"
+
+[node name="LabelEstado" type="Label" parent="HUD" unique_id=77553948]
 unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 7
@@ -608,10 +633,10 @@ anchor_left = 0.5
 anchor_top = 1.0
 anchor_right = 0.5
 anchor_bottom = 1.0
-offset_left = -200.0
-offset_top = -42.0
-offset_right = 200.0
-offset_bottom = -16.0
+offset_left = -300.0
+offset_top = -50.0
+offset_right = 300.0
+offset_bottom = -18.0
 grow_horizontal = 2
 grow_vertical = 0
 theme_override_colors/font_color = Color(0.9, 0.95, 0.92, 1)
@@ -620,7 +645,7 @@ text = "Astronauta listo en el hangar de montaje."
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="ModalTienda" type="PanelContainer" parent="HUD"]
+[node name="ModalTienda" type="PanelContainer" parent="HUD" unique_id=1527895991]
 unique_name_in_owner = true
 visible = false
 layout_mode = 1
@@ -637,60 +662,60 @@ grow_horizontal = 2
 grow_vertical = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_Modal")
 
-[node name="VBox" type="VBoxContainer" parent="HUD/ModalTienda"]
+[node name="VBox" type="VBoxContainer" parent="HUD/ModalTienda" unique_id=1913958113]
 layout_mode = 2
 theme_override_constants/separation = 10
 
-[node name="HBoxHeader" type="HBoxContainer" parent="HUD/ModalTienda/VBox"]
+[node name="HBoxHeader" type="HBoxContainer" parent="HUD/ModalTienda/VBox" unique_id=1732456167]
 layout_mode = 2
 
-[node name="VBoxTit" type="VBoxContainer" parent="HUD/ModalTienda/VBox/HBoxHeader"]
+[node name="VBoxTit" type="VBoxContainer" parent="HUD/ModalTienda/VBox/HBoxHeader" unique_id=2116303152]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="Titulo" type="Label" parent="HUD/ModalTienda/VBox/HBoxHeader/VBoxTit"]
+[node name="Titulo" type="Label" parent="HUD/ModalTienda/VBox/HBoxHeader/VBoxTit" unique_id=877861303]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.95, 0.96, 0.98, 1)
 theme_override_font_sizes/font_size = 20
 text = "CENTRO DE MEJORAS"
 
-[node name="Subtitulo" type="Label" parent="HUD/ModalTienda/VBox/HBoxHeader/VBoxTit"]
+[node name="Subtitulo" type="Label" parent="HUD/ModalTienda/VBox/HBoxHeader/VBoxTit" unique_id=1470246089]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.7, 0.76, 0.8, 1)
 theme_override_font_sizes/font_size = 13
 text = "Amplía tu terreno y equipamiento. Cada etapa incorpora nuevas herramientas de automatización."
 
-[node name="BtnCerrarTienda" type="Button" parent="HUD/ModalTienda/VBox/HBoxHeader"]
+[node name="BtnCerrarTienda" type="Button" parent="HUD/ModalTienda/VBox/HBoxHeader" unique_id=641726436]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(90, 34)
 layout_mode = 2
 text = "CERRAR"
 
-[node name="HBoxSubHeader" type="HBoxContainer" parent="HUD/ModalTienda/VBox"]
+[node name="HBoxSubHeader" type="HBoxContainer" parent="HUD/ModalTienda/VBox" unique_id=840521096]
 layout_mode = 2
 
-[node name="LabelProgresion" type="Label" parent="HUD/ModalTienda/VBox/HBoxSubHeader"]
+[node name="LabelProgresion" type="Label" parent="HUD/ModalTienda/VBox/HBoxSubHeader" unique_id=1509667156]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_colors/font_color = Color(0.545098, 0.796078, 0.568627, 1)
 theme_override_font_sizes/font_size = 13
 text = "PROGRESIÓN / Desliza para explorar las etapas"
 
-[node name="LabelSaldoTienda" type="Label" parent="HUD/ModalTienda/VBox/HBoxSubHeader"]
+[node name="LabelSaldoTienda" type="Label" parent="HUD/ModalTienda/VBox/HBoxSubHeader" unique_id=1328926354]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 0.85, 0.3, 1)
 theme_override_font_sizes/font_size = 14
-text = "⚙️ Saldo: 150 Bits"
+text = "🔩 Saldo: 0 Tuercas"
 
-[node name="HSeparator" type="HSeparator" parent="HUD/ModalTienda/VBox"]
+[node name="HSeparator" type="HSeparator" parent="HUD/ModalTienda/VBox" unique_id=1822589876]
 layout_mode = 2
 
-[node name="ScrollMejoras" type="ScrollContainer" parent="HUD/ModalTienda/VBox"]
+[node name="ScrollMejoras" type="ScrollContainer" parent="HUD/ModalTienda/VBox" unique_id=1699862864]
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="GridMejoras" type="GridContainer" parent="HUD/ModalTienda/VBox/ScrollMejoras"]
+[node name="GridMejoras" type="GridContainer" parent="HUD/ModalTienda/VBox/ScrollMejoras" unique_id=2127539592]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
@@ -698,23 +723,23 @@ theme_override_constants/h_separation = 14
 theme_override_constants/v_separation = 14
 columns = 3
 
-[node name="CategoriasLegacy" type="VBoxContainer" parent="HUD/ModalTienda/VBox/ScrollMejoras"]
+[node name="CategoriasLegacy" type="VBoxContainer" parent="HUD/ModalTienda/VBox/ScrollMejoras" unique_id=824133158]
 visible = false
 layout_mode = 2
 
-[node name="ListaBloquesTienda" type="VBoxContainer" parent="HUD/ModalTienda/VBox/ScrollMejoras/CategoriasLegacy"]
+[node name="ListaBloquesTienda" type="VBoxContainer" parent="HUD/ModalTienda/VBox/ScrollMejoras/CategoriasLegacy" unique_id=102108442]
 unique_name_in_owner = true
 layout_mode = 2
 
-[node name="ListaAstronautasTienda" type="VBoxContainer" parent="HUD/ModalTienda/VBox/ScrollMejoras/CategoriasLegacy"]
+[node name="ListaAstronautasTienda" type="VBoxContainer" parent="HUD/ModalTienda/VBox/ScrollMejoras/CategoriasLegacy" unique_id=1997286013]
 unique_name_in_owner = true
 layout_mode = 2
 
-[node name="ListaEstacionesTienda" type="VBoxContainer" parent="HUD/ModalTienda/VBox/ScrollMejoras/CategoriasLegacy"]
+[node name="ListaEstacionesTienda" type="VBoxContainer" parent="HUD/ModalTienda/VBox/ScrollMejoras/CategoriasLegacy" unique_id=18585243]
 unique_name_in_owner = true
 layout_mode = 2
 
-[node name="PanelGuia" type="PanelContainer" parent="HUD"]
+[node name="PanelGuia" type="PanelContainer" parent="HUD" unique_id=436510929]
 unique_name_in_owner = true
 visible = false
 layout_mode = 1
@@ -731,18 +756,18 @@ grow_horizontal = 2
 grow_vertical = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_Modal")
 
-[node name="VBox" type="VBoxContainer" parent="HUD/PanelGuia"]
+[node name="VBox" type="VBoxContainer" parent="HUD/PanelGuia" unique_id=570462437]
 layout_mode = 2
 theme_override_constants/separation = 12
 
-[node name="LabelGuiaTitulo" type="Label" parent="HUD/PanelGuia/VBox"]
+[node name="LabelGuiaTitulo" type="Label" parent="HUD/PanelGuia/VBox" unique_id=67586647]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.545098, 0.796078, 0.568627, 1)
 theme_override_font_sizes/font_size = 17
 text = "GUÍA DE ALGORITMIA Y COMANDOS"
 horizontal_alignment = 1
 
-[node name="LabelGuiaTexto" type="Label" parent="HUD/PanelGuia/VBox"]
+[node name="LabelGuiaTexto" type="Label" parent="HUD/PanelGuia/VBox" unique_id=47518]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 3
@@ -754,13 +779,13 @@ text = "1. Observa el objetivo en la tarjeta de misión.
 4. Presiona EJECUTAR para ver tu algoritmo en acción."
 autowrap_mode = 3
 
-[node name="BtnGuiaContinuar" type="Button" parent="HUD/PanelGuia/VBox"]
+[node name="BtnGuiaContinuar" type="Button" parent="HUD/PanelGuia/VBox" unique_id=595021958]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 38)
 layout_mode = 2
 text = "ENTENDIDO"
 
-[node name="ModalVictoria" type="PanelContainer" parent="HUD"]
+[node name="ModalVictoria" type="PanelContainer" parent="HUD" unique_id=937637669]
 unique_name_in_owner = true
 visible = false
 layout_mode = 1
@@ -777,11 +802,11 @@ grow_horizontal = 2
 grow_vertical = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_Modal")
 
-[node name="VBox" type="VBoxContainer" parent="HUD/ModalVictoria"]
+[node name="VBox" type="VBoxContainer" parent="HUD/ModalVictoria" unique_id=1634508894]
 layout_mode = 2
 theme_override_constants/separation = 10
 
-[node name="LabelEstrellas" type="Label" parent="HUD/ModalVictoria/VBox"]
+[node name="LabelEstrellas" type="Label" parent="HUD/ModalVictoria/VBox" unique_id=7221098]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 0.85, 0.2, 1)
@@ -789,7 +814,7 @@ theme_override_font_sizes/font_size = 22
 text = "★★★ HITO SUPERADO ★★★"
 horizontal_alignment = 1
 
-[node name="LabelDetalle" type="Label" parent="HUD/ModalVictoria/VBox"]
+[node name="LabelDetalle" type="Label" parent="HUD/ModalVictoria/VBox" unique_id=758268375]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 3
@@ -799,24 +824,24 @@ text = "¡Excelente ensamblaje! Spido está más cerca de completarse."
 horizontal_alignment = 1
 autowrap_mode = 3
 
-[node name="HBox" type="HBoxContainer" parent="HUD/ModalVictoria/VBox"]
+[node name="HBox" type="HBoxContainer" parent="HUD/ModalVictoria/VBox" unique_id=62187294]
 layout_mode = 2
 theme_override_constants/separation = 12
 
-[node name="BtnModalReintentar" type="Button" parent="HUD/ModalVictoria/VBox/HBox"]
+[node name="BtnModalReintentar" type="Button" parent="HUD/ModalVictoria/VBox/HBox" unique_id=1576622769]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 theme_type_variation = &"SecondaryButton"
 text = "Revisar Código"
 
-[node name="BtnModalSiguiente" type="Button" parent="HUD/ModalVictoria/VBox/HBox"]
+[node name="BtnModalSiguiente" type="Button" parent="HUD/ModalVictoria/VBox/HBox" unique_id=1586079839]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Siguiente Hito"
 
-[node name="FondoMenuPausa" type="ColorRect" parent="HUD"]
+[node name="FondoMenuPausa" type="ColorRect" parent="HUD" unique_id=53669150]
 unique_name_in_owner = true
 visible = false
 layout_mode = 1
@@ -827,7 +852,7 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0.05, 0.07, 0.1, 0.8)
 
-[node name="MenuPausa" type="PanelContainer" parent="HUD"]
+[node name="MenuPausa" type="PanelContainer" parent="HUD" unique_id=998786100]
 unique_name_in_owner = true
 visible = false
 layout_mode = 1
@@ -844,24 +869,24 @@ grow_horizontal = 2
 grow_vertical = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_Modal")
 
-[node name="VBox" type="VBoxContainer" parent="HUD/MenuPausa"]
+[node name="VBox" type="VBoxContainer" parent="HUD/MenuPausa" unique_id=1285426714]
 layout_mode = 2
 theme_override_constants/separation = 12
 
-[node name="Titulo" type="Label" parent="HUD/MenuPausa/VBox"]
+[node name="Titulo" type="Label" parent="HUD/MenuPausa/VBox" unique_id=205751798]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.545098, 0.796078, 0.568627, 1)
 theme_override_font_sizes/font_size = 18
 text = "PAUSA"
 horizontal_alignment = 1
 
-[node name="BtnContinuar" type="Button" parent="HUD/MenuPausa/VBox"]
+[node name="BtnContinuar" type="Button" parent="HUD/MenuPausa/VBox" unique_id=664844712]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
 text = "Continuar"
 
-[node name="BtnVolverMenu" type="Button" parent="HUD/MenuPausa/VBox"]
+[node name="BtnVolverMenu" type="Button" parent="HUD/MenuPausa/VBox" unique_id=962489664]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 40)
 layout_mode = 2

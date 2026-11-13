@@ -144,16 +144,18 @@ func avanzar(tiempo_custom: float = -1.0) -> bool:
 	var nueva_x = grid_x + delta.x
 	var nueva_z = grid_z + delta.y
 
-	# Limite del tablero de 12x12 casillas (gx de -6 a 5, gz de -6 a 5)
-	if nueva_x < -6 or nueva_x > 5 or nueva_z < -6 or nueva_z > 5:
-		await _animar_choque()
-		accion_fallida.emit("El astronauta alcanzó el límite del tablero de 12x12.")
-		return false
-
 	var mundo = get_parent()
-	if mundo and mundo.has_method("es_celda_solida") and mundo.es_celda_solida(Vector2i(nueva_x, nueva_z)):
+	if mundo and mundo.has_method("es_celda_valida_para_movimiento"):
+		if not mundo.es_celda_valida_para_movimiento(Vector2i(nueva_x, nueva_z)):
+			await _animar_choque()
+			if mundo.has_method("es_celda_solida") and mundo.es_celda_solida(Vector2i(nueva_x, nueva_z)):
+				accion_fallida.emit("Hay un obstáculo o estación enfrente.")
+			else:
+				accion_fallida.emit("Límite del sector alcanzado. ¡Expande la nave en MEJORAS!")
+			return false
+	elif nueva_x < -6 or nueva_x > 6 or nueva_z < -6 or nueva_z > 6:
 		await _animar_choque()
-		accion_fallida.emit("Hay una estacion de trabajo enfrente. No puedes caminar sobre ella.")
+		accion_fallida.emit("El astronauta alcanzó el límite del tablero de 13x13.")
 		return false
 
 	grid_x = nueva_x
@@ -181,15 +183,15 @@ func retroceder() -> bool:
 	var nueva_x = grid_x - delta.x
 	var nueva_z = grid_z - delta.y
 
-	if nueva_x < -6 or nueva_x > 5 or nueva_z < -6 or nueva_z > 5:
+	var mundo = get_parent()
+	if mundo and mundo.has_method("es_celda_valida_para_movimiento"):
+		if not mundo.es_celda_valida_para_movimiento(Vector2i(nueva_x, nueva_z)):
+			await _animar_choque()
+			accion_fallida.emit("Límite del sector alcanzado a espaldas del astronauta.")
+			return false
+	elif nueva_x < -6 or nueva_x > 6 or nueva_z < -6 or nueva_z > 6:
 		await _animar_choque()
 		accion_fallida.emit("Límite del tablero alcanzado.")
-		return false
-
-	var mundo = get_parent()
-	if mundo and mundo.has_method("es_celda_solida") and mundo.es_celda_solida(Vector2i(nueva_x, nueva_z)):
-		await _animar_choque()
-		accion_fallida.emit("Obstaculo a espaldas del astronauta.")
 		return false
 
 	grid_x = nueva_x
@@ -279,6 +281,24 @@ func ensamblar_en_mesa() -> bool:
 			return true
 		else:
 			accion_fallida.emit("La mesa requiere otra pieza en esta etapa.")
+			await _animar_duda()
+			return false
+	elif mundo and mundo.has_method("obtener_tolva_en") and mundo.obtener_tolva_en(celda_objetivo):
+		var tipo_pieza = pieza_en_mano.get("tipo_pieza") if "tipo_pieza" in pieza_en_mano else "TUERCA"
+		if tipo_pieza in ["TUERCA", "TORNILLO"]:
+			pieza_en_mano.queue_free()
+			pieza_en_mano = null
+			_set_color_visor(Color(0.95, 0.8, 0.2))
+			var tween = create_tween()
+			tween.tween_property(self, "position:y", position.y + 0.12, 0.1)
+			tween.tween_property(self, "position:y", position.y, 0.12)
+			await tween.finished
+			mundo.depositar_tuerca_en_tolva()
+			pieza_ensamblada.emit(tipo_pieza)
+			animacion_terminada.emit()
+			return true
+		else:
+			accion_fallida.emit("El contenedor solo recibe Tuercas.")
 			await _animar_duda()
 			return false
 	else:

@@ -45,9 +45,11 @@ extends Control
 # Consola Flotante y Paleta Desplegable
 @onready var consola_astronauta: PanelContainer = %ConsolaAstronauta
 @onready var btn_minimizar_consola: Button = %BtnMinimizarConsola
+@onready var btn_abrir_consola_flotante: Button = %BtnAbrirConsolaFlotante
 @onready var btn_toggle_paleta: Button = %BtnTogglePaleta
 @onready var drawer_paleta: PanelContainer = %DrawerPaleta
 @onready var btn_cerrar_paleta: Button = %BtnCerrarPaleta
+@onready var btn_abrir_paleta_flotante: Button = %BtnAbrirPaletaFlotante
 
 # Botones de Ejecución y Consola
 @onready var btn_ejecutar: Button = %BtnEjecutar
@@ -85,60 +87,51 @@ extends Control
 const ESCENA_MENU_PRINCIPAL := "res://escenas/menu_inicio.tscn"
 const HitosSandboxClass = preload("res://scripts/hitos_sandbox.gd")
 
-var creditos: int = 150
+var creditos: int = 0
 var bloques_adquiridos: Array[String] = ["AVANZAR", "GIRAR_IZQ", "GIRAR_DER", "TOMAR_PIEZA", "ENSAMBLAR"]
 var astronautas_desbloqueados: Array[int] = [1]
 var estaciones_desbloqueadas: Array[String] = []
 
 const ARBOL_MEJORAS = [
 	{
-		"fase": "FASE 0 / BASE 1x1",
-		"desc": "Hangar inicial de montaje. Control y calibración de Spido.",
+		"fase": "FASE 0 / TALLER 3x3",
+		"desc": "Sector inicial de 3x3 con barrera láser. Automatización básica de tuercas.",
 		"costo": 0,
 		"cat": "fase",
-		"id": "FASE_0"
+		"id": "FASE_0",
+		"tamano": 3
 	},
 	{
-		"fase": "FASE 1 / SECTOR 1x3",
-		"desc": "Corredor logístico. Bucle continuo de transporte de piezas.",
-		"costo": 60,
+		"fase": "FASE 1 / EXPANSIÓN 5x5",
+		"desc": "Expande el taller a 5x5 y activa la Mesa de Spido para iniciar el ensamblaje.",
+		"costo": 30,
 		"cat": "fase",
-		"id": "FASE_1"
+		"id": "FASE_1",
+		"tamano": 5
 	},
 	{
-		"fase": "FASE 2 / SECTOR 3x3",
-		"desc": "Expansión del hangar y Astronauta 2 (Tracción - Azul).",
-		"costo": 100,
-		"cat": "astronauta",
-		"id": 2
+		"fase": "FASE 2 / 2º ASTRO & MESÓN PATAS",
+		"desc": "Expande a 7x7, desbloquea al Astronauta 2 (Tracción) y el Mesón de Patas.",
+		"costo": 80,
+		"cat": "fase",
+		"id": "FASE_2",
+		"tamano": 7
 	},
 	{
-		"fase": "FASE 3 / MESÓN PATAS",
-		"desc": "Estación de subensamblaje: transforma tornillos en ruedas y patas.",
-		"costo": 120,
-		"cat": "estacion",
-		"id": "MESON_PATAS"
+		"fase": "FASE 3 / 3º ASTRO & SENSORES",
+		"desc": "Expande a 9x9, activa al Astronauta 3 (Sensores) y el Mesón de Sensores.",
+		"costo": 150,
+		"cat": "fase",
+		"id": "FASE_3",
+		"tamano": 9
 	},
 	{
-		"fase": "FASE 4 / MESÓN SENSORES",
-		"desc": "Estación óptica: transforma microchips en procesadores Spido.",
-		"costo": 180,
-		"cat": "estacion",
-		"id": "MESON_SENSORES"
-	},
-	{
-		"fase": "FASE 5 / SECTOR 5x5",
-		"desc": "Hangar ampliado y Astronauta 3 (Sensores - Amarillo).",
-		"costo": 200,
-		"cat": "astronauta",
-		"id": 3
-	},
-	{
-		"fase": "FASE 6 / PROTOCOLO MAESTRO",
-		"desc": "Sincronización multi-hilo completa con 5 astronautas y diagnóstico.",
-		"costo": 300,
-		"cat": "astronauta",
-		"id": 5
+		"fase": "FASE 4 / PROTOCOLO TOTAL 13x13",
+		"desc": "Desactiva las barreras láser y despliega el hangar simétrico completo de 13x13 con 5 astronautas.",
+		"costo": 250,
+		"cat": "fase",
+		"id": "FASE_4",
+		"tamano": 13
 	}
 ]
 
@@ -197,8 +190,8 @@ func _ready() -> void:
 	menu_pausa.visible = false
 	if is_instance_valid(modal_tienda):
 		modal_tienda.visible = false
-	if is_instance_valid(drawer_paleta):
-		drawer_paleta.visible = true
+	_plegar_paleta(false)
+	_plegar_consola(false)
 
 	btn_duplicar.text = "Bucle: OFF"
 	actualizar_creditos_ui()
@@ -254,6 +247,17 @@ func _aplicar_hito_actual() -> void:
 	# Configurar mundo 3D sin destruir robot Spido
 	if mundo_3d:
 		mundo_3d.config_nivel_actual = hito
+		var tam_sector_hito = hito.get("tamano_sector", 3)
+		var tam_final = max(tam_sector_hito, mundo_3d.tamano_sector_actual)
+		mundo_3d.actualizar_sector(tam_final)
+
+		if mundo_3d.mesa_spid:
+			var debe_mesa = hito.get("mostrar_mesa", false) or (mundo_3d.tamano_sector_actual >= 5)
+			mundo_3d.mesa_spid.visible = debe_mesa
+
+		if mundo_3d.astronauta and hito.has("pos_astronauta"):
+			mundo_3d.astronauta.configurar_inicio(hito.get("pos_astronauta", Vector2i(0, 2)), hito.get("ori_astronauta", 0))
+
 		if mundo_3d.baliza_meta:
 			var mostrar_b = hito.get("mostrar_baliza", false)
 			mundo_3d.baliza_meta.visible = mostrar_b
@@ -263,23 +267,23 @@ func _aplicar_hito_actual() -> void:
 		# Activación progresiva de astronautas
 		if (cant_astros >= 2 or 2 in astronautas_desbloqueados) and mundo_3d.astronauta_2 and not mundo_3d.astronauta_2.visible:
 			mundo_3d.astronauta_2.visible = true
-			mundo_3d.astronauta_2.configurar_inicio(hito.get("pos_astronauta_2", Vector2i(0, 2)), 0)
+			mundo_3d.astronauta_2.configurar_inicio(hito.get("pos_astronauta_2", Vector2i(1, 0)), 0)
 		if (cant_astros >= 3 or 3 in astronautas_desbloqueados) and mundo_3d.astronauta_3 and not mundo_3d.astronauta_3.visible:
 			mundo_3d.astronauta_3.visible = true
-			mundo_3d.astronauta_3.configurar_inicio(hito.get("pos_astronauta_3", Vector2i(-1, 2)), 0)
+			mundo_3d.astronauta_3.configurar_inicio(hito.get("pos_astronauta_3", Vector2i(-1, 0)), 0)
 		if (cant_astros >= 4 or 4 in astronautas_desbloqueados) and mundo_3d.astronauta_4 and not mundo_3d.astronauta_4.visible:
 			mundo_3d.astronauta_4.visible = true
-			mundo_3d.astronauta_4.configurar_inicio(hito.get("pos_astronauta_4", Vector2i(1, 2)), 0)
+			mundo_3d.astronauta_4.configurar_inicio(hito.get("pos_astronauta_4", Vector2i(2, 0)), 0)
 		if (cant_astros >= 5 or 5 in astronautas_desbloqueados) and mundo_3d.astronauta_5 and not mundo_3d.astronauta_5.visible:
 			mundo_3d.astronauta_5.visible = true
-			mundo_3d.astronauta_5.configurar_inicio(hito.get("pos_astronauta_5", Vector2i(0, 2)), 0)
+			mundo_3d.astronauta_5.configurar_inicio(hito.get("pos_astronauta_5", Vector2i(-2, 0)), 0)
 
 		# Mostrar mesones de subensamblaje si el hito los requiere o si ya se compraron
 		if mundo_3d.meson_patas:
-			var debe_patas = ("MESON_PATAS" in estaciones_desbloqueadas) or (indice_hito_actual >= 2)
+			var debe_patas = ("MESON_PATAS" in estaciones_desbloqueadas) or (indice_hito_actual >= 4) or (mundo_3d.tamano_sector_actual >= 7)
 			mundo_3d.meson_patas.visible = debe_patas
 		if mundo_3d.meson_sensores:
-			var debe_sensores = ("MESON_SENSORES" in estaciones_desbloqueadas) or (indice_hito_actual >= 3)
+			var debe_sensores = ("MESON_SENSORES" in estaciones_desbloqueadas) or (indice_hito_actual >= 5) or (mundo_3d.tamano_sector_actual >= 9)
 			mundo_3d.meson_sensores.visible = debe_sensores
 
 		if hito.has("piezas") and not hito.piezas.is_empty():
@@ -325,7 +329,17 @@ func _actualizar_paleta(bloques_permitidos: Array) -> void:
 				bloque = BloqueItem.new()
 
 			bloque.configurar(id_cmd, data.tit, data.prefijo, data.color, true)
+			if not bloque.solicitado_anadir.is_connected(_on_bloque_paleta_anadido):
+				bloque.solicitado_anadir.connect(_on_bloque_paleta_anadido)
 			paleta_contenedor.add_child(bloque)
+
+func _on_bloque_paleta_anadido(item_paleta: BloqueItem) -> void:
+	var idx = tabs_codigo.current_tab
+	var lienzos = [lienzo, lienzo_a2, lienzo_a3, lienzo_a4, lienzo_a5]
+	if idx >= 0 and idx < lienzos.size():
+		var l: LienzoCodigo = lienzos[idx]
+		l.agregar_comando(item_paleta.id_comando, item_paleta.parametro_valor)
+		_actualizar_estado("Bloque '%s' añadido al Astronauta %d." % [item_paleta.titulo, idx + 1])
 
 func _conectar_senales() -> void:
 	btn_ejecutar.pressed.connect(_on_ejecutar_pressed)
@@ -352,22 +366,20 @@ func _conectar_senales() -> void:
 			btn_toggle_ada.text = "SISTEMA A.D.A. ▲" if card_ada.visible else "SISTEMA A.D.A. ▼"
 		)
 
+	if btn_cerrar_paleta:
+		btn_cerrar_paleta.pressed.connect(func(): _plegar_paleta(true))
+	if btn_abrir_paleta_flotante:
+		btn_abrir_paleta_flotante.pressed.connect(func(): _plegar_paleta(false))
 	if btn_toggle_paleta:
 		btn_toggle_paleta.pressed.connect(func():
 			if is_instance_valid(drawer_paleta):
-				drawer_paleta.visible = not drawer_paleta.visible
-		)
-	if btn_cerrar_paleta:
-		btn_cerrar_paleta.pressed.connect(func():
-			if is_instance_valid(drawer_paleta):
-				drawer_paleta.visible = false
+				_plegar_paleta(drawer_paleta.visible)
 		)
 
 	if btn_minimizar_consola:
-		btn_minimizar_consola.pressed.connect(func():
-			tabs_codigo.visible = not tabs_codigo.visible
-			btn_minimizar_consola.text = "+" if not tabs_codigo.visible else "-"
-		)
+		btn_minimizar_consola.pressed.connect(func(): _plegar_consola(true))
+	if btn_abrir_consola_flotante:
+		btn_abrir_consola_flotante.pressed.connect(func(): _plegar_consola(false))
 
 	btn_nivel_prev.pressed.connect(func(): cambiar_hito(indice_hito_actual - 1))
 	btn_nivel_next.pressed.connect(func(): cambiar_hito(indice_hito_actual + 1))
@@ -382,6 +394,12 @@ func _conectar_senales() -> void:
 	tabs_codigo.tab_changed.connect(_on_tab_codigo_changed)
 
 	if mundo_3d:
+		if mundo_3d.has_signal("tuerca_depositada"):
+			mundo_3d.tuerca_depositada.connect(func(_tot):
+				ganar_creditos(10, "🔩 ¡Tuerca depositada en contenedor!")
+				_verificar_hitos_sandbox()
+			)
+
 		if mundo_3d.mesa_spid:
 			mundo_3d.mesa_spid.spid_actualizado.connect(func(_e, _t, _m):
 				_actualizar_badge_spido()
@@ -424,6 +442,20 @@ func _actualizar_badge_spido() -> void:
 	if mundo_3d and mundo_3d.mesa_spid:
 		montadas = mundo_3d.mesa_spid.etapas_completadas.size()
 	label_spido_piezas.text = "🔋 %d/5" % montadas
+
+func _plegar_paleta(plegar: bool) -> void:
+	if is_instance_valid(drawer_paleta):
+		drawer_paleta.visible = not plegar
+	if is_instance_valid(btn_abrir_paleta_flotante):
+		btn_abrir_paleta_flotante.visible = plegar
+	if is_instance_valid(btn_toggle_paleta):
+		btn_toggle_paleta.text = "[▶ BLOQUES]" if plegar else "[◀ BLOQUES]"
+
+func _plegar_consola(plegar: bool) -> void:
+	if is_instance_valid(consola_astronauta):
+		consola_astronauta.visible = not plegar
+	if is_instance_valid(btn_abrir_consola_flotante):
+		btn_abrir_consola_flotante.visible = plegar
 
 func _on_btn_codice_pressed() -> void:
 	if is_instance_valid(panel_guia):
@@ -692,6 +724,12 @@ func _verificar_hitos_sandbox() -> void:
 		"TOMAR_PIEZA":
 			if mundo_3d and mundo_3d.astronauta and is_instance_valid(mundo_3d.astronauta.pieza_en_mano):
 				completado = true
+		"DEPOSITAR_TUERCA":
+			if mundo_3d and mundo_3d.tuercas_recolectadas_sesion >= 1:
+				completado = true
+		"COMPRAR_EXPANSION_5X5":
+			if mundo_3d and mundo_3d.tamano_sector_actual >= 5:
+				completado = true
 		"ENSAMBLAR":
 			if mundo_3d and mundo_3d.mesa_spid:
 				completado = (mundo_3d.mesa_spid.etapas_completadas.size() >= hito.get("piezas_requeridas", 1))
@@ -710,14 +748,14 @@ func _verificar_hitos_sandbox() -> void:
 		_celebrar_hito(hito)
 
 func _celebrar_hito(hito: Dictionary) -> void:
-	ganar_creditos(hito.get("recompensa_creditos", 50), "¡Hito superado: %s!" % hito.titulo)
+	ganar_creditos(hito.get("recompensa_creditos", 20), "¡Hito superado: %s!" % hito.titulo)
 
 	if is_instance_valid(label_estado_fase):
 		label_estado_fase.text = "COMPLETADO ✔"
 		label_estado_fase.modulate = Color(0.4, 0.95, 0.6)
 
 	if is_instance_valid(label_victoria_detalle):
-		label_victoria_detalle.text = "%s\n\nRecompensa: +%d Bits de Mejoras." % [hito.get("mensaje_ada", "¡Excelente!"), hito.get("recompensa_creditos", 50)]
+		label_victoria_detalle.text = "%s\n\nRecompensa: +%d Tuercas para Mejoras." % [hito.get("mensaje_ada", "¡Excelente!"), hito.get("recompensa_creditos", 20)]
 	panel_victoria.visible = true
 
 func _on_modal_siguiente_pressed() -> void:
@@ -745,7 +783,7 @@ func _on_accion_fallida(motivo: String) -> void:
 	_actualizar_estado("[ALERTA] %s" % motivo)
 
 func _on_pieza_recogida(tipo: String) -> void:
-	ganar_creditos(10, "Pieza %s asegurada" % tipo)
+	_actualizar_estado("Pieza %s asegurada en manos del astronauta." % tipo)
 
 func _on_pieza_ensamblada(tipo: String) -> void:
 	ganar_creditos(30, "¡%s acoplada en Spido!" % tipo)
@@ -755,13 +793,13 @@ func ganar_creditos(cantidad: int, motivo: String = "") -> void:
 	creditos += cantidad
 	actualizar_creditos_ui()
 	if not motivo.is_empty():
-		_actualizar_estado("%s (+%d Bits)" % [motivo, cantidad])
+		_actualizar_estado("%s (+%d Tuercas)" % [motivo, cantidad])
 
 func actualizar_creditos_ui() -> void:
 	if is_instance_valid(label_creditos):
-		label_creditos.text = "⚙️ %d Bits" % creditos
+		label_creditos.text = "🔩 %d Tuercas" % creditos
 	if is_instance_valid(label_saldo_tienda):
-		label_saldo_tienda.text = "⚙️ Saldo: %d Bits" % creditos
+		label_saldo_tienda.text = "🔩 Saldo: %d Tuercas" % creditos
 
 func _abrir_tienda(abrir: bool) -> void:
 	if is_instance_valid(modal_tienda):
@@ -789,13 +827,17 @@ func _renderizar_centro_mejoras() -> void:
 		st.border_width_bottom = 2
 
 		var ya_desbloqueado = false
-		match item.cat:
-			"fase":
-				ya_desbloqueado = (item.id == "FASE_0" or indice_hito_actual >= 1)
-			"astronauta":
-				ya_desbloqueado = (item.id in astronautas_desbloqueados)
-			"estacion":
-				ya_desbloqueado = (item.id in estaciones_desbloqueadas)
+		match item.id:
+			"FASE_0":
+				ya_desbloqueado = true
+			"FASE_1":
+				ya_desbloqueado = (mundo_3d and mundo_3d.tamano_sector_actual >= 5)
+			"FASE_2":
+				ya_desbloqueado = (mundo_3d and mundo_3d.tamano_sector_actual >= 7)
+			"FASE_3":
+				ya_desbloqueado = (mundo_3d and mundo_3d.tamano_sector_actual >= 9)
+			"FASE_4":
+				ya_desbloqueado = (mundo_3d and mundo_3d.tamano_sector_actual >= 13)
 
 		if ya_desbloqueado:
 			st.border_color = Color(0.35, 0.85, 0.55, 0.9)
@@ -831,11 +873,11 @@ func _renderizar_centro_mejoras() -> void:
 			btn_accion.disabled = true
 			btn_accion.modulate = Color(0.5, 0.85, 0.5)
 		elif creditos >= item.costo:
-			btn_accion.text = "ADQUIRIR (⚙️ %d Bits)" % item.costo
+			btn_accion.text = "ADQUIRIR (🔩 %d Tuercas)" % item.costo
 			btn_accion.modulate = Color(0.35, 0.95, 0.65)
 			btn_accion.pressed.connect(func(): _comprar_mejora_arbol(item))
 		else:
-			btn_accion.text = "REQUIERE: %d Bits" % item.costo
+			btn_accion.text = "REQUIERE: %d Tuercas" % item.costo
 			btn_accion.disabled = true
 			btn_accion.modulate = Color(0.7, 0.75, 0.8)
 
@@ -848,27 +890,56 @@ func _comprar_mejora_arbol(item: Dictionary) -> void:
 	creditos -= item.costo
 	actualizar_creditos_ui()
 
-	match item.cat:
-		"astronauta":
-			var id_astro = item.id
-			astronautas_desbloqueados.append(id_astro)
-			var idx_tab = id_astro - 1
-			tabs_codigo.set_tab_hidden(idx_tab, false)
-			if mundo_3d:
-				var astros = [mundo_3d.astronauta, mundo_3d.astronauta_2, mundo_3d.astronauta_3, mundo_3d.astronauta_4, mundo_3d.astronauta_5]
-				if idx_tab < astros.size() and is_instance_valid(astros[idx_tab]):
-					astros[idx_tab].visible = true
-			_actualizar_estado("🚀 ¡Mejora activada: %s!" % item.fase)
-		"estacion":
-			estaciones_desbloqueadas.append(item.id)
-			if item.id == "MESON_PATAS" and mundo_3d and mundo_3d.meson_patas:
-				mundo_3d.meson_patas.visible = true
-			elif item.id == "MESON_SENSORES" and mundo_3d and mundo_3d.meson_sensores:
-				mundo_3d.meson_sensores.visible = true
-			_actualizar_estado("🏭 ¡Mejora de estación activada: %s!" % item.fase)
-		"fase":
-			_actualizar_estado("⭐ ¡Sector desbloqueado: %s!" % item.fase)
+	var nuevo_tam = item.get("tamano", 3)
+	if mundo_3d:
+		mundo_3d.actualizar_sector(nuevo_tam)
 
+	match item.id:
+		"FASE_1":
+			if mundo_3d and mundo_3d.mesa_spid:
+				mundo_3d.mesa_spid.visible = true
+			_actualizar_estado("🚀 ¡Hangar expandido a 5x5! Mesa de Spido habilitada.")
+		"FASE_2":
+			if not 2 in astronautas_desbloqueados:
+				astronautas_desbloqueados.append(2)
+			if not "MESON_PATAS" in estaciones_desbloqueadas:
+				estaciones_desbloqueadas.append("MESON_PATAS")
+			tabs_codigo.set_tab_hidden(1, false)
+			if mundo_3d:
+				if mundo_3d.astronauta_2:
+					mundo_3d.astronauta_2.visible = true
+					mundo_3d.astronauta_2.configurar_inicio(Vector2i(1, 0), 0)
+				if mundo_3d.meson_patas:
+					mundo_3d.meson_patas.visible = true
+			_actualizar_estado("🚀 ¡Sector 7x7! Astronauta 2 y Mesón de Patas activados.")
+		"FASE_3":
+			if not 3 in astronautas_desbloqueados:
+				astronautas_desbloqueados.append(3)
+			if not "MESON_SENSORES" in estaciones_desbloqueadas:
+				estaciones_desbloqueadas.append("MESON_SENSORES")
+			tabs_codigo.set_tab_hidden(2, false)
+			if mundo_3d:
+				if mundo_3d.astronauta_3:
+					mundo_3d.astronauta_3.visible = true
+					mundo_3d.astronauta_3.configurar_inicio(Vector2i(-1, 0), 0)
+				if mundo_3d.meson_sensores:
+					mundo_3d.meson_sensores.visible = true
+			_actualizar_estado("🚀 ¡Sector 9x9! Astronauta 3 y Mesón de Sensores activados.")
+		"FASE_4":
+			for a_id in [4, 5]:
+				if not astronautas_desbloqueados.has(a_id):
+					astronautas_desbloqueados.append(a_id)
+				tabs_codigo.set_tab_hidden(a_id - 1, false)
+			if mundo_3d:
+				if mundo_3d.astronauta_4:
+					mundo_3d.astronauta_4.visible = true
+					mundo_3d.astronauta_4.configurar_inicio(Vector2i(2, 0), 0)
+				if mundo_3d.astronauta_5:
+					mundo_3d.astronauta_5.visible = true
+					mundo_3d.astronauta_5.configurar_inicio(Vector2i(-2, 0), 0)
+			_actualizar_estado("🌟 ¡Protocolo Maestro! Hangar 13x13 simétrico abierto al completo.")
+
+	_verificar_hitos_sandbox()
 	_renderizar_centro_mejoras()
 
 func _limpiar_resaltados(secuencia: Array) -> void:

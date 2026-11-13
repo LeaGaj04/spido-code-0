@@ -3,6 +3,7 @@ extends PanelContainer
 
 signal solicitado_eliminar(bloque: BloqueItem)
 signal parametro_cambiado(bloque: BloqueItem, nuevo_valor: int)
+signal solicitado_anadir(bloque: BloqueItem)
 
 @export var id_comando: String = "AVANZAR"
 @export var titulo: String = "Avanzar"
@@ -153,6 +154,10 @@ func _get_drag_data(_at_position: Vector2) -> Variant:
 		"nodo_origen": self,
 		"es_de_paleta": es_de_paleta
 	}
+
+func _gui_input(event: InputEvent) -> void:
+	if es_de_paleta and event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.double_click:
+		solicitado_anadir.emit(self)
 
 func _on_btn_eliminar_pressed() -> void:
 	solicitado_eliminar.emit(self)
