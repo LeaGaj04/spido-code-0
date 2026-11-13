@@ -83,47 +83,87 @@ func _construir_tablero_ajedrez() -> void:
 	contenedor_tablero.name = "ContenedorTablero"
 	add_child(contenedor_tablero)
 
-	var mat_oscuro = StandardMaterial3D.new()
-	mat_oscuro.albedo_color = Color(0.65, 0.70, 0.77) # Gris tecnológico suave
-	mat_oscuro.metallic = 0.2
-	mat_oscuro.roughness = 0.55
+	# 1. Base / Marco perimetral del tablero 12x12
+	# Rango: gx de -6 a 5 (12 casillas), gz de -6 a 5 (12 casillas)
+	# Ancho total: 12 * 2.0 = 24.0. Centro: X = -1.0, Z = -1.0
+	var mat_marco = StandardMaterial3D.new()
+	mat_marco.albedo_color = Color(0.20, 0.24, 0.30)
+	mat_marco.metallic = 0.5
+	mat_marco.roughness = 0.4
 
+	var marco_base = MeshInstance3D.new()
+	var m_marco = BoxMesh.new()
+	m_marco.size = Vector3(24.5, 0.12, 24.5)
+	marco_base.mesh = m_marco
+	marco_base.material_override = mat_marco
+	marco_base.position = Vector3(-1.0, -0.07, -1.0)
+	contenedor_tablero.add_child(marco_base)
+
+	# 2. Las 2 placas de ajedrez (blanca/gris clara y gris más oscura)
 	var mat_claro = StandardMaterial3D.new()
-	mat_claro.albedo_color = Color(0.92, 0.94, 0.97) # Blanco puro limpio
+	mat_claro.albedo_color = Color(0.93, 0.95, 0.98) # Placa blanca/gris clara limpia
 	mat_claro.metallic = 0.15
-	mat_claro.roughness = 0.45
+	mat_claro.roughness = 0.4
+
+	var mat_oscuro = StandardMaterial3D.new()
+	mat_oscuro.albedo_color = Color(0.55, 0.60, 0.68) # Placa gris intermedia contrastada
+	mat_oscuro.metallic = 0.2
+	mat_oscuro.roughness = 0.5
 
 	var box_mesh = BoxMesh.new()
-	box_mesh.size = Vector3(1.92, 0.08, 1.92)
+	box_mesh.size = Vector3(1.98, 0.08, 1.98)
 
-	# Grid de casillas tipo ajedrez de -5 a 5 en X y -4 a 4 en Z
-	for gx in range(-5, 6):
-		for gz in range(-4, 5):
+	# Generación exacta de 12x12 = 144 casillas
+	for gx in range(-6, 6):
+		for gz in range(-6, 6):
 			var tile = MeshInstance3D.new()
 			tile.mesh = box_mesh
 			var es_par = ((gx + gz) % 2 == 0)
-			tile.material_override = mat_oscuro if es_par else mat_claro
-			tile.position = Vector3(gx * 2.0, -0.04, gz * 2.0)
+			tile.material_override = mat_claro if es_par else mat_oscuro
+			# Centro exacto de la casilla en la cuadrícula
+			tile.position = Vector3(gx * 2.0, -0.01, gz * 2.0)
 			contenedor_tablero.add_child(tile)
 
-	# Borde perimetral metálico iluminado
+	# 3. Rieles de acento neón en los 4 bordes del tablero 12x12
 	var mat_borde = StandardMaterial3D.new()
-	mat_borde.albedo_color = Color(0.80, 0.84, 0.90)
+	mat_borde.albedo_color = Color(0.85, 0.90, 0.95)
 	mat_borde.emission_enabled = true
 	mat_borde.emission = Color(0.3, 0.95, 0.65)
-	mat_borde.emission_energy_multiplier = 0.6
+	mat_borde.emission_energy_multiplier = 0.8
 
+	var m_rail_h = BoxMesh.new()
+	m_rail_h.size = Vector3(24.5, 0.08, 0.1)
+
+	var m_rail_v = BoxMesh.new()
+	m_rail_v.size = Vector3(0.1, 0.08, 24.5)
+
+	# Riel Norte (fondo Z = -13.15)
 	var rail_norte = MeshInstance3D.new()
-	var rail_mesh_h = BoxMesh.new()
-	rail_mesh_h.size = Vector3(22.0, 0.14, 0.12)
-	rail_norte.mesh = rail_mesh_h
+	rail_norte.mesh = m_rail_h
 	rail_norte.material_override = mat_borde
-	rail_norte.position = Vector3(0, 0.04, -9.0)
+	rail_norte.position = Vector3(-1.0, 0.03, -13.15)
 	contenedor_tablero.add_child(rail_norte)
 
-	var rail_sur = rail_norte.duplicate()
-	rail_sur.position = Vector3(0, 0.04, 9.0)
+	# Riel Sur (frente Z = +11.15)
+	var rail_sur = MeshInstance3D.new()
+	rail_sur.mesh = m_rail_h
+	rail_sur.material_override = mat_borde
+	rail_sur.position = Vector3(-1.0, 0.03, 11.15)
 	contenedor_tablero.add_child(rail_sur)
+
+	# Riel Oeste (izquierda X = -13.15)
+	var rail_oeste = MeshInstance3D.new()
+	rail_oeste.mesh = m_rail_v
+	rail_oeste.material_override = mat_borde
+	rail_oeste.position = Vector3(-13.15, 0.03, -1.0)
+	contenedor_tablero.add_child(rail_oeste)
+
+	# Riel Este (derecha X = +11.15)
+	var rail_este = MeshInstance3D.new()
+	rail_este.mesh = m_rail_v
+	rail_este.material_override = mat_borde
+	rail_este.position = Vector3(11.15, 0.03, -1.0)
+	contenedor_tablero.add_child(rail_este)
 
 func _construir_decoracion_nave() -> void:
 	if is_instance_valid(contenedor_decoracion):
@@ -133,9 +173,9 @@ func _construir_decoracion_nave() -> void:
 	contenedor_decoracion.name = "ContenedorDecoracion"
 	add_child(contenedor_decoracion)
 
-	# 1. Servidor Principal / Mainframe Central al fondo (Vector3(0, 0, -8.0))
+	# 1. Servidor Principal / Mainframe Central al fondo (Vector3(-1.0, 0, -13.5))
 	var nodo_mainframe = Node3D.new()
-	nodo_mainframe.position = Vector3(0, 0, -7.8)
+	nodo_mainframe.position = Vector3(-1.0, 0, -13.5)
 	contenedor_decoracion.add_child(nodo_mainframe)
 
 	var mat_gabinete = StandardMaterial3D.new()
@@ -206,7 +246,7 @@ func _construir_decoracion_nave() -> void:
 		antena.position = Vector3(ax, 3.8, 0)
 		nodo_mainframe.add_child(antena)
 
-	# 2. Cajas de Carga Sci-Fi (Naranjas con franjas LED verdes)
+	# 2. Cajas de Carga Sci-Fi (Naranjas con franjas LED verdes) en los laterales
 	var mat_caja = StandardMaterial3D.new()
 	mat_caja.albedo_color = Color(0.82, 0.42, 0.14)
 	mat_caja.metallic = 0.6
@@ -219,11 +259,11 @@ func _construir_decoracion_nave() -> void:
 	mat_franja.emission_energy_multiplier = 1.4
 
 	var cajas_datos = [
-		{"pos": Vector3(-6.2, 0.5, -3.0), "tam": Vector3(1.0, 1.0, 1.0)},
-		{"pos": Vector3(-5.3, 0.4, -3.7), "tam": Vector3(0.8, 0.8, 0.8)},
-		{"pos": Vector3(-6.1, 1.35, -3.1), "tam": Vector3(0.7, 0.7, 0.7)},
-		{"pos": Vector3(6.2, 0.5, -3.0), "tam": Vector3(1.0, 1.0, 1.0)},
-		{"pos": Vector3(5.4, 0.45, -3.7), "tam": Vector3(0.9, 0.9, 0.9)}
+		{"pos": Vector3(-12.0, 0.5, -4.0), "tam": Vector3(1.0, 1.0, 1.0)},
+		{"pos": Vector3(-11.0, 0.4, -4.7), "tam": Vector3(0.8, 0.8, 0.8)},
+		{"pos": Vector3(-11.8, 1.35, -4.1), "tam": Vector3(0.7, 0.7, 0.7)},
+		{"pos": Vector3(10.0, 0.5, -4.0), "tam": Vector3(1.0, 1.0, 1.0)},
+		{"pos": Vector3(9.2, 0.45, -4.7), "tam": Vector3(0.9, 0.9, 0.9)}
 	]
 
 	for c in cajas_datos:
@@ -243,9 +283,9 @@ func _construir_decoracion_nave() -> void:
 		franja.position = c.pos
 		contenedor_decoracion.add_child(franja)
 
-	# 3. Cristales de Energía en las esquinas
-	_crear_cluster_cristal(Vector3(-6.8, 0, -6.5), Color(0.95, 0.25, 0.75)) # Magenta
-	_crear_cluster_cristal(Vector3(6.8, 0, -6.5), Color(0.2, 0.85, 0.95))   # Cyan
+	# 3. Cristales de Energía en las esquinas traseras del tablero
+	_crear_cluster_cristal(Vector3(-12.8, 0, -12.8), Color(0.95, 0.25, 0.75)) # Magenta
+	_crear_cluster_cristal(Vector3(10.8, 0, -12.8), Color(0.2, 0.85, 0.95))   # Cyan
 
 func _crear_cluster_cristal(pos_base: Vector3, col_energia: Color) -> void:
 	var base_pedestal = MeshInstance3D.new()
@@ -309,30 +349,30 @@ func _crear_cursor_seleccion() -> void:
 	cursor_seleccion.name = "CursorSeleccion"
 	add_child(cursor_seleccion)
 
-	# Casilla activa verde brillante
+	# Casilla activa verde brillante centrada en la placa
 	var suelo_cursor = MeshInstance3D.new()
 	var m_cursor = BoxMesh.new()
-	m_cursor.size = Vector3(1.88, 0.02, 1.88)
+	m_cursor.size = Vector3(1.92, 0.02, 1.92)
 	suelo_cursor.mesh = m_cursor
 
 	var mat_cursor = StandardMaterial3D.new()
-	mat_cursor.albedo_color = Color(0.2, 0.85, 0.5, 0.35)
+	mat_cursor.albedo_color = Color(0.2, 0.85, 0.5, 0.45)
 	mat_cursor.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 	mat_cursor.emission_enabled = true
 	mat_cursor.emission = Color(0.3, 0.95, 0.55)
-	mat_cursor.emission_energy_multiplier = 1.2
+	mat_cursor.emission_energy_multiplier = 1.3
 	suelo_cursor.material_override = mat_cursor
-	suelo_cursor.position = Vector3(0, 0.02, 0)
+	suelo_cursor.position = Vector3(0, 0.04, 0)
 	cursor_seleccion.add_child(suelo_cursor)
 
-	# Flecha apuntando hacia adelante
+	# Flecha apuntando hacia adelante en el centro de la casilla
 	var flecha = MeshInstance3D.new()
 	var m_fl = PrismMesh.new()
-	m_fl.size = Vector3(0.45, 0.45, 0.04)
+	m_fl.size = Vector3(0.5, 0.5, 0.04)
 	flecha.mesh = m_fl
 	flecha.material_override = mat_cursor
 	flecha.rotation.x = -PI * 0.5
-	flecha.position = Vector3(0, 0.03, -0.45)
+	flecha.position = Vector3(0, 0.05, -0.45)
 	cursor_seleccion.add_child(flecha)
 
 func _actualizar_cursor_seguimiento(delta: float) -> void:
