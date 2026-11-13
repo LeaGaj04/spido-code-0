@@ -216,6 +216,23 @@ layout_mode = 2
 theme_type_variation = &"SecondaryButton"
 text = ">"
 
+[node name="SeparadorTienda" type="VSeparator" parent="HSplit/PanelCentral/BarraNivel/HBox"]
+layout_mode = 2
+
+[node name="LabelCreditos" type="Label" parent="HSplit/PanelCentral/BarraNivel/HBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(1.0, 0.85, 0.3, 1)
+theme_override_font_sizes/font_size = 15
+text = "⚙️ 100 Bits"
+vertical_alignment = 1
+
+[node name="BtnTienda" type="Button" parent="HSplit/PanelCentral/BarraNivel/HBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_type_variation = &"SecondaryButton"
+text = "🛒 Mercado"
+
 [node name="CajaADA" type="VBoxContainer" parent="HSplit/PanelCentral"]
 layout_mode = 2
 theme_override_constants/separation = 4
@@ -551,3 +568,82 @@ unique_name_in_owner = true
 layout_mode = 2
 theme_type_variation = &"SecondaryButton"
 text = "Volver al menú principal"
+
+[node name="ModalTienda" type="PanelContainer" parent="."]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -330.0
+offset_top = -250.0
+offset_right = 330.0
+offset_bottom = 250.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_Modal")
+
+[node name="VBox" type="VBoxContainer" parent="ModalTienda"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="Titulo" type="Label" parent="ModalTienda/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1.0, 0.85, 0.3, 1)
+theme_override_font_sizes/font_size = 22
+text = "🛒 MERCADO DE ALGORITMIA & MEJORAS"
+horizontal_alignment = 1
+
+[node name="LabelSaldoTienda" type="Label" parent="ModalTienda/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.35, 0.95, 0.65, 1)
+theme_override_font_sizes/font_size = 15
+text = "Créditos disponibles: ⚙️ 100 Bits"
+horizontal_alignment = 1
+
+[node name="Separador" type="HSeparator" parent="ModalTienda/VBox"]
+layout_mode = 2
+
+[node name="TabsTienda" type="TabContainer" parent="ModalTienda/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="Bloques" type="ScrollContainer" parent="ModalTienda/VBox/TabsTienda"]
+layout_mode = 2
+
+[node name="ListaBloquesTienda" type="VBoxContainer" parent="ModalTienda/VBox/TabsTienda/Bloques"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 8
+
+[node name="Personal" type="ScrollContainer" parent="ModalTienda/VBox/TabsTienda"]
+visible = false
+layout_mode = 2
+
+[node name="ListaAstronautasTienda" type="VBoxContainer" parent="ModalTienda/VBox/TabsTienda/Personal"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 8
+
+[node name="Estaciones" type="ScrollContainer" parent="ModalTienda/VBox/TabsTienda"]
+visible = false
+layout_mode = 2
+
+[node name="ListaEstacionesTienda" type="VBoxContainer" parent="ModalTienda/VBox/TabsTienda/Estaciones"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 8
+
+[node name="BtnCerrarTienda" type="Button" parent="ModalTienda/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_type_variation = &"SecondaryButton"
+text = "Cerrar Mercado"

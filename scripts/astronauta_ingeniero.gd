@@ -223,6 +223,9 @@ func tomar_pieza_cercana() -> bool:
 	if mundo and mundo.has_method("obtener_pieza_en"):
 		pieza = mundo.obtener_pieza_en(celda_objetivo)
 
+	if not pieza and mundo and mundo.has_method("obtener_producto_de_meson"):
+		pieza = mundo.obtener_producto_de_meson(celda_objetivo)
+
 	if pieza:
 		pieza_en_mano = pieza
 		var tween = create_tween()
@@ -273,9 +276,32 @@ func ensamblar_en_mesa() -> bool:
 			await _animar_duda()
 			return false
 	else:
-		accion_fallida.emit("No estas frente a la mesa de ensamblaje de Spid.")
-		await _animar_duda()
-		return false
+		var meson = null
+		if mundo and mundo.has_method("obtener_meson_en"):
+			meson = mundo.obtener_meson_en(celda_objetivo)
+
+		if meson:
+			var tipo_pieza = pieza_en_mano.get("tipo_pieza") if "tipo_pieza" in pieza_en_mano else "COMPONENTE"
+			var exito = meson.recibir_insumo(tipo_pieza)
+			if exito:
+				pieza_en_mano.queue_free()
+				pieza_en_mano = null
+				_set_color_visor(Color(0.2, 0.85, 1.0))
+				var tween = create_tween()
+				tween.tween_property(self, "position:y", position.y + 0.1, 0.1)
+				tween.tween_property(self, "position:y", position.y, 0.1)
+				await tween.finished
+				pieza_ensamblada.emit(tipo_pieza)
+				animacion_terminada.emit()
+				return true
+			else:
+				accion_fallida.emit("El mesón no requiere este insumo o su bandeja de salida está llena.")
+				await _animar_duda()
+				return false
+		else:
+			accion_fallida.emit("No estás frente a ninguna estación de trabajo.")
+			await _animar_duda()
+			return false
 
 func ejecutar_diagnostico() -> bool:
 	var dir = _obtener_vector_orientacion(orientacion_actual)

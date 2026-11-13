@@ -38,6 +38,39 @@ extends Control
 @onready var btn_duplicar: Button = %BtnDuplicar
 @onready var btn_velocidad: Button = %BtnVelocidad
 
+# Mercado / Tienda de Algoritmia
+@onready var label_creditos: Label = %LabelCreditos
+@onready var btn_tienda: Button = %BtnTienda
+@onready var modal_tienda: PanelContainer = %ModalTienda
+@onready var label_saldo_tienda: Label = %LabelSaldoTienda
+@onready var btn_cerrar_tienda: Button = %BtnCerrarTienda
+@onready var lista_bloques: VBoxContainer = %ListaBloquesTienda
+@onready var lista_astronautas: VBoxContainer = %ListaAstronautasTienda
+@onready var lista_estaciones: VBoxContainer = %ListaEstacionesTienda
+
+var creditos: int = 150
+var bloques_adquiridos: Array[String] = ["AVANZAR", "GIRAR_IZQ", "GIRAR_DER", "TOMAR_PIEZA", "ENSAMBLAR"]
+var astronautas_desbloqueados: Array[int] = [1]
+var estaciones_desbloqueadas: Array[String] = []
+
+const CATALOGO_TIENDA = {
+	"bloques": [
+		{"id": "AVANZAR_2", "nombre": "Avanzar 2 Pasos (Turbo)", "desc": "Mueve al astronauta 2 casillas rápidamente.", "precio": 60},
+		{"id": "AVANZAR_3", "nombre": "Avanzar 3 Pasos (Sprint)", "desc": "Cubre distancias largas de extremo a extremo.", "precio": 100},
+		{"id": "DIAGNOSTICO", "nombre": "Diagnóstico de Sistemas", "desc": "Comando para calibrar y despertar a Spido.", "precio": 120}
+	],
+	"astronautas": [
+		{"id": 2, "nombre": "Astronauta 2 (Tracción - Azul)", "desc": "Segundo operario para transportar o ensamblar.", "precio": 100},
+		{"id": 3, "nombre": "Astronauta 3 (Sensores - Amarillo)", "desc": "Técnico especializado en óptica y cableado.", "precio": 200},
+		{"id": 4, "nombre": "Astronauta 4 (Brazos - Naranja)", "desc": "Operador para montaje de pinzas mecánicas.", "precio": 350},
+		{"id": 5, "nombre": "Astronauta 5 (Energía - Magenta)", "desc": "Ingeniero en jefe para energizar el núcleo.", "precio": 500}
+	],
+	"estaciones": [
+		{"id": "MESON_PATAS", "nombre": "Mesón de Patas & Tracción", "desc": "Transforma tornillos en ruedas y patas mecánicas.", "precio": 120},
+		{"id": "MESON_SENSORES", "nombre": "Mesón de Sensores Ópticos", "desc": "Transforma microchips en procesadores oculares.", "precio": 180}
+	]
+}
+
 # Popup / Modal de Victoria
 @onready var panel_victoria: PanelContainer = %ModalVictoria
 @onready var label_estrellas: Label = %LabelEstrellas
@@ -106,7 +139,10 @@ func _ready() -> void:
 	panel_victoria.visible = false
 	fondo_menu_pausa.visible = false
 	menu_pausa.visible = false
+	if is_instance_valid(modal_tienda):
+		modal_tienda.visible = false
 	btn_duplicar.text = "Bucle: OFF"
+	actualizar_creditos_ui()
 	_aplicar_hito_actual()
 
 func _input(event: InputEvent) -> void:
@@ -139,13 +175,14 @@ func _aplicar_hito_actual() -> void:
 		tw_tit.tween_property(label_nivel_titulo, "modulate", Color(0.35, 1.0, 0.65), 0.2)
 		tw_tit.tween_property(label_nivel_titulo, "modulate", Color(0.95, 0.96, 0.95), 0.4)
 
-	# Actualizar paleta con los bloques disponibles en esta fase
-	_actualizar_paleta(hito.bloques_desbloqueados)
+	# Actualizar paleta con los bloques disponibles en esta fase y los comprados en la tienda
+	_actualizar_paleta(_obtener_bloques_disponibles_actuales())
 
 	# Visibilidad de pestañas segun la cantidad de astronautas
 	var cant_astros = hito.get("cantidad_astronautas", 1)
 	for i in range(1, 10):
-		tabs_codigo.set_tab_hidden(i, i >= cant_astros)
+		var desbloqueado_por_tienda = astronautas_desbloqueados.has(i + 1)
+		tabs_codigo.set_tab_hidden(i, i >= cant_astros and not desbloqueado_por_tienda)
 
 	# Configurar mundo 3D sin resetear las posiciones ni el robot Spido
 	if mundo_3d:
@@ -157,19 +194,27 @@ func _aplicar_hito_actual() -> void:
 			if mostrar_b:
 				mundo_3d.baliza_meta.posicionar_en_celda(hito.get("pos_baliza", Vector2i(0, -1)))
 
-		# Activacion progresiva de nuevos astronautas
-		if cant_astros >= 2 and mundo_3d.astronauta_2 and not mundo_3d.astronauta_2.visible:
+		# Activacion progresiva de nuevos astronautas (o los comprados en tienda)
+		if (cant_astros >= 2 or 2 in astronautas_desbloqueados) and mundo_3d.astronauta_2 and not mundo_3d.astronauta_2.visible:
 			mundo_3d.astronauta_2.visible = true
 			mundo_3d.astronauta_2.configurar_inicio(hito.get("pos_astronauta_2", Vector2i(0, 2)), 0)
-		if cant_astros >= 3 and mundo_3d.astronauta_3 and not mundo_3d.astronauta_3.visible:
+		if (cant_astros >= 3 or 3 in astronautas_desbloqueados) and mundo_3d.astronauta_3 and not mundo_3d.astronauta_3.visible:
 			mundo_3d.astronauta_3.visible = true
 			mundo_3d.astronauta_3.configurar_inicio(hito.get("pos_astronauta_3", Vector2i(-1, 2)), 0)
-		if cant_astros >= 4 and mundo_3d.astronauta_4 and not mundo_3d.astronauta_4.visible:
+		if (cant_astros >= 4 or 4 in astronautas_desbloqueados) and mundo_3d.astronauta_4 and not mundo_3d.astronauta_4.visible:
 			mundo_3d.astronauta_4.visible = true
 			mundo_3d.astronauta_4.configurar_inicio(hito.get("pos_astronauta_4", Vector2i(1, 2)), 0)
-		if cant_astros >= 5 and mundo_3d.astronauta_5 and not mundo_3d.astronauta_5.visible:
+		if (cant_astros >= 5 or 5 in astronautas_desbloqueados) and mundo_3d.astronauta_5 and not mundo_3d.astronauta_5.visible:
 			mundo_3d.astronauta_5.visible = true
 			mundo_3d.astronauta_5.configurar_inicio(hito.get("pos_astronauta_5", Vector2i(0, 2)), 0)
+
+		# Mostrar mesones de subensamblaje si el hito los requiere o si ya se compraron
+		if mundo_3d.meson_patas:
+			var debe_patas = ("MESON_PATAS" in estaciones_desbloqueadas) or (indice_hito_actual >= 2)
+			mundo_3d.meson_patas.visible = debe_patas
+		if mundo_3d.meson_sensores:
+			var debe_sensores = ("MESON_SENSORES" in estaciones_desbloqueadas) or (indice_hito_actual >= 3)
+			mundo_3d.meson_sensores.visible = debe_sensores
 
 		# Piezas del hito en las bahias (sin borrar las ya montadas)
 		if hito.has("piezas") and not hito.piezas.is_empty():
@@ -215,6 +260,10 @@ func _conectar_senales() -> void:
 	btn_duplicar.pressed.connect(_on_duplicar_pressed)
 	if btn_velocidad:
 		btn_velocidad.pressed.connect(_on_velocidad_pressed)
+	if btn_tienda:
+		btn_tienda.pressed.connect(func(): _abrir_tienda(true))
+	if btn_cerrar_tienda:
+		btn_cerrar_tienda.pressed.connect(func(): _abrir_tienda(false))
 
 	btn_nivel_prev.pressed.connect(func(): cambiar_hito(indice_hito_actual - 1))
 	btn_nivel_next.pressed.connect(func(): cambiar_hito(indice_hito_actual + 1))
@@ -233,6 +282,13 @@ func _conectar_senales() -> void:
 			mundo_3d.mesa_spid.spid_actualizado.connect(func(_e, _t, _m): _verificar_hitos_sandbox())
 			mundo_3d.mesa_spid.spid_completado.connect(func(): _verificar_hitos_sandbox())
 			mundo_3d.mesa_spid.diagnostico_realizado.connect(func(): _verificar_hitos_sandbox())
+
+		if mundo_3d.meson_patas:
+			mundo_3d.meson_patas.insumo_recibido.connect(func(_t, act, req): ganar_creditos(15, "Insumo depositado en Mesón de Patas (%d/%d)" % [act, req]))
+			mundo_3d.meson_patas.producto_fabricado.connect(func(prod): ganar_creditos(25, "¡%s fabricada en Mesón de Patas!" % prod))
+		if mundo_3d.meson_sensores:
+			mundo_3d.meson_sensores.insumo_recibido.connect(func(_t, act, req): ganar_creditos(15, "Insumo depositado en Mesón de Sensores (%d/%d)" % [act, req]))
+			mundo_3d.meson_sensores.producto_fabricado.connect(func(prod): ganar_creditos(25, "¡%s fabricado en Mesón de Sensores!" % prod))
 
 		var todos_astros = [
 			mundo_3d.astronauta, mundo_3d.astronauta_2, mundo_3d.astronauta_3,
@@ -389,7 +445,8 @@ func _verificar_hitos_sandbox() -> void:
 
 func _completar_hito_sandbox() -> void:
 	var hito_terminado = hitos[indice_hito_actual]
-	_actualizar_estado("⭐ ¡HITO LOGRADO: %s! ⭐ Desbloqueando nuevas capacidades..." % hito_terminado.titulo)
+	ganar_creditos(60, "¡Hito Completado!")
+	_actualizar_estado("⭐ ¡HITO LOGRADO: %s! (+60 ⚙️ Bits) ⭐ Desbloqueando nuevas capacidades..." % hito_terminado.titulo)
 
 	if mundo_3d and mundo_3d.astronauta:
 		mundo_3d.astronauta.resaltar_seleccion(true)
@@ -599,4 +656,130 @@ func _on_pieza_recogida(nombre: String) -> void:
 	_actualizar_estado("[ITEM] Astronauta tomo: %s" % nombre)
 
 func _on_pieza_ensamblada(tipo: String) -> void:
-	_actualizar_estado("[OK] Pieza %s montada en Spid" % tipo)
+	ganar_creditos(30, "Pieza %s acoplada con éxito" % tipo)
+	_actualizar_estado("[OK] Pieza %s montada. (+30 ⚙️ Bits)" % tipo)
+
+func _obtener_bloques_disponibles_actuales() -> Array:
+	var lista: Array = []
+	if indice_hito_actual >= 0 and indice_hito_actual < hitos.size():
+		var hito = hitos[indice_hito_actual]
+		for b in hito.get("bloques_desbloqueados", []):
+			if b not in lista: lista.append(b)
+	for b in bloques_adquiridos:
+		if b not in lista: lista.append(b)
+	return lista
+
+func ganar_creditos(monto: int, razon: String = "") -> void:
+	creditos += monto
+	actualizar_creditos_ui()
+	if not razon.is_empty():
+		_actualizar_estado("+%d ⚙️ Bits recibidos: %s" % [monto, razon])
+
+	if is_instance_valid(label_creditos):
+		var tw = create_tween()
+		tw.tween_property(label_creditos, "modulate", Color(0.3, 1.0, 0.5), 0.15)
+		tw.tween_property(label_creditos, "modulate", Color.WHITE, 0.3)
+
+func actualizar_creditos_ui() -> void:
+	if is_instance_valid(label_creditos):
+		label_creditos.text = "⚙️ %d Bits" % creditos
+	if is_instance_valid(label_saldo_tienda):
+		label_saldo_tienda.text = "Créditos disponibles: ⚙️ %d Bits" % creditos
+
+func _abrir_tienda(abrir: bool) -> void:
+	if is_instance_valid(modal_tienda):
+		modal_tienda.visible = abrir
+		if abrir:
+			actualizar_creditos_ui()
+			_renderizar_catalogo_tienda()
+
+func _renderizar_catalogo_tienda() -> void:
+	_renderizar_categoria_tienda(lista_bloques, CATALOGO_TIENDA["bloques"], "bloques")
+	_renderizar_categoria_tienda(lista_astronautas, CATALOGO_TIENDA["astronautas"], "astronautas")
+	_renderizar_categoria_tienda(lista_estaciones, CATALOGO_TIENDA["estaciones"], "estaciones")
+
+func _renderizar_categoria_tienda(contenedor: VBoxContainer, items: Array, categoria: String) -> void:
+	if not is_instance_valid(contenedor): return
+	for child in contenedor.get_children():
+		child.queue_free()
+
+	for item in items:
+		var panel = PanelContainer.new()
+		var hbox = HBoxContainer.new()
+		hbox.add_theme_constant_override("separation", 12)
+
+		var vbox_info = VBoxContainer.new()
+		vbox_info.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+
+		var lbl_nom = Label.new()
+		lbl_nom.text = "%s (⚙️ %d Bits)" % [item.nombre, item.precio]
+		lbl_nom.add_theme_color_override("font_color", Color(0.95, 0.95, 0.95))
+		lbl_nom.add_theme_font_size_override("font_size", 14)
+
+		var lbl_desc = Label.new()
+		lbl_desc.text = item.desc
+		lbl_desc.add_theme_color_override("font_color", Color(0.65, 0.7, 0.75))
+		lbl_desc.add_theme_font_size_override("font_size", 12)
+		lbl_desc.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+
+		vbox_info.add_child(lbl_nom)
+		vbox_info.add_child(lbl_desc)
+
+		var btn_comprar = Button.new()
+		btn_comprar.custom_minimum_size = Vector2(140, 36)
+
+		var ya_adquirido = false
+		match categoria:
+			"bloques":
+				ya_adquirido = (item.id in bloques_adquiridos)
+			"astronautas":
+				ya_adquirido = (item.id in astronautas_desbloqueados)
+			"estaciones":
+				ya_adquirido = (item.id in estaciones_desbloqueadas)
+
+		if ya_adquirido:
+			btn_comprar.text = "Adquirido ✔️"
+			btn_comprar.disabled = true
+			btn_comprar.modulate = Color(0.5, 0.8, 0.5)
+		elif creditos >= item.precio:
+			btn_comprar.text = "Comprar"
+			btn_comprar.modulate = Color(0.35, 0.95, 0.65)
+			btn_comprar.pressed.connect(func(): _comprar_item(categoria, item))
+		else:
+			btn_comprar.text = "Insuficiente"
+			btn_comprar.disabled = true
+			btn_comprar.modulate = Color(0.7, 0.7, 0.7)
+
+		hbox.add_child(vbox_info)
+		hbox.add_child(btn_comprar)
+		panel.add_child(hbox)
+		contenedor.add_child(panel)
+
+func _comprar_item(categoria: String, item: Dictionary) -> void:
+	if creditos < item.precio: return
+	creditos -= item.precio
+	actualizar_creditos_ui()
+
+	match categoria:
+		"bloques":
+			bloques_adquiridos.append(item.id)
+			_actualizar_paleta(_obtener_bloques_disponibles_actuales())
+			_actualizar_estado("🎉 ¡Nuevo bloque adquirido: %s!" % item.nombre)
+		"astronautas":
+			astronautas_desbloqueados.append(item.id)
+			var idx_tab = item.id - 1
+			tabs_codigo.set_tab_hidden(idx_tab, false)
+			if mundo_3d:
+				var astros = [mundo_3d.astronauta, mundo_3d.astronauta_2, mundo_3d.astronauta_3, mundo_3d.astronauta_4, mundo_3d.astronauta_5]
+				if idx_tab < astros.size() and is_instance_valid(astros[idx_tab]):
+					astros[idx_tab].visible = true
+			_actualizar_estado("🚀 ¡Nuevo astronauta contratado: %s!" % item.nombre)
+		"estaciones":
+			estaciones_desbloqueadas.append(item.id)
+			if item.id == "MESON_PATAS" and mundo_3d and mundo_3d.meson_patas:
+				mundo_3d.meson_patas.visible = true
+			elif item.id == "MESON_SENSORES" and mundo_3d and mundo_3d.meson_sensores:
+				mundo_3d.meson_sensores.visible = true
+			_actualizar_estado("🏭 ¡Nueva estación instalada en el hangar: %s!" % item.nombre)
+
+	_renderizar_catalogo_tienda()

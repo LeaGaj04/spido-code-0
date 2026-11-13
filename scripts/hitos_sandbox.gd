@@ -32,14 +32,14 @@ static func obtener_hitos() -> Array[Dictionary]:
 		{
 			"id": 3,
 			"clave": "SUMINISTRO_RUEDAS",
-			"titulo": "3. Automatización de Ruedas (Locomoción)",
-			"descripcion": "El Chasis está montado. Ahora debes equipar las Ruedas desde la bahía este en (2, -1). ¡Usa 'Avanzar 2 Pasos (Auto)' para acelerar el viaje y experimentar la automatización!",
-			"meta_texto": "Trae y monta las Ruedas de Spido",
+			"titulo": "3. Cadena de Sub-Ensamblaje & Mercado",
+			"descripcion": "¡El Mesón de Patas está activo en (-2, 0)! Lleva tornillos desde la bahía este (3, -1) al mesón para fabricar ruedas mecánicas, y ábrete paso al 'Mercado' arriba para contratar más operarios o comprar bloques.",
+			"meta_texto": "Fabrica o monta las Ruedas de Spido",
 			"bloques_desbloqueados": ["AVANZAR", "AVANZAR_2", "GIRAR_IZQ", "GIRAR_DER", "TOMAR_PIEZA", "ENSAMBLAR"],
 			"cantidad_astronautas": 1,
 			"mostrar_baliza": false,
 			"piezas": [
-				{"tipo": "RUEDAS", "celda": Vector2i(3, -1)}
+				{"tipo": "TORNILLO", "celda": Vector2i(3, -1)}
 			],
 			"componente_objetivo": "RUEDAS"
 		},

@@ -17,11 +17,45 @@ extends Node3D
 @onready var baliza_meta: BalizaMeta = $BalizaMeta
 @onready var contenedor_piezas: Node3D = $ContenedorPiezas
 
+const MesonSubensamblajeClass = preload("res://scripts/meson_subensamblaje.gd")
+
 var piezas_por_celda: Dictionary = {}
+var mesones_por_celda: Dictionary = {}
 var config_nivel_actual: Dictionary = {}
+
+var meson_patas: Node3D = null
+var meson_sensores: Node3D = null
 
 func _ready() -> void:
 	_inicializar_roles_astronautas()
+	_inicializar_mesones()
+
+func _inicializar_mesones() -> void:
+	# Mesón de Patas & Tracción (Celda (-2, 0))
+	if not meson_patas:
+		meson_patas = MesonSubensamblajeClass.new()
+		meson_patas.name = "MesonPatas"
+		meson_patas.celda_mesa = Vector2i(-2, 0)
+		meson_patas.tipo_estacion = "PATAS"
+		meson_patas.insumo_requerido = "TORNILLO"
+		meson_patas.cantidad_requerida = 1
+		meson_patas.producto_salida = "RUEDAS"
+		add_child(meson_patas)
+		mesones_por_celda[Vector2i(-2, 0)] = meson_patas
+		meson_patas.visible = false # Se activa en nivel 3 o comprándolo en la tienda
+
+	# Mesón de Sensores & Circuitos (Celda (2, 0))
+	if not meson_sensores:
+		meson_sensores = MesonSubensamblajeClass.new()
+		meson_sensores.name = "MesonSensores"
+		meson_sensores.celda_mesa = Vector2i(2, 0)
+		meson_sensores.tipo_estacion = "SENSORES"
+		meson_sensores.insumo_requerido = "MICROCHIP"
+		meson_sensores.cantidad_requerida = 1
+		meson_sensores.producto_salida = "SENSOR"
+		add_child(meson_sensores)
+		mesones_por_celda[Vector2i(2, 0)] = meson_sensores
+		meson_sensores.visible = false
 
 func _inicializar_roles_astronautas() -> void:
 	if astronauta: astronauta.establecer_identidad("Ingeniero", Color(0.2, 0.85, 0.45))
@@ -171,7 +205,34 @@ func registrar_piezas() -> void:
 func es_celda_solida(celda: Vector2i) -> bool:
 	if mesa_spid and mesa_spid.visible and mesa_spid.celda_mesa == celda:
 		return true
+	if mesones_por_celda.has(celda):
+		var m = mesones_por_celda[celda]
+		if is_instance_valid(m) and m.visible:
+			return true
 	return false
+
+func obtener_meson_en(celda: Vector2i) -> Node3D:
+	if mesones_por_celda.has(celda):
+		var m = mesones_por_celda[celda]
+		if is_instance_valid(m) and m.visible:
+			return m
+	return null
+
+func obtener_producto_de_meson(celda: Vector2i) -> Node3D:
+	var m = obtener_meson_en(celda)
+	if m and m.tiene_producto_listo():
+		var tipo_prod = m.retirar_producto()
+		var nueva_pieza: PiezaTaller
+		if escena_pieza:
+			nueva_pieza = escena_pieza.instantiate() as PiezaTaller
+		else:
+			nueva_pieza = PiezaTaller.new()
+		nueva_pieza.tipo_pieza = tipo_prod
+		nueva_pieza.celda_inicial = celda
+		contenedor_piezas.add_child(nueva_pieza)
+		nueva_pieza.global_position = m.global_position + Vector3(0, 0.85, 0)
+		return nueva_pieza
+	return null
 
 func obtener_pieza_en(celda: Vector2i) -> Node3D:
 	if piezas_por_celda.has(celda):
