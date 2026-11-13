@@ -45,9 +45,11 @@ extends Control
 # Consola Flotante y Paleta Desplegable
 @onready var consola_astronauta: PanelContainer = %ConsolaAstronauta
 @onready var btn_minimizar_consola: Button = %BtnMinimizarConsola
+@onready var btn_abrir_consola_flotante: Button = %BtnAbrirConsolaFlotante
 @onready var btn_toggle_paleta: Button = %BtnTogglePaleta
 @onready var drawer_paleta: PanelContainer = %DrawerPaleta
 @onready var btn_cerrar_paleta: Button = %BtnCerrarPaleta
+@onready var btn_abrir_paleta_flotante: Button = %BtnAbrirPaletaFlotante
 
 # Botones de Ejecución y Consola
 @onready var btn_ejecutar: Button = %BtnEjecutar
@@ -188,8 +190,8 @@ func _ready() -> void:
 	menu_pausa.visible = false
 	if is_instance_valid(modal_tienda):
 		modal_tienda.visible = false
-	if is_instance_valid(drawer_paleta):
-		drawer_paleta.visible = true
+	_plegar_paleta(false)
+	_plegar_consola(false)
 
 	btn_duplicar.text = "Bucle: OFF"
 	actualizar_creditos_ui()
@@ -327,7 +329,17 @@ func _actualizar_paleta(bloques_permitidos: Array) -> void:
 				bloque = BloqueItem.new()
 
 			bloque.configurar(id_cmd, data.tit, data.prefijo, data.color, true)
+			if not bloque.solicitado_anadir.is_connected(_on_bloque_paleta_anadido):
+				bloque.solicitado_anadir.connect(_on_bloque_paleta_anadido)
 			paleta_contenedor.add_child(bloque)
+
+func _on_bloque_paleta_anadido(item_paleta: BloqueItem) -> void:
+	var idx = tabs_codigo.current_tab
+	var lienzos = [lienzo, lienzo_a2, lienzo_a3, lienzo_a4, lienzo_a5]
+	if idx >= 0 and idx < lienzos.size():
+		var l: LienzoCodigo = lienzos[idx]
+		l.agregar_comando(item_paleta.id_comando, item_paleta.parametro_valor)
+		_actualizar_estado("Bloque '%s' añadido al Astronauta %d." % [item_paleta.titulo, idx + 1])
 
 func _conectar_senales() -> void:
 	btn_ejecutar.pressed.connect(_on_ejecutar_pressed)
@@ -354,22 +366,20 @@ func _conectar_senales() -> void:
 			btn_toggle_ada.text = "SISTEMA A.D.A. ▲" if card_ada.visible else "SISTEMA A.D.A. ▼"
 		)
 
+	if btn_cerrar_paleta:
+		btn_cerrar_paleta.pressed.connect(func(): _plegar_paleta(true))
+	if btn_abrir_paleta_flotante:
+		btn_abrir_paleta_flotante.pressed.connect(func(): _plegar_paleta(false))
 	if btn_toggle_paleta:
 		btn_toggle_paleta.pressed.connect(func():
 			if is_instance_valid(drawer_paleta):
-				drawer_paleta.visible = not drawer_paleta.visible
-		)
-	if btn_cerrar_paleta:
-		btn_cerrar_paleta.pressed.connect(func():
-			if is_instance_valid(drawer_paleta):
-				drawer_paleta.visible = false
+				_plegar_paleta(drawer_paleta.visible)
 		)
 
 	if btn_minimizar_consola:
-		btn_minimizar_consola.pressed.connect(func():
-			tabs_codigo.visible = not tabs_codigo.visible
-			btn_minimizar_consola.text = "+" if not tabs_codigo.visible else "-"
-		)
+		btn_minimizar_consola.pressed.connect(func(): _plegar_consola(true))
+	if btn_abrir_consola_flotante:
+		btn_abrir_consola_flotante.pressed.connect(func(): _plegar_consola(false))
 
 	btn_nivel_prev.pressed.connect(func(): cambiar_hito(indice_hito_actual - 1))
 	btn_nivel_next.pressed.connect(func(): cambiar_hito(indice_hito_actual + 1))
@@ -432,6 +442,20 @@ func _actualizar_badge_spido() -> void:
 	if mundo_3d and mundo_3d.mesa_spid:
 		montadas = mundo_3d.mesa_spid.etapas_completadas.size()
 	label_spido_piezas.text = "🔋 %d/5" % montadas
+
+func _plegar_paleta(plegar: bool) -> void:
+	if is_instance_valid(drawer_paleta):
+		drawer_paleta.visible = not plegar
+	if is_instance_valid(btn_abrir_paleta_flotante):
+		btn_abrir_paleta_flotante.visible = plegar
+	if is_instance_valid(btn_toggle_paleta):
+		btn_toggle_paleta.text = "[▶ BLOQUES]" if plegar else "[◀ BLOQUES]"
+
+func _plegar_consola(plegar: bool) -> void:
+	if is_instance_valid(consola_astronauta):
+		consola_astronauta.visible = not plegar
+	if is_instance_valid(btn_abrir_consola_flotante):
+		btn_abrir_consola_flotante.visible = plegar
 
 func _on_btn_codice_pressed() -> void:
 	if is_instance_valid(panel_guia):

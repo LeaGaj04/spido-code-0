@@ -324,10 +324,10 @@ layout_mode = 1
 anchors_preset = 1
 anchor_left = 1.0
 anchor_right = 1.0
-offset_left = -340.0
+offset_left = -580.0
 offset_top = 64.0
 offset_right = -16.0
-offset_bottom = 360.0
+offset_bottom = 370.0
 grow_horizontal = 0
 theme_override_constants/separation = 6
 
@@ -385,13 +385,16 @@ horizontal_alignment = 1
 [node name="ConsolaAstronauta" type="PanelContainer" parent="HUD"]
 unique_name_in_owner = true
 layout_mode = 1
-anchors_preset = 2
+anchors_preset = 3
+anchor_left = 1.0
 anchor_top = 1.0
+anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 16.0
-offset_top = -340.0
-offset_right = 530.0
+offset_left = -580.0
+offset_top = -650.0
+offset_right = -16.0
 offset_bottom = -16.0
+grow_horizontal = 0
 grow_vertical = 0
 theme_override_styles/panel = SubResource("StyleBoxFlat_Consola")
 
@@ -423,14 +426,14 @@ unique_name_in_owner = true
 custom_minimum_size = Vector2(85, 24)
 layout_mode = 2
 theme_override_font_sizes/font_size = 12
-text = "[+ BLOQUES]"
+text = "[◀ BLOQUES]"
 
 [node name="BtnMinimizarConsola" type="Button" parent="HUD/ConsolaAstronauta/VBox/HBoxConsolaTop"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(24, 24)
+custom_minimum_size = Vector2(75, 24)
 layout_mode = 2
 theme_type_variation = &"SecondaryButton"
-text = "-"
+text = "Plegar ▶"
 
 [node name="EquipoCodigo" type="TabContainer" parent="HUD/ConsolaAstronauta/VBox"]
 unique_name_in_owner = true
@@ -559,19 +562,17 @@ text = "EJECUTAR"
 [node name="DrawerPaleta" type="PanelContainer" parent="HUD"]
 unique_name_in_owner = true
 layout_mode = 1
-anchors_preset = 2
-anchor_top = 1.0
 anchor_bottom = 1.0
-offset_left = 554.0
-offset_top = -340.0
-offset_right = 780.0
+offset_left = 16.0
+offset_top = 264.0
+offset_right = 380.0
 offset_bottom = -16.0
-grow_vertical = 0
+grow_vertical = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_Drawer")
 
 [node name="VBox" type="VBoxContainer" parent="HUD/DrawerPaleta"]
 layout_mode = 2
-theme_override_constants/separation = 6
+theme_override_constants/separation = 8
 
 [node name="HBoxTit" type="HBoxContainer" parent="HUD/DrawerPaleta/VBox"]
 layout_mode = 2
@@ -580,15 +581,15 @@ layout_mode = 2
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_colors/font_color = Color(0.545098, 0.796078, 0.568627, 1)
-theme_override_font_sizes/font_size = 13
-text = "PALETA DE BLOQUES"
+theme_override_font_sizes/font_size = 14
+text = "◆ PALETA DE BLOQUES"
 
 [node name="BtnCerrarPaleta" type="Button" parent="HUD/DrawerPaleta/VBox/HBoxTit"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(20, 20)
+custom_minimum_size = Vector2(70, 24)
 layout_mode = 2
 theme_type_variation = &"SecondaryButton"
-text = "×"
+text = "◀ Plegar"
 
 [node name="PaletaScroll" type="ScrollContainer" parent="HUD/DrawerPaleta/VBox"]
 layout_mode = 2
@@ -598,7 +599,34 @@ size_flags_vertical = 3
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_constants/separation = 6
+theme_override_constants/separation = 8
+
+[node name="BtnAbrirPaletaFlotante" type="Button" parent="HUD"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+offset_left = 16.0
+offset_top = 264.0
+offset_right = 140.0
+offset_bottom = 302.0
+text = "▶ BLOQUES"
+
+[node name="BtnAbrirConsolaFlotante" type="Button" parent="HUD"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -160.0
+offset_top = -54.0
+offset_right = -16.0
+offset_bottom = -16.0
+grow_horizontal = 0
+grow_vertical = 0
+text = "◀ CONSOLA"
 
 [node name="LabelEstado" type="Label" parent="HUD"]
 unique_name_in_owner = true
