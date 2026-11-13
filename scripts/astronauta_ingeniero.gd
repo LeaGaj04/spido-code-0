@@ -153,9 +153,9 @@ func avanzar(tiempo_custom: float = -1.0) -> bool:
 			else:
 				accion_fallida.emit("Límite del sector alcanzado. ¡Expande la nave en MEJORAS!")
 			return false
-	elif nueva_x < -6 or nueva_x > 5 or nueva_z < -6 or nueva_z > 5:
+	elif nueva_x < -6 or nueva_x > 6 or nueva_z < -6 or nueva_z > 6:
 		await _animar_choque()
-		accion_fallida.emit("El astronauta alcanzó el límite del tablero de 12x12.")
+		accion_fallida.emit("El astronauta alcanzó el límite del tablero de 13x13.")
 		return false
 
 	grid_x = nueva_x
@@ -189,7 +189,7 @@ func retroceder() -> bool:
 			await _animar_choque()
 			accion_fallida.emit("Límite del sector alcanzado a espaldas del astronauta.")
 			return false
-	elif nueva_x < -6 or nueva_x > 5 or nueva_z < -6 or nueva_z > 5:
+	elif nueva_x < -6 or nueva_x > 6 or nueva_z < -6 or nueva_z > 6:
 		await _animar_choque()
 		accion_fallida.emit("Límite del tablero alcanzado.")
 		return false

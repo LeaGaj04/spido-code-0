@@ -65,8 +65,8 @@ func actualizar_sector(tamano: int) -> void:
 			limites_sector = {"min_x": -3, "max_x": 3, "min_z": -3, "max_z": 3}
 		9:
 			limites_sector = {"min_x": -4, "max_x": 4, "min_z": -4, "max_z": 4}
-		12, _:
-			limites_sector = {"min_x": -6, "max_x": 5, "min_z": -6, "max_z": 5}
+		13, 12, _:
+			limites_sector = {"min_x": -6, "max_x": 6, "min_z": -6, "max_z": 6}
 
 	_actualizar_barrera_laser()
 
@@ -146,7 +146,7 @@ func _actualizar_barrera_laser() -> void:
 	for child in contenedor_barrera_laser.get_children():
 		child.queue_free()
 
-	if tamano_sector_actual >= 12:
+	if tamano_sector_actual >= 13:
 		contenedor_barrera_laser.visible = false
 		return
 
@@ -263,9 +263,9 @@ func _construir_tablero_ajedrez() -> void:
 	contenedor_tablero.name = "ContenedorTablero"
 	add_child(contenedor_tablero)
 
-	# 1. Base / Marco perimetral del tablero 12x12
-	# Rango: gx de -6 a 5 (12 casillas), gz de -6 a 5 (12 casillas)
-	# Ancho total: 12 * 2.0 = 24.0. Centro: X = -1.0, Z = -1.0
+	# 1. Base / Marco perimetral del tablero simétrico 13x13 (169 casillas)
+	# Rango: gx de -6 a 6 (13 casillas), gz de -6 a 6 (13 casillas)
+	# Ancho total: 13 * 2.0 = 26.0. Centro exacto: X = 0.0, Z = 0.0
 	var mat_marco = StandardMaterial3D.new()
 	mat_marco.albedo_color = Color(0.20, 0.24, 0.30)
 	mat_marco.metallic = 0.5
@@ -273,10 +273,10 @@ func _construir_tablero_ajedrez() -> void:
 
 	var marco_base = MeshInstance3D.new()
 	var m_marco = BoxMesh.new()
-	m_marco.size = Vector3(24.5, 0.12, 24.5)
+	m_marco.size = Vector3(26.6, 0.12, 26.6)
 	marco_base.mesh = m_marco
 	marco_base.material_override = mat_marco
-	marco_base.position = Vector3(-1.0, -0.07, -1.0)
+	marco_base.position = Vector3(0.0, -0.07, 0.0)
 	contenedor_tablero.add_child(marco_base)
 
 	# 2. Las 2 placas de ajedrez (blanca/gris clara y gris más oscura)
@@ -293,17 +293,17 @@ func _construir_tablero_ajedrez() -> void:
 	var box_mesh = BoxMesh.new()
 	box_mesh.size = Vector3(1.98, 0.08, 1.98)
 
-	# Generación exacta de 12x12 = 144 casillas
-	for gx in range(-6, 6):
-		for gz in range(-6, 6):
+	# Generación simétrica de 13x13 = 169 casillas con centro en (0, 0)
+	for gx in range(-6, 7):
+		for gz in range(-6, 7):
 			var tile = MeshInstance3D.new()
 			tile.mesh = box_mesh
-			var es_par = ((gx + gz) % 2 == 0)
+			var es_par = (posmod(gx + gz, 2) == 0)
 			tile.material_override = mat_claro if es_par else mat_oscuro
 			tile.position = Vector3(gx * 2.0, -0.01, gz * 2.0)
 			contenedor_tablero.add_child(tile)
 
-	# 3. Rieles de acento neón en los 4 bordes del tablero 12x12
+	# 3. Rieles de acento neón en los 4 bordes del tablero simétrico 13x13
 	var mat_borde = StandardMaterial3D.new()
 	mat_borde.albedo_color = Color(0.85, 0.90, 0.95)
 	mat_borde.emission_enabled = true
@@ -311,37 +311,37 @@ func _construir_tablero_ajedrez() -> void:
 	mat_borde.emission_energy_multiplier = 0.8
 
 	var m_rail_h = BoxMesh.new()
-	m_rail_h.size = Vector3(24.5, 0.08, 0.1)
+	m_rail_h.size = Vector3(26.6, 0.08, 0.1)
 
 	var m_rail_v = BoxMesh.new()
-	m_rail_v.size = Vector3(0.1, 0.08, 24.5)
+	m_rail_v.size = Vector3(0.1, 0.08, 26.6)
 
 	# Riel Norte (fondo Z = -13.15)
 	var rail_norte = MeshInstance3D.new()
 	rail_norte.mesh = m_rail_h
 	rail_norte.material_override = mat_borde
-	rail_norte.position = Vector3(-1.0, 0.03, -13.15)
+	rail_norte.position = Vector3(0.0, 0.03, -13.15)
 	contenedor_tablero.add_child(rail_norte)
 
-	# Riel Sur (frente Z = +11.15)
+	# Riel Sur (frente Z = +13.15)
 	var rail_sur = MeshInstance3D.new()
 	rail_sur.mesh = m_rail_h
 	rail_sur.material_override = mat_borde
-	rail_sur.position = Vector3(-1.0, 0.03, 11.15)
+	rail_sur.position = Vector3(0.0, 0.03, 13.15)
 	contenedor_tablero.add_child(rail_sur)
 
 	# Riel Oeste (izquierda X = -13.15)
 	var rail_oeste = MeshInstance3D.new()
 	rail_oeste.mesh = m_rail_v
 	rail_oeste.material_override = mat_borde
-	rail_oeste.position = Vector3(-13.15, 0.03, -1.0)
+	rail_oeste.position = Vector3(-13.15, 0.03, 0.0)
 	contenedor_tablero.add_child(rail_oeste)
 
-	# Riel Este (derecha X = +11.15)
+	# Riel Este (derecha X = +13.15)
 	var rail_este = MeshInstance3D.new()
 	rail_este.mesh = m_rail_v
 	rail_este.material_override = mat_borde
-	rail_este.position = Vector3(11.15, 0.03, -1.0)
+	rail_este.position = Vector3(13.15, 0.03, 0.0)
 	contenedor_tablero.add_child(rail_este)
 
 func _construir_decoracion_nave() -> void:
@@ -352,9 +352,9 @@ func _construir_decoracion_nave() -> void:
 	contenedor_decoracion.name = "ContenedorDecoracion"
 	add_child(contenedor_decoracion)
 
-	# 1. Servidor Principal / Mainframe Central al fondo (Vector3(-1.0, 0, -13.5))
+	# 1. Servidor Principal / Mainframe Central al fondo (Vector3(0.0, 0, -14.2))
 	var nodo_mainframe = Node3D.new()
-	nodo_mainframe.position = Vector3(-1.0, 0, -13.5)
+	nodo_mainframe.position = Vector3(0.0, 0, -14.2)
 	contenedor_decoracion.add_child(nodo_mainframe)
 
 	var mat_gabinete = StandardMaterial3D.new()
@@ -435,11 +435,11 @@ func _construir_decoracion_nave() -> void:
 	mat_franja.emission_energy_multiplier = 1.4
 
 	var cajas_datos = [
-		{"pos": Vector3(-12.0, 0.5, -4.0), "tam": Vector3(1.0, 1.0, 1.0)},
-		{"pos": Vector3(-11.0, 0.4, -4.7), "tam": Vector3(0.8, 0.8, 0.8)},
-		{"pos": Vector3(-11.8, 1.35, -4.1), "tam": Vector3(0.7, 0.7, 0.7)},
-		{"pos": Vector3(10.0, 0.5, -4.0), "tam": Vector3(1.0, 1.0, 1.0)},
-		{"pos": Vector3(9.2, 0.45, -4.7), "tam": Vector3(0.9, 0.9, 0.9)}
+		{"pos": Vector3(-14.0, 0.5, -4.0), "tam": Vector3(1.0, 1.0, 1.0)},
+		{"pos": Vector3(-13.0, 0.4, -4.7), "tam": Vector3(0.8, 0.8, 0.8)},
+		{"pos": Vector3(-13.8, 1.35, -4.1), "tam": Vector3(0.7, 0.7, 0.7)},
+		{"pos": Vector3(14.0, 0.5, -4.0), "tam": Vector3(1.0, 1.0, 1.0)},
+		{"pos": Vector3(13.0, 0.45, -4.7), "tam": Vector3(0.9, 0.9, 0.9)}
 	]
 
 	for c in cajas_datos:
@@ -459,9 +459,9 @@ func _construir_decoracion_nave() -> void:
 		franja.position = c.pos
 		contenedor_decoracion.add_child(franja)
 
-	# 3. Cristales de Energía en las esquinas traseras
-	_crear_cluster_cristal(Vector3(-12.8, 0, -12.8), Color(0.95, 0.25, 0.75)) # Magenta
-	_crear_cluster_cristal(Vector3(10.8, 0, -12.8), Color(0.2, 0.85, 0.95))   # Cyan
+	# 3. Cristales de Energía en las esquinas traseras (simetría en ±14.2)
+	_crear_cluster_cristal(Vector3(-14.2, 0, -14.2), Color(0.95, 0.25, 0.75)) # Magenta
+	_crear_cluster_cristal(Vector3(14.2, 0, -14.2), Color(0.2, 0.85, 0.95))   # Cyan
 
 func _crear_cluster_cristal(pos_base: Vector3, col_energia: Color) -> void:
 	var base_pedestal = MeshInstance3D.new()

@@ -126,12 +126,12 @@ const ARBOL_MEJORAS = [
 		"tamano": 9
 	},
 	{
-		"fase": "FASE 4 / PROTOCOLO TOTAL 12x12",
-		"desc": "Desactiva las barreras láser y despliega el hangar completo de 12x12 con 5 astronautas.",
+		"fase": "FASE 4 / PROTOCOLO TOTAL 13x13",
+		"desc": "Desactiva las barreras láser y despliega el hangar simétrico completo de 13x13 con 5 astronautas.",
 		"costo": 250,
 		"cat": "fase",
 		"id": "FASE_4",
-		"tamano": 12
+		"tamano": 13
 	}
 ]
 
@@ -837,7 +837,7 @@ func _renderizar_centro_mejoras() -> void:
 			"FASE_3":
 				ya_desbloqueado = (mundo_3d and mundo_3d.tamano_sector_actual >= 9)
 			"FASE_4":
-				ya_desbloqueado = (mundo_3d and mundo_3d.tamano_sector_actual >= 12)
+				ya_desbloqueado = (mundo_3d and mundo_3d.tamano_sector_actual >= 13)
 
 		if ya_desbloqueado:
 			st.border_color = Color(0.35, 0.85, 0.55, 0.9)
@@ -937,7 +937,7 @@ func _comprar_mejora_arbol(item: Dictionary) -> void:
 				if mundo_3d.astronauta_5:
 					mundo_3d.astronauta_5.visible = true
 					mundo_3d.astronauta_5.configurar_inicio(Vector2i(-2, 0), 0)
-			_actualizar_estado("🌟 ¡Protocolo Maestro! Hangar 12x12 abierto al completo.")
+			_actualizar_estado("🌟 ¡Protocolo Maestro! Hangar 13x13 simétrico abierto al completo.")
 
 	_verificar_hitos_sandbox()
 	_renderizar_centro_mejoras()
