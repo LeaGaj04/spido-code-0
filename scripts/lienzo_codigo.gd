@@ -33,9 +33,11 @@ func _drop_data(at_position: Vector2, data: Variant) -> void:
 			data.get("titulo", "Comando"),
 			data.get("prefijo", "[CMD]"),
 			data.get("color_borde", Color(0.13, 0.77, 0.45)),
-			false
+			false,
+			data.get("parametro_valor", 1)
 		)
 		nuevo_bloque.solicitado_eliminar.connect(_on_bloque_solicitado_eliminar)
+		nuevo_bloque.parametro_cambiado.connect(func(_b, _v): algoritmo_modificado.emit())
 
 		contenedor_bloques.add_child(nuevo_bloque)
 		contenedor_bloques.move_child(nuevo_bloque, idx_destino)

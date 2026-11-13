@@ -9,6 +9,8 @@ signal accion_fallida(motivo: String)
 @export var tamano_celda: float = 2.0
 @export var tiempo_movimiento: float = 0.4
 @export var tiempo_giro: float = 0.35
+@export var color_identidad: Color = Color(0.13, 0.77, 0.45)
+@export var nombre_rol: String = "Ingeniero"
 
 var grid_x: int = 0
 var grid_z: int = 0
@@ -23,15 +25,48 @@ var pieza_en_mano: Node3D = null
 
 @onready var slot_manos: Marker3D = $SlotManos
 var casco_visor: MeshInstance3D = null
+var luz_seleccion: OmniLight3D = null
 
 func _ready() -> void:
 	casco_visor = find_child("Visor", true, false) as MeshInstance3D
+	_crear_luz_seleccion_si_falta()
 	posicion_inicial = global_position
 	rotacion_inicial = rotation
 	grid_x_inicial = int(round(position.x / tamano_celda))
 	grid_z_inicial = int(round(position.z / tamano_celda))
 	grid_x = grid_x_inicial
 	grid_z = grid_z_inicial
+	_set_color_visor(color_identidad)
+
+func _crear_luz_seleccion_si_falta() -> void:
+	if not luz_seleccion:
+		luz_seleccion = OmniLight3D.new()
+		luz_seleccion.name = "LuzSeleccion"
+		luz_seleccion.light_energy = 0.0
+		luz_seleccion.omni_range = 2.2
+		luz_seleccion.light_color = color_identidad
+		luz_seleccion.position = Vector3(0, 1.8, 0)
+		add_child(luz_seleccion)
+
+func establecer_identidad(p_rol: String, p_color: Color) -> void:
+	nombre_rol = p_rol
+	color_identidad = p_color
+	if luz_seleccion:
+		luz_seleccion.light_color = p_color
+	_set_color_visor(p_color)
+
+func resaltar_seleccion(activo: bool) -> void:
+	if not is_inside_tree() or not visible:
+		return
+	if luz_seleccion:
+		var tw_luz = create_tween()
+		tw_luz.tween_property(luz_seleccion, "light_energy", 1.8 if activo else 0.0, 0.2)
+
+	if activo:
+		_set_color_visor(color_identidad)
+		var tween = create_tween()
+		tween.tween_property(self, "position:y", position.y + 0.15, 0.12).set_trans(Tween.TRANS_SINE)
+		tween.tween_property(self, "position:y", position.y, 0.12).set_trans(Tween.TRANS_BOUNCE)
 
 func configurar_inicio(pos_grid: Vector2i, ori: int) -> void:
 	grid_x_inicial = pos_grid.x
@@ -44,11 +79,17 @@ func configurar_inicio(pos_grid: Vector2i, ori: int) -> void:
 	position = posicion_inicial
 	rotation = rotacion_inicial
 
+func fijar_checkpoint_actual() -> void:
+	grid_x_inicial = grid_x
+	grid_z_inicial = grid_z
+	orientacion_actual = int(round(-rad_to_deg(rotation.y) / 90.0)) % 4
+	if orientacion_actual < 0: orientacion_actual += 4
+	posicion_inicial = position
+	rotacion_inicial = rotation
+
 func reiniciar() -> void:
 	if is_instance_valid(pieza_en_mano):
-		pieza_en_mano.reparent(get_parent())
-		if pieza_en_mano.has_method("reiniciar"):
-			pieza_en_mano.reiniciar()
+		pieza_en_mano.queue_free()
 		pieza_en_mano = null
 
 	var tween = create_tween().set_parallel(true)
@@ -58,13 +99,29 @@ func reiniciar() -> void:
 
 	grid_x = grid_x_inicial
 	grid_z = grid_z_inicial
-	orientacion_actual = 0
-	_set_color_visor(Color(0.13, 0.77, 0.45))
+	orientacion_actual = int(round(-rad_to_deg(rotacion_inicial.y) / 90.0)) % 4
+	if orientacion_actual < 0: orientacion_actual += 4
+	_set_color_visor(color_identidad)
 
-func ejecutar_accion(accion: String) -> bool:
+func ejecutar_accion(accion: String, parametro: int = 1) -> bool:
 	match accion:
 		"AVANZAR":
-			return await avanzar()
+			var cantidad = max(1, parametro)
+			var tiempo_paso = 0.28 if cantidad > 1 else -1.0
+			for k in range(cantidad):
+				var r = await avanzar(tiempo_paso)
+				if not r: return false
+			return true
+		"AVANZAR_2":
+			for k in range(2):
+				var r = await avanzar(0.25)
+				if not r: return false
+			return true
+		"AVANZAR_3":
+			for k in range(3):
+				var r = await avanzar(0.22)
+				if not r: return false
+			return true
 		"RETROCEDER":
 			return await retroceder()
 		"GIRAR_DER":
@@ -81,7 +138,8 @@ func ejecutar_accion(accion: String) -> bool:
 			push_warning("Comando no reconocido: %s" % accion)
 			return false
 
-func avanzar() -> bool:
+func avanzar(tiempo_custom: float = -1.0) -> bool:
+	var t_mov = tiempo_custom if tiempo_custom > 0 else tiempo_movimiento
 	var delta = _obtener_vector_orientacion(orientacion_actual)
 	var nueva_x = grid_x + delta.x
 	var nueva_z = grid_z + delta.y
@@ -102,16 +160,16 @@ func avanzar() -> bool:
 	var destino = Vector3(grid_x * tamano_celda, position.y, grid_z * tamano_celda)
 
 	var tween = create_tween().set_parallel(true)
-	tween.tween_property(self, "position:x", destino.x, tiempo_movimiento).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
-	tween.tween_property(self, "position:z", destino.z, tiempo_movimiento).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	tween.tween_property(self, "position:x", destino.x, t_mov).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	tween.tween_property(self, "position:z", destino.z, t_mov).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 
 	var tween_bob = create_tween()
-	tween_bob.tween_property(self, "position:y", position.y + 0.18, tiempo_movimiento * 0.5).set_trans(Tween.TRANS_SINE)
-	tween_bob.tween_property(self, "position:y", position.y, tiempo_movimiento * 0.5).set_trans(Tween.TRANS_SINE)
+	tween_bob.tween_property(self, "position:y", position.y + 0.18, t_mov * 0.5).set_trans(Tween.TRANS_SINE)
+	tween_bob.tween_property(self, "position:y", position.y, t_mov * 0.5).set_trans(Tween.TRANS_SINE)
 
 	var tween_roll = create_tween()
-	tween_roll.tween_property(self, "rotation:z", deg_to_rad(4.0), tiempo_movimiento * 0.5)
-	tween_roll.tween_property(self, "rotation:z", 0.0, tiempo_movimiento * 0.5)
+	tween_roll.tween_property(self, "rotation:z", deg_to_rad(4.0), t_mov * 0.5)
+	tween_roll.tween_property(self, "rotation:z", 0.0, t_mov * 0.5)
 
 	await tween.finished
 	animacion_terminada.emit()
@@ -170,6 +228,9 @@ func tomar_pieza_cercana() -> bool:
 	if mundo and mundo.has_method("obtener_pieza_en"):
 		pieza = mundo.obtener_pieza_en(celda_objetivo)
 
+	if not pieza and mundo and mundo.has_method("obtener_producto_de_meson"):
+		pieza = mundo.obtener_producto_de_meson(celda_objetivo)
+
 	if pieza:
 		pieza_en_mano = pieza
 		var tween = create_tween()
@@ -220,9 +281,32 @@ func ensamblar_en_mesa() -> bool:
 			await _animar_duda()
 			return false
 	else:
-		accion_fallida.emit("No estas frente a la mesa de ensamblaje de Spid.")
-		await _animar_duda()
-		return false
+		var meson = null
+		if mundo and mundo.has_method("obtener_meson_en"):
+			meson = mundo.obtener_meson_en(celda_objetivo)
+
+		if meson:
+			var tipo_pieza = pieza_en_mano.get("tipo_pieza") if "tipo_pieza" in pieza_en_mano else "COMPONENTE"
+			var exito = meson.recibir_insumo(tipo_pieza)
+			if exito:
+				pieza_en_mano.queue_free()
+				pieza_en_mano = null
+				_set_color_visor(Color(0.2, 0.85, 1.0))
+				var tween = create_tween()
+				tween.tween_property(self, "position:y", position.y + 0.1, 0.1)
+				tween.tween_property(self, "position:y", position.y, 0.1)
+				await tween.finished
+				pieza_ensamblada.emit(tipo_pieza)
+				animacion_terminada.emit()
+				return true
+			else:
+				accion_fallida.emit("El mesón no requiere este insumo o su bandeja de salida está llena.")
+				await _animar_duda()
+				return false
+		else:
+			accion_fallida.emit("No estás frente a ninguna estación de trabajo.")
+			await _animar_duda()
+			return false
 
 func ejecutar_diagnostico() -> bool:
 	var dir = _obtener_vector_orientacion(orientacion_actual)
@@ -256,7 +340,7 @@ func _animar_choque() -> void:
 	tween.tween_property(self, "position", pos_tope, 0.08)
 	tween.tween_property(self, "position", pos_curr, 0.12)
 	await tween.finished
-	_set_color_visor(Color(0.13, 0.77, 0.45))
+	_set_color_visor(color_identidad)
 	animacion_terminada.emit()
 
 func _animar_duda() -> void:

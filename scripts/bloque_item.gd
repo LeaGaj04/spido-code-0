@@ -2,15 +2,21 @@ class_name BloqueItem
 extends PanelContainer
 
 signal solicitado_eliminar(bloque: BloqueItem)
+signal parametro_cambiado(bloque: BloqueItem, nuevo_valor: int)
 
 @export var id_comando: String = "AVANZAR"
-@export var titulo: String = "Avanzar 1 Paso"
+@export var titulo: String = "Avanzar"
 @export var prefijo: String = "[AVZ]"
 @export var color_borde: Color = Color(0.545098, 0.796078, 0.568627, 1.0)
 @export var es_de_paleta: bool = false
+@export var parametro_valor: int = 1
 
 @onready var label_prefijo: Label = $HBox/Prefijo
 @onready var label_titulo: Label = $HBox/Titulo
+@onready var box_parametro: HBoxContainer = $HBox/BoxParametro
+@onready var btn_menos: Button = $HBox/BoxParametro/BtnMenos
+@onready var label_valor: Label = $HBox/BoxParametro/LabelValor
+@onready var btn_mas: Button = $HBox/BoxParametro/BtnMas
 @onready var btn_eliminar: Button = $HBox/BtnEliminar
 
 var style_box_normal: StyleBoxFlat
@@ -18,21 +24,27 @@ var style_box_activo: StyleBoxFlat
 var style_box_error: StyleBoxFlat
 
 func _ready() -> void:
-	custom_minimum_size = Vector2(200, 54)
+	custom_minimum_size = Vector2(210, 54)
 	mouse_filter = Control.MOUSE_FILTER_STOP
 	_configurar_estilos()
 	actualizar_vista()
 
-	if btn_eliminar:
+	if is_instance_valid(btn_eliminar):
 		btn_eliminar.visible = not es_de_paleta
 		btn_eliminar.pressed.connect(_on_btn_eliminar_pressed)
 
-func configurar(p_id: String, p_titulo: String, p_prefijo: String, p_color_borde: Color, p_paleta: bool = false) -> void:
+	if is_instance_valid(btn_menos):
+		btn_menos.pressed.connect(_on_btn_menos_pressed)
+	if is_instance_valid(btn_mas):
+		btn_mas.pressed.connect(_on_btn_mas_pressed)
+
+func configurar(p_id: String, p_titulo: String, p_prefijo: String, p_color_borde: Color, p_paleta: bool = false, p_parametro: int = 1) -> void:
 	id_comando = p_id
 	titulo = p_titulo
 	prefijo = p_prefijo
 	color_borde = p_color_borde
 	es_de_paleta = p_paleta
+	parametro_valor = p_parametro
 	_configurar_estilos()
 	actualizar_vista()
 
@@ -45,22 +57,38 @@ func actualizar_vista() -> void:
 	if is_instance_valid(btn_eliminar):
 		btn_eliminar.visible = not es_de_paleta
 
+	var admite_parametro = (id_comando == "AVANZAR")
+	if is_instance_valid(box_parametro):
+		box_parametro.visible = admite_parametro
+		if admite_parametro and is_instance_valid(label_valor):
+			label_valor.text = str(parametro_valor)
+
+func _on_btn_menos_pressed() -> void:
+	if parametro_valor > 1:
+		parametro_valor -= 1
+		actualizar_vista()
+		parametro_cambiado.emit(self, parametro_valor)
+
+func _on_btn_mas_pressed() -> void:
+	if parametro_valor < 8:
+		parametro_valor += 1
+		actualizar_vista()
+		parametro_cambiado.emit(self, parametro_valor)
+
 func _configurar_estilos() -> void:
-	# Tarjeta compacta basada en la superficie y el volumen del tema principal.
 	style_box_normal = StyleBoxFlat.new()
 	style_box_normal.bg_color = Color(0.12549, 0.156863, 0.2, 0.98)
 	style_box_normal.set_corner_radius_all(12)
-	style_box_normal.set_content_margin_all(10)
+	style_box_normal.set_content_margin_all(8)
 	style_box_normal.border_width_left = 4
-	style_box_normal.border_width_top = 3
-	style_box_normal.border_width_right = 3
-	style_box_normal.border_width_bottom = 4
+	style_box_normal.border_width_top = 2
+	style_box_normal.border_width_right = 2
+	style_box_normal.border_width_bottom = 3
 	style_box_normal.border_color = color_borde
 	style_box_normal.shadow_color = Color(0.12549, 0.156863, 0.2, 0.9)
 	style_box_normal.shadow_size = 2
-	style_box_normal.shadow_offset = Vector2(0, 4)
+	style_box_normal.shadow_offset = Vector2(0, 3)
 
-	# Estado activo con el mismo verde de foco del juego principal.
 	style_box_activo = style_box_normal.duplicate()
 	style_box_activo.bg_color = Color(0.270588, 0.301961, 0.352941, 1.0)
 	style_box_activo.border_color = Color(0.545098, 0.796078, 0.568627, 1.0)
@@ -104,7 +132,10 @@ func _get_drag_data(_at_position: Vector2) -> Variant:
 	l_pref.text = prefijo
 	l_pref.modulate = color_borde
 	var l_tit = Label.new()
-	l_tit.text = titulo
+	if id_comando == "AVANZAR":
+		l_tit.text = "%s (%d)" % [titulo, parametro_valor]
+	else:
+		l_tit.text = titulo
 	l_tit.modulate = Color(0.956863, 0.964706, 0.94902, 1.0)
 	hbox.add_child(l_pref)
 	hbox.add_child(l_tit)
@@ -118,6 +149,7 @@ func _get_drag_data(_at_position: Vector2) -> Variant:
 		"titulo": titulo,
 		"prefijo": prefijo,
 		"color_borde": color_borde,
+		"parametro_valor": parametro_valor,
 		"nodo_origen": self,
 		"es_de_paleta": es_de_paleta
 	}
