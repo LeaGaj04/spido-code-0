@@ -46,7 +46,7 @@ light_color = Color(0.92, 0.96, 0.94, 1)
 shadow_enabled = true
 
 [node name="Camera3D" type="Camera3D" parent="." unique_id=1784270914]
-transform = Transform3D(1, 0, 0, 0, 0.7880111, 0.6156611, 0, -0.6156611, 0.7880111, 0, 7.768818, 11.910039)
+transform = Transform3D(1, 0, 0, 0, 0.7880111, 0.6156611, 0, -0.6156611, 0.7880111, 0, 10.28046, 16.106438)
 fov = 46.0
 
 [node name="SueloHangar" type="MeshInstance3D" parent="." unique_id=1389275597]
@@ -61,40 +61,40 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.05, -2)
 [node name="Astronauta" parent="." unique_id=609596835 instance=ExtResource("2_astronauta")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 2)
 
-[node name="Astronauta2" parent="." instance=ExtResource("2_astronauta")]
-visible = false
+[node name="Astronauta2" parent="." unique_id=85606849 instance=ExtResource("2_astronauta")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, 2)
-
-[node name="Astronauta3" parent="." instance=ExtResource("2_astronauta")]
 visible = false
+
+[node name="Astronauta3" parent="." unique_id=1497468332 instance=ExtResource("2_astronauta")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0, 2)
-
-[node name="Astronauta4" parent="." instance=ExtResource("2_astronauta")]
 visible = false
+
+[node name="Astronauta4" parent="." unique_id=1802115778 instance=ExtResource("2_astronauta")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0, 2)
-
-[node name="Astronauta5" parent="." instance=ExtResource("2_astronauta")]
 visible = false
+
+[node name="Astronauta5" parent="." unique_id=1234855157 instance=ExtResource("2_astronauta")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 0, 2)
-
-[node name="Astronauta6" parent="." instance=ExtResource("2_astronauta")]
 visible = false
+
+[node name="Astronauta6" parent="." unique_id=696516936 instance=ExtResource("2_astronauta")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0, 0)
-
-[node name="Astronauta7" parent="." instance=ExtResource("2_astronauta")]
 visible = false
+
+[node name="Astronauta7" parent="." unique_id=1053631899 instance=ExtResource("2_astronauta")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 0, 0)
-
-[node name="Astronauta8" parent="." instance=ExtResource("2_astronauta")]
 visible = false
+
+[node name="Astronauta8" parent="." unique_id=1203011476 instance=ExtResource("2_astronauta")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0, -2)
-
-[node name="Astronauta9" parent="." instance=ExtResource("2_astronauta")]
 visible = false
+
+[node name="Astronauta9" parent="." unique_id=1084149711 instance=ExtResource("2_astronauta")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 0, -2)
-
-[node name="Astronauta10" parent="." instance=ExtResource("2_astronauta")]
 visible = false
+
+[node name="Astronauta10" parent="." unique_id=1965252812 instance=ExtResource("2_astronauta")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 4)
+visible = false
 
 [node name="ContenedorPiezas" type="Node3D" parent="." unique_id=498335174]
