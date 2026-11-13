@@ -307,16 +307,16 @@ theme_override_font_sizes/font_size = 14
 text = "🔋 0/5"
 vertical_alignment = 1
 
-[node name="BadgeBits" type="PanelContainer" parent="HUD/TopRightContainer"]
+[node name="BadgeTuercas" type="PanelContainer" parent="HUD/TopRightContainer"]
 layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_Badge")
 
-[node name="LabelCreditos" type="Label" parent="HUD/TopRightContainer/BadgeBits"]
+[node name="LabelCreditos" type="Label" parent="HUD/TopRightContainer/BadgeTuercas"]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 0.85, 0.3, 1)
 theme_override_font_sizes/font_size = 14
-text = "⚙️ 150 Bits"
+text = "🔩 0 Tuercas"
 vertical_alignment = 1
 
 [node name="RightSidebarADA" type="VBoxContainer" parent="HUD"]
@@ -681,7 +681,7 @@ unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 0.85, 0.3, 1)
 theme_override_font_sizes/font_size = 14
-text = "⚙️ Saldo: 150 Bits"
+text = "🔩 Saldo: 0 Tuercas"
 
 [node name="HSeparator" type="HSeparator" parent="HUD/ModalTienda/VBox"]
 layout_mode = 2

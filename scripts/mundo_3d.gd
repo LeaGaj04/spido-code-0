@@ -1,6 +1,8 @@
 class_name Mundo3D
 extends Node3D
 
+signal tuerca_depositada(total_recibidas: int)
+
 @export var escena_pieza: PackedScene
 
 @onready var astronauta: AstronautaIngeniero = $Astronauta
@@ -31,15 +33,193 @@ var idx_astronauta_activo: int = 0
 var contenedor_tablero: Node3D = null
 var contenedor_decoracion: Node3D = null
 
+# Sistema de Sectores Progresivos y Barrera Láser
+var tamano_sector_actual: int = 3
+var limites_sector: Dictionary = {"min_x": -1, "max_x": 1, "min_z": 0, "max_z": 2}
+var contenedor_barrera_laser: Node3D = null
+var nodo_tolva: Node3D = null
+var celda_tolva: Vector2i = Vector2i(1, 1)
+var tuercas_recolectadas_sesion: int = 0
+
 func _ready() -> void:
 	_inicializar_roles_astronautas()
 	_inicializar_mesones()
 	_construir_tablero_ajedrez()
 	_construir_decoracion_nave()
 	_crear_cursor_seleccion()
+	_construir_tolva()
+	_construir_barrera_laser()
+	actualizar_sector(3)
 
 func _process(delta: float) -> void:
 	_actualizar_cursor_seguimiento(delta)
+
+func actualizar_sector(tamano: int) -> void:
+	tamano_sector_actual = tamano
+	match tamano:
+		3:
+			limites_sector = {"min_x": -1, "max_x": 1, "min_z": 0, "max_z": 2}
+		5:
+			limites_sector = {"min_x": -2, "max_x": 2, "min_z": -2, "max_z": 2}
+		7:
+			limites_sector = {"min_x": -3, "max_x": 3, "min_z": -3, "max_z": 3}
+		9:
+			limites_sector = {"min_x": -4, "max_x": 4, "min_z": -4, "max_z": 4}
+		12, _:
+			limites_sector = {"min_x": -6, "max_x": 5, "min_z": -6, "max_z": 5}
+
+	_actualizar_barrera_laser()
+
+	if is_instance_valid(nodo_tolva):
+		nodo_tolva.visible = (tamano_sector_actual <= 5)
+
+func _construir_tolva() -> void:
+	if is_instance_valid(nodo_tolva):
+		nodo_tolva.queue_free()
+
+	nodo_tolva = Node3D.new()
+	nodo_tolva.name = "TolvaTuercas"
+	nodo_tolva.position = Vector3(celda_tolva.x * 2.0, 0, celda_tolva.y * 2.0)
+	add_child(nodo_tolva)
+
+	var base = MeshInstance3D.new()
+	var m_base = BoxMesh.new()
+	m_base.size = Vector3(1.3, 0.6, 1.3)
+	base.mesh = m_base
+	var mat_b = StandardMaterial3D.new()
+	mat_b.albedo_color = Color(0.25, 0.30, 0.38)
+	mat_b.metallic = 0.5
+	mat_b.roughness = 0.4
+	base.material_override = mat_b
+	base.position = Vector3(0, 0.3, 0)
+	nodo_tolva.add_child(base)
+
+	var embudo = MeshInstance3D.new()
+	var m_emb = CylinderMesh.new()
+	m_emb.top_radius = 0.55
+	m_emb.bottom_radius = 0.35
+	m_emb.height = 0.25
+	embudo.mesh = m_emb
+	var mat_emb = StandardMaterial3D.new()
+	mat_emb.albedo_color = Color(0.95, 0.82, 0.25)
+	mat_emb.emission_enabled = true
+	mat_emb.emission = Color(0.9, 0.75, 0.2)
+	mat_emb.emission_energy_multiplier = 1.0
+	embudo.material_override = mat_emb
+	embudo.position = Vector3(0, 0.7, 0)
+	nodo_tolva.add_child(embudo)
+
+	var luz = OmniLight3D.new()
+	luz.light_color = Color(1.0, 0.85, 0.3)
+	luz.light_energy = 0.8
+	luz.omni_range = 2.5
+	luz.position = Vector3(0, 1.0, 0)
+	nodo_tolva.add_child(luz)
+
+func obtener_tolva_en(celda: Vector2i) -> Node3D:
+	if is_instance_valid(nodo_tolva) and nodo_tolva.visible and celda == celda_tolva:
+		return nodo_tolva
+	return null
+
+func depositar_tuerca_en_tolva() -> bool:
+	tuercas_recolectadas_sesion += 1
+	tuerca_depositada.emit(tuercas_recolectadas_sesion)
+	if is_instance_valid(nodo_tolva):
+		var tw = create_tween()
+		tw.tween_property(nodo_tolva, "scale", Vector3(1.15, 0.85, 1.15), 0.1)
+		tw.tween_property(nodo_tolva, "scale", Vector3.ONE, 0.15)
+	return true
+
+func _construir_barrera_laser() -> void:
+	if is_instance_valid(contenedor_barrera_laser):
+		contenedor_barrera_laser.queue_free()
+
+	contenedor_barrera_laser = Node3D.new()
+	contenedor_barrera_laser.name = "ContenedorBarreraLaser"
+	add_child(contenedor_barrera_laser)
+	_actualizar_barrera_laser()
+
+func _actualizar_barrera_laser() -> void:
+	if not is_instance_valid(contenedor_barrera_laser):
+		return
+
+	for child in contenedor_barrera_laser.get_children():
+		child.queue_free()
+
+	if tamano_sector_actual >= 12:
+		contenedor_barrera_laser.visible = false
+		return
+
+	contenedor_barrera_laser.visible = true
+
+	var x0 = limites_sector.min_x * 2.0 - 1.0
+	var x1 = limites_sector.max_x * 2.0 + 1.0
+	var z0 = limites_sector.min_z * 2.0 - 1.0
+	var z1 = limites_sector.max_z * 2.0 + 1.0
+
+	var mat_poste = StandardMaterial3D.new()
+	mat_poste.albedo_color = Color(0.25, 0.3, 0.38)
+	mat_poste.metallic = 0.8
+	mat_poste.roughness = 0.2
+
+	var mat_haz = StandardMaterial3D.new()
+	mat_haz.albedo_color = Color(0.2, 0.95, 0.65, 0.45)
+	mat_haz.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	mat_haz.emission_enabled = true
+	mat_haz.emission = Color(0.25, 1.0, 0.7)
+	mat_haz.emission_energy_multiplier = 2.2
+
+	var m_poste = CylinderMesh.new()
+	m_poste.top_radius = 0.1
+	m_poste.bottom_radius = 0.14
+	m_poste.height = 1.0
+
+	var esquinas = [
+		Vector3(x0, 0.5, z0),
+		Vector3(x1, 0.5, z0),
+		Vector3(x1, 0.5, z1),
+		Vector3(x0, 0.5, z1)
+	]
+
+	for p in esquinas:
+		var poste = MeshInstance3D.new()
+		poste.mesh = m_poste
+		poste.material_override = mat_poste
+		poste.position = p
+		contenedor_barrera_laser.add_child(poste)
+
+	# 4 Rayos Láser perimetrales a media altura
+	var ancho_x = x1 - x0
+	var largo_z = z1 - z0
+
+	# Rayo Norte y Sur
+	for z_pos in [z0, z1]:
+		var haz_h = MeshInstance3D.new()
+		var m_hh = BoxMesh.new()
+		m_hh.size = Vector3(ancho_x, 0.06, 0.04)
+		haz_h.mesh = m_hh
+		haz_h.material_override = mat_haz
+		haz_h.position = Vector3((x0 + x1) * 0.5, 0.55, z_pos)
+		contenedor_barrera_laser.add_child(haz_h)
+
+	# Rayo Oeste y Este
+	for x_pos in [x0, x1]:
+		var haz_v = MeshInstance3D.new()
+		var m_hv = BoxMesh.new()
+		m_hv.size = Vector3(0.04, 0.06, largo_z)
+		haz_v.mesh = m_hv
+		haz_v.material_override = mat_haz
+		haz_v.position = Vector3(x_pos, 0.55, (z0 + z1) * 0.5)
+		contenedor_barrera_laser.add_child(haz_v)
+
+func es_celda_valida_para_movimiento(celda: Vector2i) -> bool:
+	if celda.x < limites_sector.min_x or celda.x > limites_sector.max_x:
+		return false
+	if celda.y < limites_sector.min_z or celda.y > limites_sector.max_z:
+		return false
+	if es_celda_solida(celda):
+		return false
+	return true
 
 func _inicializar_mesones() -> void:
 	# Mesón de Patas & Tracción (Celda (-2, 0))
@@ -120,7 +300,6 @@ func _construir_tablero_ajedrez() -> void:
 			tile.mesh = box_mesh
 			var es_par = ((gx + gz) % 2 == 0)
 			tile.material_override = mat_claro if es_par else mat_oscuro
-			# Centro exacto de la casilla en la cuadrícula
 			tile.position = Vector3(gx * 2.0, -0.01, gz * 2.0)
 			contenedor_tablero.add_child(tile)
 
@@ -179,7 +358,7 @@ func _construir_decoracion_nave() -> void:
 	contenedor_decoracion.add_child(nodo_mainframe)
 
 	var mat_gabinete = StandardMaterial3D.new()
-	mat_gabinete.albedo_color = Color(0.91, 0.93, 0.96) # Blanco limpio de nave
+	mat_gabinete.albedo_color = Color(0.91, 0.93, 0.96)
 	mat_gabinete.metallic = 0.25
 	mat_gabinete.roughness = 0.25
 
@@ -191,7 +370,6 @@ func _construir_decoracion_nave() -> void:
 	gabinete.position = Vector3(0, 1.8, 0)
 	nodo_mainframe.add_child(gabinete)
 
-	# Pantalla principal con brillo verde sci-fi
 	var mat_pantalla = StandardMaterial3D.new()
 	mat_pantalla.albedo_color = Color(0.1, 0.35, 0.25)
 	mat_pantalla.emission_enabled = true
@@ -206,7 +384,6 @@ func _construir_decoracion_nave() -> void:
 	pantalla.position = Vector3(0, 2.0, 0.62)
 	nodo_mainframe.add_child(pantalla)
 
-	# Puertas laterales del servidor en verde menta como la referencia oficial
 	var mat_puerta = StandardMaterial3D.new()
 	mat_puerta.albedo_color = Color(0.42, 0.76, 0.58)
 	mat_puerta.metallic = 0.2
@@ -234,7 +411,6 @@ func _construir_decoracion_nave() -> void:
 		leds.position = Vector3(lado * 2.1, 1.5, 0.58)
 		nodo_mainframe.add_child(leds)
 
-	# Antenas en la parte superior del mainframe
 	for ax in [-0.7, 0.0, 0.7]:
 		var antena = MeshInstance3D.new()
 		var m_ant = CylinderMesh.new()
@@ -246,7 +422,7 @@ func _construir_decoracion_nave() -> void:
 		antena.position = Vector3(ax, 3.8, 0)
 		nodo_mainframe.add_child(antena)
 
-	# 2. Cajas de Carga Sci-Fi (Naranjas con franjas LED verdes) en los laterales
+	# 2. Cajas de Carga Sci-Fi
 	var mat_caja = StandardMaterial3D.new()
 	mat_caja.albedo_color = Color(0.82, 0.42, 0.14)
 	mat_caja.metallic = 0.6
@@ -283,7 +459,7 @@ func _construir_decoracion_nave() -> void:
 		franja.position = c.pos
 		contenedor_decoracion.add_child(franja)
 
-	# 3. Cristales de Energía en las esquinas traseras del tablero
+	# 3. Cristales de Energía en las esquinas traseras
 	_crear_cluster_cristal(Vector3(-12.8, 0, -12.8), Color(0.95, 0.25, 0.75)) # Magenta
 	_crear_cluster_cristal(Vector3(10.8, 0, -12.8), Color(0.2, 0.85, 0.95))   # Cyan
 
@@ -349,7 +525,6 @@ func _crear_cursor_seleccion() -> void:
 	cursor_seleccion.name = "CursorSeleccion"
 	add_child(cursor_seleccion)
 
-	# Casilla activa verde brillante centrada en la placa
 	var suelo_cursor = MeshInstance3D.new()
 	var m_cursor = BoxMesh.new()
 	m_cursor.size = Vector3(1.92, 0.02, 1.92)
@@ -365,7 +540,6 @@ func _crear_cursor_seleccion() -> void:
 	suelo_cursor.position = Vector3(0, 0.04, 0)
 	cursor_seleccion.add_child(suelo_cursor)
 
-	# Flecha apuntando hacia adelante en el centro de la casilla
 	var flecha = MeshInstance3D.new()
 	var m_fl = PrismMesh.new()
 	m_fl.size = Vector3(0.5, 0.5, 0.04)
@@ -383,7 +557,7 @@ func _actualizar_cursor_seguimiento(delta: float) -> void:
 	if is_instance_valid(astro) and astro.visible:
 		cursor_seleccion.visible = true
 		var target_pos = astro.position
-		target_pos.y = 0.01
+		target_pos.y = 0.0
 		cursor_seleccion.position = cursor_seleccion.position.lerp(target_pos, clamp(16.0 * delta, 0.0, 1.0))
 		cursor_seleccion.rotation.y = lerp_angle(cursor_seleccion.rotation.y, astro.rotation.y, clamp(16.0 * delta, 0.0, 1.0))
 	else:
@@ -404,6 +578,9 @@ func resaltar_astronauta_seleccionado(idx: int) -> void:
 
 func cargar_nivel(config: Dictionary, preservar_estado: bool = false) -> void:
 	config_nivel_actual = config
+
+	var tam_sec = config.get("tamano_sector", 3)
+	actualizar_sector(tam_sec)
 
 	# 1. Configurar astronauta principal (Ingeniero)
 	var pos_astro = config.get("pos_astronauta", Vector2i(0, 2))
@@ -448,33 +625,7 @@ func cargar_nivel(config: Dictionary, preservar_estado: bool = false) -> void:
 				else:
 					extra.configurar_inicio(config.get("pos_astronauta_%d" % numero, Vector2i.ZERO), config.get("ori_astronauta_%d" % numero, 0))
 
-	for par in [[astronauta_6, 6], [astronauta_7, 7]]:
-		var extra: AstronautaIngeniero = par[0]
-		var numero: int = par[1]
-		if extra:
-			var debe_mostrar = config.get("cantidad_astronautas", 1) >= numero
-			var ya_activo = extra.visible
-			extra.visible = debe_mostrar
-			if debe_mostrar:
-				if preservar_estado and ya_activo:
-					extra.fijar_checkpoint_actual()
-				else:
-					extra.configurar_inicio(config.get("pos_astronauta_%d" % numero, Vector2i.ZERO), config.get("ori_astronauta_%d" % numero, 0))
-
-	for par in [[astronauta_8, 8], [astronauta_9, 9], [astronauta_10, 10]]:
-		var extra: AstronautaIngeniero = par[0]
-		var numero: int = par[1]
-		if extra:
-			var debe_mostrar = config.get("cantidad_astronautas", 1) >= numero
-			var ya_activo = extra.visible
-			extra.visible = debe_mostrar
-			if debe_mostrar:
-				if preservar_estado and ya_activo:
-					extra.fijar_checkpoint_actual()
-				else:
-					extra.configurar_inicio(config.get("pos_astronauta_%d" % numero, Vector2i.ZERO), config.get("ori_astronauta_%d" % numero, 0))
-
-	# 3. Configurar mesa de ensamblaje
+	# 3. Configurar mesa de ensamblaje Spido
 	var mostrar_mesa = config.get("mostrar_mesa", false)
 	if mesa_spid:
 		mesa_spid.visible = mostrar_mesa
@@ -535,6 +686,8 @@ func registrar_piezas() -> void:
 func es_celda_solida(celda: Vector2i) -> bool:
 	if mesa_spid and mesa_spid.visible and mesa_spid.celda_mesa == celda:
 		return true
+	if is_instance_valid(nodo_tolva) and nodo_tolva.visible and celda == celda_tolva:
+		return true
 	if mesones_por_celda.has(celda):
 		var m = mesones_por_celda[celda]
 		if is_instance_valid(m) and m.visible:
@@ -570,14 +723,13 @@ func remover_pieza_en(celda: Vector2i) -> void:
 		p.visible = false
 		p.queue_free()
 
-	# Reabastecimiento automático en bucle continuo
 	_reabastecer_bahia(celda)
 
 func _reabastecer_bahia(celda_antigua: Vector2i) -> void:
 	for p_data in config_nivel_actual.get("piezas", []):
 		if p_data.get("celda") == celda_antigua:
-			var tipo = p_data.get("tipo", "TORNILLO")
-			await get_tree().create_timer(1.2).timeout
+			var tipo = p_data.get("tipo", "TUERCA")
+			await get_tree().create_timer(1.0).timeout
 			if not is_instance_valid(self): return
 			var p_nueva: PiezaTaller
 			if escena_pieza:
@@ -609,22 +761,6 @@ func obtener_mesa_en(celda: Vector2i) -> MesaEnsamblaje:
 		return mesa_spid
 	return null
 
-func verificar_objetivo_completado() -> bool:
-	var tipo_meta = config_nivel_actual.get("tipo_meta", "BALIZA")
-	match tipo_meta:
-		"BALIZA":
-			var celda_actual = Vector2i(astronauta.grid_x, astronauta.grid_z)
-			var celda_meta = config_nivel_actual.get("pos_baliza", Vector2i(0, -1))
-			if celda_actual == celda_meta:
-				if baliza_meta: baliza_meta.activar_exito()
-				return true
-			return false
-		"ENSAMBLAJE":
-			return mesa_spid and mesa_spid.etapas_completadas.size() > 0
-		"ENSAMBLAJE_EQUIPO":
-			return mesa_spid and mesa_spid.etapas_completadas.size() >= config_nivel_actual.get("componentes_objetivo", 2)
-	return false
-
 func reiniciar_mundo(preservar_spido: bool = true) -> void:
 	if astronauta:
 		await astronauta.reiniciar()
@@ -636,16 +772,6 @@ func reiniciar_mundo(preservar_spido: bool = true) -> void:
 		await astronauta_4.reiniciar()
 	if astronauta_5 and astronauta_5.visible:
 		await astronauta_5.reiniciar()
-	if astronauta_6 and astronauta_6.visible:
-		await astronauta_6.reiniciar()
-	if astronauta_7 and astronauta_7.visible:
-		await astronauta_7.reiniciar()
-	if astronauta_8 and astronauta_8.visible:
-		await astronauta_8.reiniciar()
-	if astronauta_9 and astronauta_9.visible:
-		await astronauta_9.reiniciar()
-	if astronauta_10 and astronauta_10.visible:
-		await astronauta_10.reiniciar()
 
 	if not preservar_spido and mesa_spid and mesa_spid.visible:
 		mesa_spid.reiniciar()

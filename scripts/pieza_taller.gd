@@ -22,13 +22,13 @@ func _actualizar_aspecto() -> void:
 	var mat = StandardMaterial3D.new()
 	mat.roughness = 0.3
 	match tipo_pieza:
-		"TORNILLO":
-			mat.albedo_color = Color(0.85, 0.75, 0.3, 1)
-			mat.metallic = 0.9
+		"TUERCA", "TORNILLO":
+			mat.albedo_color = Color(0.95, 0.82, 0.25, 1)
+			mat.metallic = 0.95
 			mat.roughness = 0.2
 			mat.emission_enabled = true
-			mat.emission = Color(0.9, 0.8, 0.4, 1)
-			mat.emission_energy_multiplier = 0.6
+			mat.emission = Color(0.9, 0.75, 0.2, 1)
+			mat.emission_energy_multiplier = 0.8
 		"PLACA":
 			mat.albedo_color = Color(0.3, 0.5, 0.7, 1)
 			mat.metallic = 0.8
