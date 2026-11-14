@@ -438,7 +438,7 @@ func _conectar_senales() -> void:
 	if btn_toggle_ada:
 		btn_toggle_ada.pressed.connect(func():
 			card_ada.visible = not card_ada.visible
-			btn_toggle_ada.text = "SISTEMA A.D.A. ▲" if card_ada.visible else "SISTEMA A.D.A. ▼"
+			btn_toggle_ada.text = "SISTEMA ADA ▼" if card_ada.visible else "SISTEMA ADA ▲"
 		)
 
 	if btn_cerrar_paleta:
