@@ -209,13 +209,6 @@ theme_override_constants/separation = 6
 [node name="HBoxTituloFase" type="HBoxContainer" parent="HUD/TopLeftContainer/TarjetaMision/VBox" unique_id=1329557828]
 layout_mode = 2
 
-[node name="BtnNivelPrev" type="Button" parent="HUD/TopLeftContainer/TarjetaMision/VBox/HBoxTituloFase" unique_id=1678529888]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(26, 26)
-layout_mode = 2
-theme_type_variation = &"SecondaryButton"
-text = "<"
-
 [node name="LabelNivelTitulo" type="Label" parent="HUD/TopLeftContainer/TarjetaMision/VBox/HBoxTituloFase" unique_id=444634649]
 unique_name_in_owner = true
 layout_mode = 2
@@ -224,13 +217,6 @@ theme_override_colors/font_color = Color(0.545098, 0.796078, 0.568627, 1)
 theme_override_font_sizes/font_size = 14
 text = "◆ FASE 0: INDUCCIÓN BÁSICA"
 vertical_alignment = 1
-
-[node name="BtnNivelNext" type="Button" parent="HUD/TopLeftContainer/TarjetaMision/VBox/HBoxTituloFase" unique_id=2073994819]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(26, 26)
-layout_mode = 2
-theme_type_variation = &"SecondaryButton"
-text = ">"
 
 [node name="LabelConcepto" type="Label" parent="HUD/TopLeftContainer/TarjetaMision/VBox" unique_id=1544947122]
 unique_name_in_owner = true
