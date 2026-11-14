@@ -26,8 +26,8 @@ func _draw() -> void:
 		return
 
 	# 1. Widget Radar Circular a la izquierda
-	var centro_radar = Vector2(40, alto * 0.5)
-	var radio_max = min(32.0, alto * 0.42)
+	var centro_radar = Vector2(28, alto * 0.5)
+	var radio_max = min(20.0, alto * 0.42)
 
 	# Círculos concéntricos de referencia
 	draw_arc(centro_radar, radio_max * 0.4, 0, TAU, 32, color_secundario, 1.2)
@@ -42,15 +42,15 @@ func _draw() -> void:
 	draw_arc(centro_radar, radio_pulso, 0, TAU, 32, col_pulso, 2.0)
 
 	# Punto central del radar
-	draw_circle(centro_radar, 4.0, color_primario)
+	draw_circle(centro_radar, 3.5, color_primario)
 
 	# Cruz guía del radar
 	draw_line(centro_radar - Vector2(radio_max + 4, 0), centro_radar + Vector2(radio_max + 4, 0), color_secundario, 1.0)
 	draw_line(centro_radar - Vector2(0, radio_max + 4), centro_radar + Vector2(0, radio_max + 4), color_secundario, 1.0)
 
 	# 2. Barras de frecuencia de audio ecualizador a la derecha
-	var inicio_x = 95.0
-	var espacio_disponible = ancho - inicio_x - 10.0
+	var inicio_x = 64.0
+	var espacio_disponible = ancho - inicio_x - 6.0
 	var cant_barras = alturas_barras.size()
 	var ancho_barra = max(3.0, (espacio_disponible / cant_barras) - 3.0)
 	var base_y = alto * 0.5

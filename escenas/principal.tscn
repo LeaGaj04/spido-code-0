@@ -309,18 +309,18 @@ layout_mode = 1
 anchors_preset = 1
 anchor_left = 1.0
 anchor_right = 1.0
-offset_left = -580.0
+offset_left = -270.0
 offset_top = 64.0
 offset_right = -16.0
-offset_bottom = 370.0
+offset_bottom = 440.0
 grow_horizontal = 0
 theme_override_constants/separation = 6
 
 [node name="BtnToggleADA" type="Button" parent="HUD/RightSidebarADA" unique_id=1547970552]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 32)
+custom_minimum_size = Vector2(0, 34)
 layout_mode = 2
-text = "SISTEMA A.D.A. ▲"
+text = "SISTEMA ADA ▼"
 
 [node name="CardADA" type="PanelContainer" parent="HUD/RightSidebarADA" unique_id=627830607]
 unique_name_in_owner = true
@@ -334,11 +334,16 @@ theme_override_constants/separation = 8
 [node name="HBoxHeader" type="HBoxContainer" parent="HUD/RightSidebarADA/CardADA/VBox" unique_id=1744191824]
 layout_mode = 2
 
+[node name="BarraAcento" type="ColorRect" parent="HUD/RightSidebarADA/CardADA/VBox/HBoxHeader" unique_id=1122334455]
+custom_minimum_size = Vector2(4, 16)
+layout_mode = 2
+color = Color(0.545098, 0.796078, 0.568627, 1)
+
 [node name="LabelTituloADA" type="Label" parent="HUD/RightSidebarADA/CardADA/VBox/HBoxHeader" unique_id=1290208081]
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_colors/font_color = Color(0.545098, 0.796078, 0.568627, 1)
-theme_override_font_sizes/font_size = 15
+theme_override_colors/font_color = Color(0.95, 0.96, 0.98, 1)
+theme_override_font_sizes/font_size = 14
 text = "A.D.A."
 
 [node name="LabelEstadoADA" type="Label" parent="HUD/RightSidebarADA/CardADA/VBox/HBoxHeader" unique_id=781667830]
