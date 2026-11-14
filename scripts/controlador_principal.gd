@@ -217,6 +217,7 @@ var guia_activa: bool = false
 var paso_guia: int = 0
 var ultimo_error: String = ""
 var bloque_con_error: BloqueItem = null
+var ha_recogido_pieza_en_fase: bool = false
 
 const PASOS_GUIA = [
 	{"titulo": "1. OBSERVA", "texto": "Tu Astronauta Ingeniero está en la posición inicial y la baliza brillante marca la meta de calibración."},
@@ -283,6 +284,7 @@ func cambiar_hito(indice: int) -> void:
 func _aplicar_hito_actual() -> void:
 	if indice_hito_actual < 0 or indice_hito_actual >= hitos.size():
 		return
+	ha_recogido_pieza_en_fase = false
 	var hito = hitos[indice_hito_actual]
 
 	# Cabecera de la Tarjeta de Misión
@@ -468,19 +470,18 @@ func _conectar_senales() -> void:
 		if mundo_3d.has_signal("tuerca_depositada"):
 			mundo_3d.tuerca_depositada.connect(func(_tot):
 				ganar_creditos(10, "🔩 ¡Tuerca depositada en contenedor!")
-				_verificar_hitos_sandbox()
 			)
 
 		if mundo_3d.mesa_spid:
 			mundo_3d.mesa_spid.spid_actualizado.connect(func(_e, _t, _m):
 				_actualizar_badge_spido()
-				_verificar_hitos_sandbox()
 			)
 			mundo_3d.mesa_spid.spid_completado.connect(func():
 				_actualizar_badge_spido()
-				_verificar_hitos_sandbox()
 			)
-			mundo_3d.mesa_spid.diagnostico_realizado.connect(func(): _verificar_hitos_sandbox())
+			mundo_3d.mesa_spid.diagnostico_realizado.connect(func():
+				if not en_ejecucion: _verificar_hitos_sandbox()
+			)
 
 		if mundo_3d.meson_patas:
 			mundo_3d.meson_patas.insumo_recibido.connect(func(_t, act, req): ganar_creditos(15, "Insumo depositado en Mesón de Patas (%d/%d)" % [act, req]))
@@ -498,12 +499,10 @@ func _conectar_senales() -> void:
 				a.accion_fallida.connect(_on_accion_fallida)
 				a.pieza_recogida.connect(func(nom):
 					_on_pieza_recogida(nom)
-					_verificar_hitos_sandbox()
 				)
 				a.pieza_ensamblada.connect(func(tipo): 
 					_on_pieza_ensamblada(tipo)
 					_actualizar_badge_spido()
-					_verificar_hitos_sandbox()
 				)
 
 func _actualizar_badge_spido() -> void:
@@ -674,7 +673,6 @@ func _ejecutar_un_ciclo(astronautas: Array) -> bool:
 				_actualizar_estado("[ALERTA] %s se detuvo: %s" % [astro.nombre_rol, ultimo_error if not ultimo_error.is_empty() else "Acción bloqueada."])
 				return false
 
-		_verificar_hitos_sandbox()
 		await get_tree().create_timer(0.06).timeout
 
 	return true
@@ -745,7 +743,8 @@ func _on_paso_pressed() -> void:
 	indice_paso_actual += 1
 	en_ejecucion = false
 	_bloquear_interfaz(false)
-	_verificar_hitos_sandbox()
+	if indice_paso_actual >= secuencia.size():
+		_verificar_hitos_sandbox()
 
 func _on_reiniciar_pressed() -> void:
 	if en_ejecucion:
@@ -788,6 +787,8 @@ func _on_tab_codigo_changed(tab_idx: int) -> void:
 	_actualizar_estado("Editando algoritmo para Astronauta %d: %s." % [tab_idx + 1, rol])
 
 func _verificar_hitos_sandbox() -> void:
+	if en_ejecucion:
+		return
 	if indice_hito_actual < 0 or indice_hito_actual >= hitos.size():
 		return
 	var hito = hitos[indice_hito_actual]
@@ -802,7 +803,7 @@ func _verificar_hitos_sandbox() -> void:
 					mundo_3d.baliza_meta.activar_exito()
 					completado = true
 		"TOMAR_PIEZA":
-			if mundo_3d and mundo_3d.astronauta and is_instance_valid(mundo_3d.astronauta.pieza_en_mano):
+			if ha_recogido_pieza_en_fase or (mundo_3d and mundo_3d.astronauta and is_instance_valid(mundo_3d.astronauta.pieza_en_mano)):
 				completado = true
 		"DEPOSITAR_TUERCA":
 			if mundo_3d and mundo_3d.tuercas_recolectadas_sesion >= 1:
@@ -815,7 +816,7 @@ func _verificar_hitos_sandbox() -> void:
 				lienzo_a4.obtener_secuencia_comandos(),
 				lienzo_a5.obtener_secuencia_comandos()
 			]
-			if bloques_adquiridos.has("BUCLE") and (_tiene_bloque_bucle_activo(secuencias_actuales) or en_ejecucion):
+			if bloques_adquiridos.has("BUCLE") and _tiene_bloque_bucle_activo(secuencias_actuales):
 				completado = true
 		"COMPRAR_EXPANSION_5X5":
 			if mundo_3d and mundo_3d.tamano_sector_actual >= 5:
@@ -838,6 +839,12 @@ func _verificar_hitos_sandbox() -> void:
 		_celebrar_hito(hito)
 
 func _celebrar_hito(hito: Dictionary) -> void:
+	en_ejecucion = false
+	detener_solicitado = true
+	btn_ejecutar.text = "EJECUTAR"
+	btn_ejecutar.modulate = Color.WHITE
+	_bloquear_interfaz(false)
+
 	ganar_creditos(hito.get("recompensa_creditos", 20), "¡Hito superado: %s!" % hito.titulo)
 
 	if is_instance_valid(label_estado_fase):
@@ -873,6 +880,7 @@ func _on_accion_fallida(motivo: String) -> void:
 	_actualizar_estado("[ALERTA] %s" % motivo)
 
 func _on_pieza_recogida(tipo: String) -> void:
+	ha_recogido_pieza_en_fase = true
 	_actualizar_estado("Pieza %s asegurada en manos del astronauta." % tipo)
 
 func _on_pieza_ensamblada(tipo: String) -> void:
