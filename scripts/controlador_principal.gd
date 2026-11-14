@@ -25,8 +25,8 @@ extends Control
 
 # Tarjeta de Misión / Fase
 @onready var label_nivel_titulo: Label = %LabelNivelTitulo
-@onready var btn_nivel_prev: Button = %BtnNivelPrev
-@onready var btn_nivel_next: Button = %BtnNivelNext
+@onready var btn_nivel_prev: Button = get_node_or_null("%BtnNivelPrev")
+@onready var btn_nivel_next: Button = get_node_or_null("%BtnNivelNext")
 @onready var label_concepto: Label = %LabelConcepto
 @onready var label_mision_desc: Label = %LabelMisionDesc
 @onready var label_estado_fase: Label = %LabelEstadoFase
@@ -305,8 +305,10 @@ func _aplicar_hito_actual() -> void:
 		label_estado_fase.text = "COMPLETADO ✔" if compl else "EN CURSO"
 		label_estado_fase.modulate = Color(0.4, 0.95, 0.6) if compl else Color(0.35, 0.95, 0.55)
 
-	btn_nivel_prev.disabled = (indice_hito_actual == 0)
-	btn_nivel_next.disabled = (indice_hito_actual == hitos.size() - 1)
+	if is_instance_valid(btn_nivel_prev):
+		btn_nivel_prev.disabled = (indice_hito_actual == 0)
+	if is_instance_valid(btn_nivel_next):
+		btn_nivel_next.disabled = (indice_hito_actual == hitos.size() - 1)
 
 	# Paleta de bloques disponibles
 	_actualizar_paleta(_obtener_bloques_disponibles_actuales())
@@ -454,8 +456,10 @@ func _conectar_senales() -> void:
 	if btn_abrir_consola_flotante:
 		btn_abrir_consola_flotante.pressed.connect(func(): _plegar_consola(false))
 
-	btn_nivel_prev.pressed.connect(func(): cambiar_hito(indice_hito_actual - 1))
-	btn_nivel_next.pressed.connect(func(): cambiar_hito(indice_hito_actual + 1))
+	if is_instance_valid(btn_nivel_prev):
+		btn_nivel_prev.pressed.connect(func(): cambiar_hito(indice_hito_actual - 1))
+	if is_instance_valid(btn_nivel_next):
+		btn_nivel_next.pressed.connect(func(): cambiar_hito(indice_hito_actual + 1))
 
 	btn_modal_siguiente.pressed.connect(_on_modal_siguiente_pressed)
 	btn_modal_reintentar.pressed.connect(_on_modal_reintentar_pressed)
@@ -1091,5 +1095,7 @@ func _bloquear_interfaz(bloquear: bool) -> void:
 	btn_paso.disabled = bloquear
 	btn_reiniciar.disabled = bloquear
 	btn_limpiar.disabled = bloquear
-	btn_nivel_prev.disabled = bloquear or (indice_hito_actual == 0)
-	btn_nivel_next.disabled = bloquear or (indice_hito_actual == hitos.size() - 1)
+	if is_instance_valid(btn_nivel_prev):
+		btn_nivel_prev.disabled = bloquear or (indice_hito_actual == 0)
+	if is_instance_valid(btn_nivel_next):
+		btn_nivel_next.disabled = bloquear or (indice_hito_actual == hitos.size() - 1)
