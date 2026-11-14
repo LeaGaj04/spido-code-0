@@ -519,6 +519,7 @@ text = "🗑"
 
 [node name="BtnDuplicar" type="Button" parent="HUD/ConsolaAstronauta/VBox/HBoxConsolaBottom" unique_id=242185581]
 unique_name_in_owner = true
+visible = false
 custom_minimum_size = Vector2(85, 36)
 layout_mode = 2
 theme_type_variation = &"SecondaryButton"

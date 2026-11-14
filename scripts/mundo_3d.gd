@@ -33,45 +33,33 @@ var idx_astronauta_activo: int = 0
 var contenedor_tablero: Node3D = null
 var contenedor_decoracion: Node3D = null
 
-# Sistema de Sectores Progresivos y Barrera Láser
-var tamano_sector_actual: int = 3
-var limites_sector: Dictionary = {"min_x": -1, "max_x": 1, "min_z": 0, "max_z": 2}
-var contenedor_barrera_laser: Node3D = null
+# Sistema de Sectores Progresivos (Plataforma Modular Dinámica)
+var tamano_sector_actual: int = 5
+var limites_sector: Dictionary = {"min_x": -2, "max_x": 2, "min_z": -2, "max_z": 2}
 var nodo_tolva: Node3D = null
-var celda_tolva: Vector2i = Vector2i(1, 1)
+var celda_tolva: Vector2i = Vector2i(1, 0)
 var tuercas_recolectadas_sesion: int = 0
 
 func _ready() -> void:
 	_inicializar_roles_astronautas()
 	_inicializar_mesones()
-	_construir_tablero_ajedrez()
 	_construir_decoracion_nave()
 	_crear_cursor_seleccion()
 	_construir_tolva()
-	_construir_barrera_laser()
-	actualizar_sector(3)
+	actualizar_sector(5)
 
 func _process(delta: float) -> void:
 	_actualizar_cursor_seguimiento(delta)
 
 func actualizar_sector(tamano: int) -> void:
 	tamano_sector_actual = tamano
-	match tamano:
-		3:
-			limites_sector = {"min_x": -1, "max_x": 1, "min_z": 0, "max_z": 2}
-		5:
-			limites_sector = {"min_x": -2, "max_x": 2, "min_z": -2, "max_z": 2}
-		7:
-			limites_sector = {"min_x": -3, "max_x": 3, "min_z": -3, "max_z": 3}
-		9:
-			limites_sector = {"min_x": -4, "max_x": 4, "min_z": -4, "max_z": 4}
-		13, 12, _:
-			limites_sector = {"min_x": -6, "max_x": 6, "min_z": -6, "max_z": 6}
+	var radio = int(tamano / 2)
+	limites_sector = {"min_x": -radio, "max_x": radio, "min_z": -radio, "max_z": radio}
 
-	_actualizar_barrera_laser()
+	_construir_tablero_ajedrez()
 
 	if is_instance_valid(nodo_tolva):
-		nodo_tolva.visible = (tamano_sector_actual <= 5)
+		nodo_tolva.visible = true
 
 func _construir_tolva() -> void:
 	if is_instance_valid(nodo_tolva):
@@ -130,87 +118,9 @@ func depositar_tuerca_en_tolva() -> bool:
 		tw.tween_property(nodo_tolva, "scale", Vector3.ONE, 0.15)
 	return true
 
-func _construir_barrera_laser() -> void:
-	if is_instance_valid(contenedor_barrera_laser):
-		contenedor_barrera_laser.queue_free()
-
-	contenedor_barrera_laser = Node3D.new()
-	contenedor_barrera_laser.name = "ContenedorBarreraLaser"
-	add_child(contenedor_barrera_laser)
-	_actualizar_barrera_laser()
-
-func _actualizar_barrera_laser() -> void:
-	if not is_instance_valid(contenedor_barrera_laser):
-		return
-
-	for child in contenedor_barrera_laser.get_children():
-		child.queue_free()
-
-	if tamano_sector_actual >= 13:
-		contenedor_barrera_laser.visible = false
-		return
-
-	contenedor_barrera_laser.visible = true
-
-	var x0 = limites_sector.min_x * 2.0 - 1.0
-	var x1 = limites_sector.max_x * 2.0 + 1.0
-	var z0 = limites_sector.min_z * 2.0 - 1.0
-	var z1 = limites_sector.max_z * 2.0 + 1.0
-
-	var mat_poste = StandardMaterial3D.new()
-	mat_poste.albedo_color = Color(0.25, 0.3, 0.38)
-	mat_poste.metallic = 0.8
-	mat_poste.roughness = 0.2
-
-	var mat_haz = StandardMaterial3D.new()
-	mat_haz.albedo_color = Color(0.2, 0.95, 0.65, 0.45)
-	mat_haz.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-	mat_haz.emission_enabled = true
-	mat_haz.emission = Color(0.25, 1.0, 0.7)
-	mat_haz.emission_energy_multiplier = 2.2
-
-	var m_poste = CylinderMesh.new()
-	m_poste.top_radius = 0.1
-	m_poste.bottom_radius = 0.14
-	m_poste.height = 1.0
-
-	var esquinas = [
-		Vector3(x0, 0.5, z0),
-		Vector3(x1, 0.5, z0),
-		Vector3(x1, 0.5, z1),
-		Vector3(x0, 0.5, z1)
-	]
-
-	for p in esquinas:
-		var poste = MeshInstance3D.new()
-		poste.mesh = m_poste
-		poste.material_override = mat_poste
-		poste.position = p
-		contenedor_barrera_laser.add_child(poste)
-
-	# 4 Rayos Láser perimetrales a media altura
-	var ancho_x = x1 - x0
-	var largo_z = z1 - z0
-
-	# Rayo Norte y Sur
-	for z_pos in [z0, z1]:
-		var haz_h = MeshInstance3D.new()
-		var m_hh = BoxMesh.new()
-		m_hh.size = Vector3(ancho_x, 0.06, 0.04)
-		haz_h.mesh = m_hh
-		haz_h.material_override = mat_haz
-		haz_h.position = Vector3((x0 + x1) * 0.5, 0.55, z_pos)
-		contenedor_barrera_laser.add_child(haz_h)
-
-	# Rayo Oeste y Este
-	for x_pos in [x0, x1]:
-		var haz_v = MeshInstance3D.new()
-		var m_hv = BoxMesh.new()
-		m_hv.size = Vector3(0.04, 0.06, largo_z)
-		haz_v.mesh = m_hv
-		haz_v.material_override = mat_haz
-		haz_v.position = Vector3(x_pos, 0.55, (z0 + z1) * 0.5)
-		contenedor_barrera_laser.add_child(haz_v)
+func notificar_pieza_tomada(celda: Vector2i) -> void:
+	piezas_por_celda.erase(celda)
+	_reabastecer_bahia(celda)
 
 func es_celda_valida_para_movimiento(celda: Vector2i) -> bool:
 	if celda.x < limites_sector.min_x or celda.x > limites_sector.max_x:
@@ -263,9 +173,13 @@ func _construir_tablero_ajedrez() -> void:
 	contenedor_tablero.name = "ContenedorTablero"
 	add_child(contenedor_tablero)
 
-	# 1. Base / Marco perimetral del tablero simétrico 13x13 (169 casillas)
-	# Rango: gx de -6 a 6 (13 casillas), gz de -6 a 6 (13 casillas)
-	# Ancho total: 13 * 2.0 = 26.0. Centro exacto: X = 0.0, Z = 0.0
+	# Dimensiones dinámicas basadas en el sector desbloqueado (5x5, 7x7, 9x9, 13x13)
+	var radio = int(tamano_sector_actual / 2)
+	var cant_casillas = radio * 2 + 1
+	var tam_marco = cant_casillas * 2.0 + 0.6
+	var pos_riel = (cant_casillas * 2.0) * 0.5 + 0.15
+
+	# 1. Base / Marco perimetral del tablero
 	var mat_marco = StandardMaterial3D.new()
 	mat_marco.albedo_color = Color(0.20, 0.24, 0.30)
 	mat_marco.metallic = 0.5
@@ -273,7 +187,7 @@ func _construir_tablero_ajedrez() -> void:
 
 	var marco_base = MeshInstance3D.new()
 	var m_marco = BoxMesh.new()
-	m_marco.size = Vector3(26.6, 0.12, 26.6)
+	m_marco.size = Vector3(tam_marco, 0.12, tam_marco)
 	marco_base.mesh = m_marco
 	marco_base.material_override = mat_marco
 	marco_base.position = Vector3(0.0, -0.07, 0.0)
@@ -293,9 +207,9 @@ func _construir_tablero_ajedrez() -> void:
 	var box_mesh = BoxMesh.new()
 	box_mesh.size = Vector3(1.98, 0.08, 1.98)
 
-	# Generación simétrica de 13x13 = 169 casillas con centro en (0, 0)
-	for gx in range(-6, 7):
-		for gz in range(-6, 7):
+	# Generación simétrica de solo las casillas del sector activo con centro en (0, 0)
+	for gx in range(-radio, radio + 1):
+		for gz in range(-radio, radio + 1):
 			var tile = MeshInstance3D.new()
 			tile.mesh = box_mesh
 			var es_par = (posmod(gx + gz, 2) == 0)
@@ -303,7 +217,7 @@ func _construir_tablero_ajedrez() -> void:
 			tile.position = Vector3(gx * 2.0, -0.01, gz * 2.0)
 			contenedor_tablero.add_child(tile)
 
-	# 3. Rieles de acento neón en los 4 bordes del tablero simétrico 13x13
+	# 3. Rieles de acento neón en los 4 bordes del tablero
 	var mat_borde = StandardMaterial3D.new()
 	mat_borde.albedo_color = Color(0.85, 0.90, 0.95)
 	mat_borde.emission_enabled = true
@@ -311,37 +225,37 @@ func _construir_tablero_ajedrez() -> void:
 	mat_borde.emission_energy_multiplier = 0.8
 
 	var m_rail_h = BoxMesh.new()
-	m_rail_h.size = Vector3(26.6, 0.08, 0.1)
+	m_rail_h.size = Vector3(tam_marco, 0.08, 0.1)
 
 	var m_rail_v = BoxMesh.new()
-	m_rail_v.size = Vector3(0.1, 0.08, 26.6)
+	m_rail_v.size = Vector3(0.1, 0.08, tam_marco)
 
-	# Riel Norte (fondo Z = -13.15)
+	# Riel Norte
 	var rail_norte = MeshInstance3D.new()
 	rail_norte.mesh = m_rail_h
 	rail_norte.material_override = mat_borde
-	rail_norte.position = Vector3(0.0, 0.03, -13.15)
+	rail_norte.position = Vector3(0.0, 0.03, -pos_riel)
 	contenedor_tablero.add_child(rail_norte)
 
-	# Riel Sur (frente Z = +13.15)
+	# Riel Sur
 	var rail_sur = MeshInstance3D.new()
 	rail_sur.mesh = m_rail_h
 	rail_sur.material_override = mat_borde
-	rail_sur.position = Vector3(0.0, 0.03, 13.15)
+	rail_sur.position = Vector3(0.0, 0.03, pos_riel)
 	contenedor_tablero.add_child(rail_sur)
 
-	# Riel Oeste (izquierda X = -13.15)
+	# Riel Oeste
 	var rail_oeste = MeshInstance3D.new()
 	rail_oeste.mesh = m_rail_v
 	rail_oeste.material_override = mat_borde
-	rail_oeste.position = Vector3(-13.15, 0.03, 0.0)
+	rail_oeste.position = Vector3(-pos_riel, 0.03, 0.0)
 	contenedor_tablero.add_child(rail_oeste)
 
-	# Riel Este (derecha X = +13.15)
+	# Riel Este
 	var rail_este = MeshInstance3D.new()
 	rail_este.mesh = m_rail_v
 	rail_este.material_override = mat_borde
-	rail_este.position = Vector3(13.15, 0.03, 0.0)
+	rail_este.position = Vector3(pos_riel, 0.03, 0.0)
 	contenedor_tablero.add_child(rail_este)
 
 func _construir_decoracion_nave() -> void:
@@ -729,7 +643,7 @@ func _reabastecer_bahia(celda_antigua: Vector2i) -> void:
 	for p_data in config_nivel_actual.get("piezas", []):
 		if p_data.get("celda") == celda_antigua:
 			var tipo = p_data.get("tipo", "TUERCA")
-			await get_tree().create_timer(1.0).timeout
+			await get_tree().create_timer(0.35).timeout
 			if not is_instance_valid(self): return
 			var p_nueva: PiezaTaller
 			if escena_pieza:
