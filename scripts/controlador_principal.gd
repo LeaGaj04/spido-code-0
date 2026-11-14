@@ -1089,6 +1089,7 @@ func _limpiar_error() -> void:
 
 func _actualizar_estado(mensaje: String) -> void:
 	if is_instance_valid(label_estado):
+		label_estado.visible = false
 		label_estado.text = mensaje
 
 func _bloquear_interfaz(bloquear: bool) -> void:
