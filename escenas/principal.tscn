@@ -289,7 +289,7 @@ unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(0.4, 0.95, 0.6, 1)
 theme_override_font_sizes/font_size = 14
-text = "🔋 0/5"
+text = "0/5"
 vertical_alignment = 1
 
 [node name="BadgeTuercas" type="PanelContainer" parent="HUD/TopRightContainer" unique_id=816462134]
@@ -301,7 +301,7 @@ unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 0.85, 0.3, 1)
 theme_override_font_sizes/font_size = 14
-text = "🔩 0 Tuercas"
+text = "0 Tuercas"
 vertical_alignment = 1
 
 [node name="RightSidebarADA" type="VBoxContainer" parent="HUD" unique_id=746682798]
@@ -503,10 +503,10 @@ text = "VUELTA A BASE"
 
 [node name="BtnLimpiar" type="Button" parent="HUD/ConsolaAstronauta/VBox/HBoxConsolaBottom" unique_id=530467116]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(32, 36)
+custom_minimum_size = Vector2(65, 36)
 layout_mode = 2
 theme_type_variation = &"SecondaryButton"
-text = "🗑"
+text = "LIMPIAR"
 
 [node name="BtnDuplicar" type="Button" parent="HUD/ConsolaAstronauta/VBox/HBoxConsolaBottom" unique_id=242185581]
 unique_name_in_owner = true
@@ -699,7 +699,7 @@ unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 0.85, 0.3, 1)
 theme_override_font_sizes/font_size = 14
-text = "🔩 Saldo: 0 Tuercas"
+text = "Saldo: 0 Tuercas"
 
 [node name="HSeparator" type="HSeparator" parent="HUD/ModalTienda/VBox" unique_id=1822589876]
 layout_mode = 2
@@ -804,7 +804,7 @@ unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 0.85, 0.2, 1)
 theme_override_font_sizes/font_size = 22
-text = "★★★ HITO SUPERADO ★★★"
+text = "HITO SUPERADO"
 horizontal_alignment = 1
 
 [node name="LabelDetalle" type="Label" parent="HUD/ModalVictoria/VBox" unique_id=758268375]

@@ -302,7 +302,7 @@ func _aplicar_hito_actual() -> void:
 		label_progreso.text = "FASE %d/%d // Progresión (%d%%)" % [indice_hito_actual, total_hitos, pct]
 	if is_instance_valid(label_estado_fase):
 		var compl = (indice_hito_actual in hitos_completados)
-		label_estado_fase.text = "COMPLETADO ✔" if compl else "EN CURSO"
+		label_estado_fase.text = "COMPLETADO" if compl else "EN CURSO"
 		label_estado_fase.modulate = Color(0.4, 0.95, 0.6) if compl else Color(0.35, 0.95, 0.55)
 
 	if is_instance_valid(btn_nivel_prev):
@@ -473,7 +473,7 @@ func _conectar_senales() -> void:
 	if mundo_3d:
 		if mundo_3d.has_signal("tuerca_depositada"):
 			mundo_3d.tuerca_depositada.connect(func(_tot):
-				ganar_creditos(10, "🔩 ¡Tuerca depositada en contenedor!")
+				ganar_creditos(10, "¡Tuerca depositada en contenedor!")
 			)
 
 		if mundo_3d.mesa_spid:
@@ -515,7 +515,7 @@ func _actualizar_badge_spido() -> void:
 	var montadas = 0
 	if mundo_3d and mundo_3d.mesa_spid:
 		montadas = mundo_3d.mesa_spid.etapas_completadas.size()
-	label_spido_piezas.text = "🔋 %d/5" % montadas
+	label_spido_piezas.text = "%d/5" % montadas
 
 func _plegar_paleta(plegar: bool) -> void:
 	if is_instance_valid(drawer_paleta):
@@ -852,7 +852,7 @@ func _celebrar_hito(hito: Dictionary) -> void:
 	ganar_creditos(hito.get("recompensa_creditos", 20), "¡Hito superado: %s!" % hito.titulo)
 
 	if is_instance_valid(label_estado_fase):
-		label_estado_fase.text = "COMPLETADO ✔"
+		label_estado_fase.text = "COMPLETADO"
 		label_estado_fase.modulate = Color(0.4, 0.95, 0.6)
 
 	if is_instance_valid(label_victoria_detalle):
@@ -864,7 +864,7 @@ func _on_modal_siguiente_pressed() -> void:
 	if indice_hito_actual < hitos.size() - 1:
 		cambiar_hito(indice_hito_actual + 1)
 	else:
-		_actualizar_estado("🎉 ¡Todas las fases del hangar completadas! Spido está ensamblado y calibrado.")
+		_actualizar_estado("¡Todas las fases del hangar completadas! Spido está ensamblado y calibrado.")
 
 func _on_modal_reintentar_pressed() -> void:
 	panel_victoria.visible = false
@@ -899,9 +899,9 @@ func ganar_creditos(cantidad: int, motivo: String = "") -> void:
 
 func actualizar_creditos_ui() -> void:
 	if is_instance_valid(label_creditos):
-		label_creditos.text = "🔩 %d Tuercas" % creditos
+		label_creditos.text = "%d Tuercas" % creditos
 	if is_instance_valid(label_saldo_tienda):
-		label_saldo_tienda.text = "🔩 Saldo: %d Tuercas" % creditos
+		label_saldo_tienda.text = "Saldo: %d Tuercas" % creditos
 
 func _abrir_tienda(abrir: bool) -> void:
 	if is_instance_valid(modal_tienda):
@@ -945,16 +945,16 @@ func _renderizar_centro_mejoras() -> void:
 		match item.cat:
 			"bloque":
 				color_cat = Color(0.95, 0.75, 0.20)
-				texto_cat = "⚡ BLOQUE DE CÓDIGO"
+				texto_cat = "BLOQUE DE CÓDIGO"
 			"espacio":
 				color_cat = Color(0.25, 0.85, 0.95)
-				texto_cat = "📐 TERRENO MODULAR"
+				texto_cat = "TERRENO MODULAR"
 			"estacion":
 				color_cat = Color(0.95, 0.55, 0.20)
-				texto_cat = "🛠️ ESTACIÓN DE MONTAJE"
+				texto_cat = "ESTACIÓN DE MONTAJE"
 			"astronauta":
 				color_cat = Color(0.35, 0.95, 0.65)
-				texto_cat = "👨‍🚀 ASTRONAUTA CONCURRENTE"
+				texto_cat = "ASTRONAUTA CONCURRENTE"
 
 		if ya_desbloqueado:
 			st.border_color = Color(0.35, 0.85, 0.55, 0.9)
@@ -994,11 +994,11 @@ func _renderizar_centro_mejoras() -> void:
 		btn_accion.theme_type_variation = &"SecondaryButton" if not ya_desbloqueado else &""
 
 		if ya_desbloqueado:
-			btn_accion.text = "DESBLOQUEADO ✔"
+			btn_accion.text = "DESBLOQUEADO"
 			btn_accion.disabled = true
 			btn_accion.modulate = Color(0.5, 0.85, 0.5)
 		elif creditos >= item.costo:
-			btn_accion.text = "ADQUIRIR (🔩 %d Tuercas)" % item.costo
+			btn_accion.text = "ADQUIRIR (%d Tuercas)" % item.costo
 			btn_accion.modulate = color_cat
 			btn_accion.pressed.connect(func(): _comprar_mejora_arbol(item))
 		else:
@@ -1021,12 +1021,12 @@ func _comprar_mejora_arbol(item: Dictionary) -> void:
 			if not cmd.is_empty() and not bloques_adquiridos.has(cmd):
 				bloques_adquiridos.append(cmd)
 			_actualizar_paleta(_obtener_bloques_disponibles_actuales())
-			_actualizar_estado("⭐ ¡Bloque '%s' adquirido! Ya está disponible en tu paleta." % item.fase)
+			_actualizar_estado("¡Bloque '%s' adquirido! Ya está disponible en tu paleta." % item.fase)
 		"espacio":
 			var nuevo_tam = item.get("tamano", 5)
 			if mundo_3d:
 				mundo_3d.actualizar_sector(nuevo_tam)
-			_actualizar_estado("🚀 ¡Terreno expandido a %dx%d casillas!" % [nuevo_tam, nuevo_tam])
+			_actualizar_estado("¡Terreno expandido a %dx%d casillas!" % [nuevo_tam, nuevo_tam])
 		"estacion":
 			if not item.id in estaciones_desbloqueadas:
 				estaciones_desbloqueadas.append(item.id)
@@ -1034,15 +1034,15 @@ func _comprar_mejora_arbol(item: Dictionary) -> void:
 				"MESA_SPIDO":
 					if mundo_3d and mundo_3d.mesa_spid:
 						mundo_3d.mesa_spid.visible = true
-					_actualizar_estado("🛠️ ¡Mesa Central de Spido instalada en el hangar (0, -2)!")
+					_actualizar_estado("¡Mesa Central de Spido instalada en el hangar (0, -2)!")
 				"MESON_PATAS":
 					if mundo_3d and mundo_3d.meson_patas:
 						mundo_3d.meson_patas.visible = true
-					_actualizar_estado("🛠️ ¡Mesón de Patas & Tracción instalado en (-2, 0)!")
+					_actualizar_estado("¡Mesón de Patas & Tracción instalado en (-2, 0)!")
 				"MESON_SENSORES":
 					if mundo_3d and mundo_3d.meson_sensores:
 						mundo_3d.meson_sensores.visible = true
-					_actualizar_estado("🛠️ ¡Mesón de Sensores Ópticos instalado en (2, 0)!")
+					_actualizar_estado("¡Mesón de Sensores Ópticos instalado en (2, 0)!")
 		"astronauta":
 			var a_id = item.get("astro_id", 2)
 			if a_id == 4:
@@ -1057,7 +1057,7 @@ func _comprar_mejora_arbol(item: Dictionary) -> void:
 					if mundo_3d.astronauta_5:
 						mundo_3d.astronauta_5.visible = true
 						mundo_3d.astronauta_5.configurar_inicio(Vector2i(-2, 0), 0)
-				_actualizar_estado("👨‍🚀 ¡Astros 4 y 5 activados para automatización a escala total!")
+				_actualizar_estado("¡Astros 4 y 5 activados para automatización a escala total!")
 			else:
 				if not astronautas_desbloqueados.has(a_id):
 					astronautas_desbloqueados.append(a_id)
@@ -1068,7 +1068,7 @@ func _comprar_mejora_arbol(item: Dictionary) -> void:
 						a_node.visible = true
 						var pos_i = Vector2i(1, 0) if a_id == 2 else Vector2i(-1, 0)
 						a_node.configurar_inicio(pos_i, 0)
-				_actualizar_estado("👨‍🚀 ¡Astro %d activado y listo para programar!" % a_id)
+				_actualizar_estado("¡Astro %d activado y listo para programar!" % a_id)
 
 	_verificar_hitos_sandbox()
 	_renderizar_centro_mejoras()
