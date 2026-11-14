@@ -93,45 +93,113 @@ var astronautas_desbloqueados: Array[int] = [1]
 var estaciones_desbloqueadas: Array[String] = []
 
 const ARBOL_MEJORAS = [
+	# 1. BLOQUES DE ALGORITMIA
 	{
-		"fase": "FASE 0 / TALLER 3x3",
-		"desc": "Sector inicial de 3x3 con barrera láser. Automatización básica de tuercas.",
-		"costo": 0,
-		"cat": "fase",
-		"id": "FASE_0",
-		"tamano": 3
+		"fase": "BLOQUE [LOOP] BUCLE",
+		"desc": "Repite tu algoritmo de forma autónoma e infinita. ¡El corazón de la automatización!",
+		"costo": 20,
+		"cat": "bloque",
+		"id": "BLOQUE_BUCLE",
+		"desbloquea_comando": "BUCLE"
 	},
 	{
-		"fase": "FASE 1 / EXPANSIÓN 5x5",
-		"desc": "Expande el taller a 5x5 y activa la Mesa de Spido para iniciar el ensamblaje.",
-		"costo": 30,
-		"cat": "fase",
-		"id": "FASE_1",
+		"fase": "BLOQUE [180°] GIRO TOTAL",
+		"desc": "Da media vuelta en un solo paso algorítmico, ahorrando bloques en tu circuito de transporte.",
+		"costo": 35,
+		"cat": "bloque",
+		"id": "BLOQUE_GIRO_180",
+		"desbloquea_comando": "GIRO_180"
+	},
+	{
+		"fase": "BLOQUE [3x AVZ] TURBO",
+		"desc": "Avanza 3 casillas de golpe a alta velocidad. Optimiza algoritmos en hangares amplios.",
+		"costo": 45,
+		"cat": "bloque",
+		"id": "BLOQUE_AVZ_3",
+		"desbloquea_comando": "AVANZAR_3"
+	},
+
+	# 2. ESPACIO Y TERRENO MODULAR
+	{
+		"fase": "TERRENO BASE 5x5",
+		"desc": "Plataforma inicial de 5x5 casillas con centro exacto en (0, 0).",
+		"costo": 0,
+		"cat": "espacio",
+		"id": "ESPACIO_5X5",
 		"tamano": 5
 	},
 	{
-		"fase": "FASE 2 / 2º ASTRO & MESÓN PATAS",
-		"desc": "Expande a 7x7, desbloquea al Astronauta 2 (Tracción) y el Mesón de Patas.",
-		"costo": 80,
-		"cat": "fase",
-		"id": "FASE_2",
+		"fase": "EXPANSIÓN TERRENO 7x7",
+		"desc": "Agranda físicamente la plataforma a 7x7 casillas (49 casillas) con nuevos rieles exteriores.",
+		"costo": 50,
+		"cat": "espacio",
+		"id": "ESPACIO_7X7",
 		"tamano": 7
 	},
 	{
-		"fase": "FASE 3 / 3º ASTRO & SENSORES",
-		"desc": "Expande a 9x9, activa al Astronauta 3 (Sensores) y el Mesón de Sensores.",
-		"costo": 150,
-		"cat": "fase",
-		"id": "FASE_3",
+		"fase": "EXPANSIÓN TERRENO 9x9",
+		"desc": "Expande el taller a 9x9 casillas (81 casillas) para albergar líneas de producción simultáneas.",
+		"costo": 100,
+		"cat": "espacio",
+		"id": "ESPACIO_9X9",
 		"tamano": 9
 	},
 	{
-		"fase": "FASE 4 / PROTOCOLO TOTAL 13x13",
-		"desc": "Desactiva las barreras láser y despliega el hangar simétrico completo de 13x13 con 5 astronautas.",
-		"costo": 250,
-		"cat": "fase",
-		"id": "FASE_4",
+		"fase": "HANGAR COMPLETO 13x13",
+		"desc": "Abre el hangar simétrico completo de 13x13 casillas (169 casillas) a máxima capacidad.",
+		"costo": 200,
+		"cat": "espacio",
+		"id": "ESPACIO_13X13",
 		"tamano": 13
+	},
+
+	# 3. MESAS Y ESTACIONES DE MONTAJE
+	{
+		"fase": "MESA CENTRAL SPIDO",
+		"desc": "Instala la mesa en (0, -2) donde se fija el chasis y se ensambla la estructura de Spido.",
+		"costo": 30,
+		"cat": "estacion",
+		"id": "MESA_SPIDO"
+	},
+	{
+		"fase": "MESÓN DE PATAS",
+		"desc": "Instala el mesón en (-2, 0) que forja sistemas de tracción y extremidades mecánicas.",
+		"costo": 60,
+		"cat": "estacion",
+		"id": "MESON_PATAS"
+	},
+	{
+		"fase": "MESÓN DE SENSORES",
+		"desc": "Instala el mesón en (2, 0) para ensamblar los circuitos de visión y sensores ópticos.",
+		"costo": 120,
+		"cat": "estacion",
+		"id": "MESON_SENSORES"
+	},
+
+	# 4. ASTRONAUTAS Y LÓGICA CONCURRENTE
+	{
+		"fase": "ASTRO 2: TRACCIÓN",
+		"desc": "Despierta al 2º astronauta con su propia pestaña de código para trabajo en paralelo.",
+		"costo": 70,
+		"cat": "astronauta",
+		"id": "ASTRO_2",
+		"astro_id": 2
+	},
+	{
+		"fase": "ASTRO 3: SENSORES",
+		"desc": "Despierta al 3º astronauta para alimentar la estación óptica y acelerar el montaje.",
+		"costo": 130,
+		"cat": "astronauta",
+		"id": "ASTRO_3",
+		"astro_id": 3
+	},
+	{
+		"fase": "ASTROS 4 & 5: ESCUADRÓN",
+		"desc": "Despierta a Astro 4 (Brazos) y Astro 5 (Energía) para automatización total.",
+		"costo": 220,
+		"cat": "astronauta",
+		"id": "ASTRO_4_5",
+		"astro_id": 4
 	}
 ]
 
@@ -164,8 +232,10 @@ const COMANDOS_DISPONIBLES = {
 	"RETROCEDER": {"tit": "Retroceder 1 Paso", "prefijo": "[RET]", "color": Color(0.34902, 0.388235, 0.447059, 1.0)},
 	"GIRAR_DER": {"tit": "Girar Derecha 90°", "prefijo": "[DER]", "color": Color(0.631373, 0.85098, 0.65098, 1.0)},
 	"GIRAR_IZQ": {"tit": "Girar Izquierda 90°", "prefijo": "[IZQ]", "color": Color(0.631373, 0.85098, 0.65098, 1.0)},
+	"GIRO_180": {"tit": "Girar 180°", "prefijo": "[180°]", "color": Color(0.85, 0.65, 0.35, 1.0)},
+	"BUCLE": {"tit": "Bucle Continuo", "prefijo": "[LOOP]", "color": Color(0.95, 0.75, 0.18, 1.0)},
 	"TOMAR_PIEZA": {"tit": "Tomar Pieza", "prefijo": "[TOM]", "color": Color(0.545098, 0.796078, 0.568627, 1.0)},
-	"ENSAMBLAR": {"tit": "Ensamblar en Spid", "prefijo": "[ENS]", "color": Color(0.435294, 0.686275, 0.470588, 1.0)},
+	"ENSAMBLAR": {"tit": "Ensamblar / Depositar", "prefijo": "[ENS]", "color": Color(0.435294, 0.686275, 0.470588, 1.0)},
 	"DIAGNOSTICO": {"tit": "Diagnóstico Spido", "prefijo": "[TEST]", "color": Color(0.2, 0.85, 1.0, 1.0)}
 }
 
@@ -193,7 +263,8 @@ func _ready() -> void:
 	_plegar_paleta(false)
 	_plegar_consola(false)
 
-	btn_duplicar.text = "Bucle: OFF"
+	if is_instance_valid(btn_duplicar):
+		btn_duplicar.visible = false
 	actualizar_creditos_ui()
 	_actualizar_badge_spido()
 	_aplicar_hito_actual()
@@ -477,6 +548,13 @@ func _on_volver_menu_pressed() -> void:
 	get_tree().paused = false
 	get_tree().change_scene_to_file(ESCENA_MENU_PRINCIPAL)
 
+func _tiene_bloque_bucle_activo(secuencias: Array) -> bool:
+	for sec in secuencias:
+		for b in sec:
+			if is_instance_valid(b) and b is BloqueItem and b.id_comando == "BUCLE":
+				return true
+	return false
+
 func _on_ejecutar_pressed() -> void:
 	if en_ejecucion:
 		detener_solicitado = true
@@ -526,7 +604,17 @@ func _on_ejecutar_pressed() -> void:
 		if not exito_ciclo:
 			break
 
-		if not modo_bucle or detener_solicitado:
+		# Actualizar lectura de secuencias para verificar si el usuario incluyó el bloque [LOOP] Bucle Continuo
+		secuencias = [
+			lienzo.obtener_secuencia_comandos(),
+			lienzo_a2.obtener_secuencia_comandos(),
+			lienzo_a3.obtener_secuencia_comandos(),
+			lienzo_a4.obtener_secuencia_comandos(),
+			lienzo_a5.obtener_secuencia_comandos()
+		]
+
+		var tiene_bucle = _tiene_bloque_bucle_activo(secuencias)
+		if not tiene_bucle or detener_solicitado:
 			break
 
 		ciclo += 1
@@ -592,15 +680,7 @@ func _ejecutar_un_ciclo(astronautas: Array) -> bool:
 	return true
 
 func _on_duplicar_pressed() -> void:
-	modo_bucle = not modo_bucle
-	if modo_bucle:
-		btn_duplicar.text = "Bucle: ON"
-		btn_duplicar.modulate = Color(0.35, 0.95, 0.65)
-		_actualizar_estado("Modo bucle continuo activado. Los algoritmos se repetirán sin fin.")
-	else:
-		btn_duplicar.text = "Bucle: OFF"
-		btn_duplicar.modulate = Color.WHITE
-		_actualizar_estado("Modo de ejecución simple (un solo ciclo).")
+	pass
 
 func _on_velocidad_pressed() -> void:
 	match factor_velocidad:
@@ -727,6 +807,16 @@ func _verificar_hitos_sandbox() -> void:
 		"DEPOSITAR_TUERCA":
 			if mundo_3d and mundo_3d.tuercas_recolectadas_sesion >= 1:
 				completado = true
+		"ACTIVAR_BUCLE":
+			var secuencias_actuales = [
+				lienzo.obtener_secuencia_comandos(),
+				lienzo_a2.obtener_secuencia_comandos(),
+				lienzo_a3.obtener_secuencia_comandos(),
+				lienzo_a4.obtener_secuencia_comandos(),
+				lienzo_a5.obtener_secuencia_comandos()
+			]
+			if bloques_adquiridos.has("BUCLE") and (_tiene_bloque_bucle_activo(secuencias_actuales) or en_ejecucion):
+				completado = true
 		"COMPRAR_EXPANSION_5X5":
 			if mundo_3d and mundo_3d.tamano_sector_actual >= 5:
 				completado = true
@@ -827,28 +917,51 @@ func _renderizar_centro_mejoras() -> void:
 		st.border_width_bottom = 2
 
 		var ya_desbloqueado = false
-		match item.id:
-			"FASE_0":
-				ya_desbloqueado = true
-			"FASE_1":
-				ya_desbloqueado = (mundo_3d and mundo_3d.tamano_sector_actual >= 5)
-			"FASE_2":
-				ya_desbloqueado = (mundo_3d and mundo_3d.tamano_sector_actual >= 7)
-			"FASE_3":
-				ya_desbloqueado = (mundo_3d and mundo_3d.tamano_sector_actual >= 9)
-			"FASE_4":
-				ya_desbloqueado = (mundo_3d and mundo_3d.tamano_sector_actual >= 13)
+		match item.cat:
+			"bloque":
+				ya_desbloqueado = bloques_adquiridos.has(item.get("desbloquea_comando", ""))
+			"espacio":
+				ya_desbloqueado = (item.tamano == 5) or (mundo_3d and mundo_3d.tamano_sector_actual >= item.tamano)
+			"estacion":
+				ya_desbloqueado = estaciones_desbloqueadas.has(item.id)
+			"astronauta":
+				var a_id = item.get("astro_id", 2)
+				ya_desbloqueado = astronautas_desbloqueados.has(a_id)
+
+		var color_cat = Color(0.35, 0.95, 0.65)
+		var texto_cat = "[ MEJORA ]"
+		match item.cat:
+			"bloque":
+				color_cat = Color(0.95, 0.75, 0.20)
+				texto_cat = "⚡ BLOQUE DE CÓDIGO"
+			"espacio":
+				color_cat = Color(0.25, 0.85, 0.95)
+				texto_cat = "📐 TERRENO MODULAR"
+			"estacion":
+				color_cat = Color(0.95, 0.55, 0.20)
+				texto_cat = "🛠️ ESTACIÓN DE MONTAJE"
+			"astronauta":
+				color_cat = Color(0.35, 0.95, 0.65)
+				texto_cat = "👨‍🚀 ASTRONAUTA CONCURRENTE"
 
 		if ya_desbloqueado:
 			st.border_color = Color(0.35, 0.85, 0.55, 0.9)
+		elif creditos >= item.costo:
+			st.border_color = color_cat
 		else:
 			st.border_color = Color(0.25, 0.32, 0.42, 0.8)
 
 		panel.add_theme_stylebox_override("panel", st)
-		panel.custom_minimum_size = Vector2(270, 140)
+		panel.custom_minimum_size = Vector2(270, 150)
 
 		var vbox = VBoxContainer.new()
-		vbox.add_theme_constant_override("separation", 6)
+		vbox.add_theme_constant_override("separation", 5)
+
+		var lbl_cat = Label.new()
+		lbl_cat.text = texto_cat
+		lbl_cat.add_theme_color_override("font_color", color_cat)
+		lbl_cat.add_theme_font_size_override("font_size", 10)
+		vbox.add_child(lbl_cat)
 
 		var lbl_tit = Label.new()
 		lbl_tit.text = item.fase
@@ -859,7 +972,7 @@ func _renderizar_centro_mejoras() -> void:
 		var lbl_desc = Label.new()
 		lbl_desc.text = item.desc
 		lbl_desc.add_theme_color_override("font_color", Color(0.72, 0.78, 0.82))
-		lbl_desc.add_theme_font_size_override("font_size", 12)
+		lbl_desc.add_theme_font_size_override("font_size", 11)
 		lbl_desc.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		lbl_desc.size_flags_vertical = Control.SIZE_EXPAND_FILL
 		vbox.add_child(lbl_desc)
@@ -874,7 +987,7 @@ func _renderizar_centro_mejoras() -> void:
 			btn_accion.modulate = Color(0.5, 0.85, 0.5)
 		elif creditos >= item.costo:
 			btn_accion.text = "ADQUIRIR (🔩 %d Tuercas)" % item.costo
-			btn_accion.modulate = Color(0.35, 0.95, 0.65)
+			btn_accion.modulate = color_cat
 			btn_accion.pressed.connect(func(): _comprar_mejora_arbol(item))
 		else:
 			btn_accion.text = "REQUIERE: %d Tuercas" % item.costo
@@ -890,54 +1003,63 @@ func _comprar_mejora_arbol(item: Dictionary) -> void:
 	creditos -= item.costo
 	actualizar_creditos_ui()
 
-	var nuevo_tam = item.get("tamano", 3)
-	if mundo_3d:
-		mundo_3d.actualizar_sector(nuevo_tam)
-
-	match item.id:
-		"FASE_1":
-			if mundo_3d and mundo_3d.mesa_spid:
-				mundo_3d.mesa_spid.visible = true
-			_actualizar_estado("🚀 ¡Hangar expandido a 5x5! Mesa de Spido habilitada.")
-		"FASE_2":
-			if not 2 in astronautas_desbloqueados:
-				astronautas_desbloqueados.append(2)
-			if not "MESON_PATAS" in estaciones_desbloqueadas:
-				estaciones_desbloqueadas.append("MESON_PATAS")
-			tabs_codigo.set_tab_hidden(1, false)
+	match item.cat:
+		"bloque":
+			var cmd = item.get("desbloquea_comando", "")
+			if not cmd.is_empty() and not bloques_adquiridos.has(cmd):
+				bloques_adquiridos.append(cmd)
+			_actualizar_paleta(_obtener_bloques_disponibles_actuales())
+			_actualizar_estado("⭐ ¡Bloque '%s' adquirido! Ya está disponible en tu paleta." % item.fase)
+		"espacio":
+			var nuevo_tam = item.get("tamano", 5)
 			if mundo_3d:
-				if mundo_3d.astronauta_2:
-					mundo_3d.astronauta_2.visible = true
-					mundo_3d.astronauta_2.configurar_inicio(Vector2i(1, 0), 0)
-				if mundo_3d.meson_patas:
-					mundo_3d.meson_patas.visible = true
-			_actualizar_estado("🚀 ¡Sector 7x7! Astronauta 2 y Mesón de Patas activados.")
-		"FASE_3":
-			if not 3 in astronautas_desbloqueados:
-				astronautas_desbloqueados.append(3)
-			if not "MESON_SENSORES" in estaciones_desbloqueadas:
-				estaciones_desbloqueadas.append("MESON_SENSORES")
-			tabs_codigo.set_tab_hidden(2, false)
-			if mundo_3d:
-				if mundo_3d.astronauta_3:
-					mundo_3d.astronauta_3.visible = true
-					mundo_3d.astronauta_3.configurar_inicio(Vector2i(-1, 0), 0)
-				if mundo_3d.meson_sensores:
-					mundo_3d.meson_sensores.visible = true
-			_actualizar_estado("🚀 ¡Sector 9x9! Astronauta 3 y Mesón de Sensores activados.")
-		"FASE_4":
-			for a_id in [4, 5]:
+				mundo_3d.actualizar_sector(nuevo_tam)
+			_actualizar_estado("🚀 ¡Terreno expandido a %dx%d casillas!" % [nuevo_tam, nuevo_tam])
+		"estacion":
+			if not item.id in estaciones_desbloqueadas:
+				estaciones_desbloqueadas.append(item.id)
+			match item.id:
+				"MESA_SPIDO":
+					if mundo_3d and mundo_3d.mesa_spid:
+						mundo_3d.mesa_spid.visible = true
+					_actualizar_estado("🛠️ ¡Mesa Central de Spido instalada en el hangar (0, -2)!")
+				"MESON_PATAS":
+					if mundo_3d and mundo_3d.meson_patas:
+						mundo_3d.meson_patas.visible = true
+					_actualizar_estado("🛠️ ¡Mesón de Patas & Tracción instalado en (-2, 0)!")
+				"MESON_SENSORES":
+					if mundo_3d and mundo_3d.meson_sensores:
+						mundo_3d.meson_sensores.visible = true
+					_actualizar_estado("🛠️ ¡Mesón de Sensores Ópticos instalado en (2, 0)!")
+		"astronauta":
+			var a_id = item.get("astro_id", 2)
+			if a_id == 4:
+				for sub_id in [4, 5]:
+					if not astronautas_desbloqueados.has(sub_id):
+						astronautas_desbloqueados.append(sub_id)
+					tabs_codigo.set_tab_hidden(sub_id - 1, false)
+				if mundo_3d:
+					if mundo_3d.astronauta_4:
+						mundo_3d.astronauta_4.visible = true
+						mundo_3d.astronauta_4.configurar_inicio(Vector2i(2, 0), 0)
+					if mundo_3d.astronauta_5:
+						mundo_3d.astronauta_5.visible = true
+						mundo_3d.astronauta_5.configurar_inicio(Vector2i(-2, 0), 0)
+				_actualizar_estado("👨‍🚀 ¡Astros 4 y 5 activados para automatización a escala total!")
+			else:
 				if not astronautas_desbloqueados.has(a_id):
 					astronautas_desbloqueados.append(a_id)
 				tabs_codigo.set_tab_hidden(a_id - 1, false)
-			if mundo_3d:
-				if mundo_3d.astronauta_4:
-					mundo_3d.astronauta_4.visible = true
-					mundo_3d.astronauta_4.configurar_inicio(Vector2i(2, 0), 0)
-				if mundo_3d.astronauta_5:
-					mundo_3d.astronauta_5.visible = true
-					mundo_3d.astronauta_5.configurar_inicio(Vector2i(-2, 0), 0)
-			_actualizar_estado("🌟 ¡Protocolo Maestro! Hangar 13x13 simétrico abierto al completo.")
+				if mundo_3d:
+					var a_node = mundo_3d.astronauta_2 if a_id == 2 else mundo_3d.astronauta_3
+					if a_node:
+						a_node.visible = true
+						var pos_i = Vector2i(1, 0) if a_id == 2 else Vector2i(-1, 0)
+						a_node.configurar_inicio(pos_i, 0)
+				_actualizar_estado("👨‍🚀 ¡Astro %d activado y listo para programar!" % a_id)
+
+	_verificar_hitos_sandbox()
+	_renderizar_centro_mejoras()
 
 	_verificar_hitos_sandbox()
 	_renderizar_centro_mejoras()

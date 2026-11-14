@@ -128,6 +128,17 @@ func ejecutar_accion(accion: String, parametro: int = 1) -> bool:
 			return await girar(false)
 		"GIRAR_IZQ":
 			return await girar(true)
+		"GIRO_180":
+			return await girar_180()
+		"BUCLE":
+			# Efecto visual de ciclo infinito en el visor
+			_set_color_visor(Color(0.95, 0.75, 0.18))
+			var tw = create_tween()
+			tw.tween_property(self, "scale", Vector3(1.1, 0.9, 1.1), 0.1)
+			tw.tween_property(self, "scale", Vector3.ONE, 0.1)
+			await tw.finished
+			_set_color_visor(color_identidad)
+			return true
 		"TOMAR_PIEZA":
 			return await tomar_pieza_cercana()
 		"ENSAMBLAR":
@@ -151,7 +162,7 @@ func avanzar(tiempo_custom: float = -1.0) -> bool:
 			if mundo.has_method("es_celda_solida") and mundo.es_celda_solida(Vector2i(nueva_x, nueva_z)):
 				accion_fallida.emit("Hay un obstáculo o estación enfrente.")
 			else:
-				accion_fallida.emit("Límite del sector alcanzado. ¡Expande la nave en MEJORAS!")
+				accion_fallida.emit("¡Borde de la plataforma alcanzado! Expande el terreno en MEJORAS.")
 			return false
 	elif nueva_x < -6 or nueva_x > 6 or nueva_z < -6 or nueva_z > 6:
 		await _animar_choque()
@@ -217,6 +228,15 @@ func girar(hacia_izquierda: bool) -> bool:
 	animacion_terminada.emit()
 	return true
 
+func girar_180() -> bool:
+	orientacion_actual = (orientacion_actual + 2) % 4
+	var angulo_meta = -deg_to_rad(orientacion_actual * 90.0)
+	var tween = create_tween()
+	tween.tween_property(self, "rotation:y", angulo_meta, tiempo_giro * 1.3).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	await tween.finished
+	animacion_terminada.emit()
+	return true
+
 func tomar_pieza_cercana() -> bool:
 	if is_instance_valid(pieza_en_mano):
 		accion_fallida.emit("El astronauta ya lleva una pieza en sus manos.")
@@ -228,14 +248,22 @@ func tomar_pieza_cercana() -> bool:
 
 	var mundo = get_parent()
 	var pieza = null
+	var celda_origen = celda_objetivo
 	if mundo and mundo.has_method("obtener_pieza_en"):
 		pieza = mundo.obtener_pieza_en(celda_objetivo)
+		if not pieza:
+			pieza = mundo.obtener_pieza_en(Vector2i(grid_x, grid_z))
+			if pieza:
+				celda_origen = Vector2i(grid_x, grid_z)
 
 	if not pieza and mundo and mundo.has_method("obtener_producto_de_meson"):
 		pieza = mundo.obtener_producto_de_meson(celda_objetivo)
 
 	if pieza:
 		pieza_en_mano = pieza
+		if mundo and mundo.has_method("notificar_pieza_tomada"):
+			mundo.notificar_pieza_tomada(celda_origen)
+
 		var tween = create_tween()
 		tween.tween_property(pieza, "global_position", slot_manos.global_position, 0.25).set_trans(Tween.TRANS_CUBIC)
 		await tween.finished
